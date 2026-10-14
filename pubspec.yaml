@@ -1,5 +1,5 @@
 name: reborn_app
-description: "A new Flutter project."
+description: "Re:Born - 감정 기록 기반 인간관계 회고 앱"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev

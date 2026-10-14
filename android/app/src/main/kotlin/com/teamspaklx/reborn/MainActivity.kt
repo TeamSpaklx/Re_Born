@@ -1,4 +1,4 @@
-package com.example.reborn_app
+package com.teamspaklx.reborn
 
 import io.flutter.embedding.android.FlutterActivity
 
