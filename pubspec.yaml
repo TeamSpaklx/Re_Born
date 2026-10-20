@@ -35,6 +35,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   supabase_flutter: 2.17.2
+  flutter_svg: ^2.3.0
 
 dev_dependencies:
   flutter_test:
@@ -58,6 +59,27 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # 이미지·아이콘 (docs/DESIGN_SYSTEM.md의 에셋 목록 참고)
+  # 앱 아이콘 원본(assets/icons/reborn_app_icon_1024.png)은 번들에 넣지 않도록 ui 폴더만 선언한다.
+  assets:
+    - assets/icons/ui/
+    - assets/images/
+
+  # 디자인 기준 폰트: Pretendard (SIL OFL 1.1, assets/fonts/OFL-LICENSE.txt)
+  fonts:
+    - family: Pretendard
+      fonts:
+        - asset: assets/fonts/Pretendard-Regular.otf
+          weight: 400
+        - asset: assets/fonts/Pretendard-Medium.otf
+          weight: 500
+        - asset: assets/fonts/Pretendard-SemiBold.otf
+          weight: 600
+        - asset: assets/fonts/Pretendard-Bold.otf
+          weight: 700
+        - asset: assets/fonts/Pretendard-ExtraBold.otf
+          weight: 800
 
   # To add assets to your application, add an assets section, like this:
   # assets:

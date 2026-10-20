@@ -8,7 +8,10 @@
 | 영역 | 사용 기술 | 비고 |
 |---|---|---|
 | 앱 | Flutter (stable 3.47.4), Dart `^3.12.0` | CI와 같은 버전 사용 |
-| 대상 OS | Android 우선 | iOS는 MVP 이후 검토 (SPEC 9.1) |
+| 대상 OS | **iOS와 Android 둘 다** | 둘 다 잘 동작해야 합니다 (SPEC 9.1의 "Android 우선"보다 이 항목이 우선). 플랫폼 설정(Info.plist, AndroidManifest)은 항상 양쪽 다 처리 |
+| 폰트 | Pretendard (400·500·600·700·800) | `assets/fonts/`, 라이선스 SIL OFL 1.1 (`OFL-LICENSE.txt`) |
+| 아이콘 | `flutter_svg` ^2.3.0 + Figma에서 내려받은 SVG | `assets/icons/ui/`, 경로는 `lib/app/theme/app_assets.dart` |
+| 디자인 기준 | Figma 홈 화면 (100% 일치 목표) | [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md), 값은 `lib/app/theme/` 상수만 사용 |
 | 인증 | Supabase Auth, 이메일 + 비밀번호 | 구글 로그인은 미정 (SPEC 11장 7번) |
 | DB | Supabase PostgreSQL | 사용자별 접근은 RLS로 제한 |
 | 클라이언트 SDK | `supabase_flutter` 2.17.2 | 초기화: `lib/main.dart`, 설정: `lib/core/config/supabase_config.dart` |
@@ -29,14 +32,26 @@
 ```
 lib/
   main.dart          앱 진입점, Supabase 초기화
-  app/               앱 전체 설정 (라우팅, 테마)
+  app/               앱 전체 설정 (라우팅)
+    theme/           색·글자·모서리·간격·탭 바 치수·에셋 경로 상수, ThemeData
   core/              공통 기반 (config, 상수, 유틸)
-  features/<기능>/   기능별 화면·로직 (예: auth, people, entries, todos, insights, history)
+  features/<기능>/   기능별 {models, data, presentation} (예: home, relations, record, all)
   shared/            여러 기능이 같이 쓰는 위젯·모델
+assets/
+  fonts/             Pretendard
+  icons/ui/          Figma에서 내려받은 SVG 아이콘
+  images/            로고 등
 supabase/
   migrations/        DB 스키마·RLS 마이그레이션
-docs/                명세서와 프로젝트 문서
+docs/                명세서, 디자인 시스템, 프론트 문서 (design/ 은 Figma 스크린샷)
 ```
+
+## 화면 규칙
+
+- **하단 탭 4개:** 투데이(홈) / 관계 / 기록 / 전체. 디자인이 있는 화면은 홈뿐이고, 나머지 탭은 흰 배경의 빈 화면으로 둡니다.
+- **고정 규칙:** 글자 크기 배율 1.0(시스템 글자 크기 설정 무시), 라이트 모드만, 세로 방향만. **다크 모드는 나중에 추가할 예정**이라 색은 `AppColors` 팔레트로만 씁니다.
+- 로그인·회원가입은 디자인이 나올 때까지 제외하고 앱은 홈으로 바로 시작합니다.
+- 하단 탭 바는 플랫폼별로 다릅니다: iOS = Liquid Glass 스타일(Figma 기준), Android = 블러 배경.
 
 ## 보안 규칙
 
@@ -49,8 +64,8 @@ docs/                명세서와 프로젝트 문서
 
 | 항목 | 후보 | 비고 |
 |---|---|---|
-| 상태 관리 | Riverpod / Provider / Bloc / setState | 화면 개발 전에 결정 |
-| 라우팅 | go_router / Navigator 기본 | |
-| 그래프 (F-09) | fl_chart 등 | |
+| 상태 관리 | Riverpod / Provider / Bloc / setState | 앱 뼈대 작업 시작 때 결정 (추천: flutter_riverpod) |
+| 라우팅 | go_router / Navigator 기본 | 앱 뼈대 작업 시작 때 결정 (추천: go_router, 하단 탭은 StatefulShellRoute) |
+| 그래프 (F-09) | fl_chart 등 | 홈의 주간 막대 그래프는 Figma 그대로 직접 그리므로 라이브러리가 필요 없음 |
 | 푸시 알림 (F-10) | FCM / 로컬 알림 / 미도입 | MVP 이후 확장 기능 |
 | 오류 수집 (F-12) | 앱 내부 처리만 / 외부 도구 | MVP는 앱 내부 처리만 |

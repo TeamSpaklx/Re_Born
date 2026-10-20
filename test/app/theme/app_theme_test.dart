@@ -1,0 +1,266 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:reborn_app/app/theme/app_assets.dart';
+import 'package:reborn_app/app/theme/app_colors.dart';
+import 'package:reborn_app/app/theme/app_radii.dart';
+import 'package:reborn_app/app/theme/app_spacing.dart';
+import 'package:reborn_app/app/theme/app_text_styles.dart';
+import 'package:reborn_app/app/theme/app_theme.dart';
+import 'package:reborn_app/app/theme/bottom_nav_tokens.dart';
+
+/// docs/DESIGN_SYSTEM.md의 표와 코드 상수가 어긋나지 않는지 확인한다.
+/// 디자인 값을 바꾸면 문서와 이 테스트를 함께 고친다.
+void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  group('색상 (docs/DESIGN_SYSTEM.md 색상 표)', () {
+    const c = AppColors.light;
+
+    test('주요 색', () {
+      expect(c.brand, const Color(0xFFD94F79));
+      expect(c.cta, const Color(0xFFCF3F6B));
+      expect(c.cardPink, const Color(0xFFFEDAE5));
+      expect(c.cardBorder, const Color(0xFFEEE6E9));
+      expect(c.attendancePanel, const Color(0xFFCF9FAE));
+    });
+
+    test('반투명 색은 Figma rgba 값과 같다', () {
+      void expectRgba(Color color, int r, int g, int b, double a) {
+        expect((color.r * 255).round(), r, reason: 'red of $color');
+        expect((color.g * 255).round(), g, reason: 'green of $color');
+        expect((color.b * 255).round(), b, reason: 'blue of $color');
+        expect(color.a, closeTo(a, 0.005), reason: 'alpha of $color');
+      }
+
+      expectRgba(c.backgroundGradientTop, 217, 79, 121, 0.8);
+      expectRgba(c.textSecondary, 76, 83, 95, 0.8);
+      expectRgba(c.textDate, 68, 68, 68, 0.6);
+      expectRgba(c.iconTile, 217, 217, 217, 0.5);
+      expectRgba(c.gridLine, 160, 167, 180, 0.5);
+      expectRgba(c.onAttendancePanel, 255, 255, 255, 0.8);
+      expectRgba(c.bellButton, 153, 153, 153, 0.1);
+      expectRgba(c.navFill, 255, 255, 255, 0.7);
+      expectRgba(c.navShadow, 0, 0, 0, 0.1);
+    });
+  });
+
+  group('글자 스타일 (docs/DESIGN_SYSTEM.md 글자 표)', () {
+    void expectStyle(
+      TextStyle style,
+      double size,
+      FontWeight weight,
+      double letterSpacing, {
+      double? lineHeight,
+    }) {
+      expect(style.fontFamily, 'Pretendard');
+      expect(style.fontSize, size);
+      expect(style.fontWeight, weight);
+      expect(style.letterSpacing, letterSpacing);
+      if (lineHeight == null) {
+        expect(style.height, isNull);
+      } else {
+        // 렌더링되는 줄 높이(px)가 Figma 값과 같아야 한다.
+        expect(style.height! * style.fontSize!, closeTo(lineHeight, 0.001));
+      }
+    }
+
+    test('인사말·제목', () {
+      expectStyle(
+        AppTextStyles.greeting,
+        26,
+        FontWeight.w800,
+        -0.65,
+        lineHeight: 32,
+      );
+      expectStyle(
+        AppTextStyles.sectionTitle,
+        20,
+        FontWeight.w600,
+        -0.5,
+        lineHeight: 32,
+      );
+      expectStyle(AppTextStyles.attendanceTitle, 20, FontWeight.w600, -0.5);
+    });
+
+    test('카드 제목', () {
+      expectStyle(
+        AppTextStyles.recordCardTitleBefore,
+        18,
+        FontWeight.w700,
+        -0.45,
+      );
+      expectStyle(
+        AppTextStyles.recordCardTitleAfter,
+        18,
+        FontWeight.w700,
+        -0.45,
+        lineHeight: 24,
+      );
+      expectStyle(
+        AppTextStyles.actionTitle,
+        18,
+        FontWeight.w600,
+        -0.45,
+        lineHeight: 32,
+      );
+    });
+
+    test('본문·보조 글자', () {
+      expectStyle(AppTextStyles.body, 14, FontWeight.w500, -0.35);
+      expectStyle(AppTextStyles.button, 14, FontWeight.w600, -0.35);
+      expectStyle(AppTextStyles.graphTitle, 14, FontWeight.w600, -0.35);
+      expectStyle(AppTextStyles.weekday, 14, FontWeight.w500, -0.35);
+      expectStyle(AppTextStyles.date, 14, FontWeight.w400, -0.35);
+      expectStyle(
+        AppTextStyles.signalText,
+        12,
+        FontWeight.w500,
+        -0.3,
+        lineHeight: 32,
+      );
+      expectStyle(AppTextStyles.seeAll, 12, FontWeight.w500, -0.3);
+      expectStyle(
+        AppTextStyles.chipLabel,
+        12,
+        FontWeight.w600,
+        -0.3,
+        lineHeight: 32,
+      );
+      expectStyle(AppTextStyles.graphMonth, 12, FontWeight.w400, -0.3);
+      expectStyle(AppTextStyles.graphCaption, 12, FontWeight.w400, -0.12);
+      expectStyle(AppTextStyles.caption, 10, FontWeight.w400, -0.25);
+      expectStyle(AppTextStyles.graphEmoji, 22, FontWeight.w400, -0.22);
+    });
+
+    test('그래프 설명 강조는 밑줄이 있다', () {
+      expectStyle(
+        AppTextStyles.graphCaptionEmphasis,
+        12,
+        FontWeight.w600,
+        -0.12,
+      );
+      expect(
+        AppTextStyles.graphCaptionEmphasis.decoration,
+        TextDecoration.underline,
+      );
+    });
+
+    test('탭 라벨·출석 숫자', () {
+      expectStyle(
+        AppTextStyles.navLabel,
+        10,
+        FontWeight.w700,
+        -0.1,
+        lineHeight: 12,
+      );
+      expectStyle(
+        AppTextStyles.attendanceNumber,
+        40,
+        FontWeight.w700,
+        -0.45,
+        lineHeight: 24,
+      );
+      expectStyle(
+        AppTextStyles.attendanceUnit,
+        20,
+        FontWeight.w700,
+        -0.45,
+        lineHeight: 24,
+      );
+    });
+  });
+
+  group('모서리·간격·탭 바 치수', () {
+    test('모서리', () {
+      expect(AppRadii.card, 24);
+      expect(AppRadii.button, 12);
+      expect(AppRadii.graphBarTop, 5);
+      expect(AppRadii.pill, 100);
+    });
+
+    test('간격', () {
+      expect(AppSpacing.designWidth, 402);
+      expect(AppSpacing.designHeight, 874);
+      expect(AppSpacing.pageMargin, 24);
+      // 카드 폭 = 화면 폭 - 좌우 여백 × 2
+      expect(
+        AppSpacing.designWidth - AppSpacing.pageMargin * 2,
+        AppSpacing.designCardWidth,
+      );
+    });
+
+    test('그래프 막대는 6개이고 간격이 일정하다', () {
+      expect(GraphLayout.barLefts, hasLength(6));
+      for (var i = 1; i < GraphLayout.barLefts.length; i++) {
+        expect(
+          GraphLayout.barLefts[i] - GraphLayout.barLefts[i - 1],
+          closeTo(47.76, 0.01),
+        );
+      }
+    });
+
+    test('하단 탭 바', () {
+      expect(BottomNavTokens.width, 354);
+      expect(BottomNavTokens.height, 64);
+      expect(BottomNavTokens.labels, ['투데이', '관계', '기록', '전체']);
+      expect(BottomNavTokens.selectionLefts, hasLength(4));
+      // 항목 4개(68) + 간격 3개(17)가 탭 바 안쪽 323에 들어간다.
+      expect(BottomNavTokens.itemWidth * 4 + BottomNavTokens.itemGap * 3, 323);
+    });
+  });
+
+  group('테마', () {
+    test('라이트 전용이며 Pretendard와 AppColors를 쓴다', () {
+      final theme = AppTheme.light;
+      expect(theme.brightness, Brightness.light);
+      expect(theme.textTheme.bodyMedium?.fontFamily, 'Pretendard');
+      expect(theme.extension<AppColors>(), AppColors.light);
+      expect(theme.scaffoldBackgroundColor, AppColors.light.background);
+    });
+
+    testWidgets('context.colors로 팔레트를 읽을 수 있다', (tester) async {
+      late AppColors read;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.light,
+          home: Builder(
+            builder: (context) {
+              read = context.colors;
+              return const SizedBox();
+            },
+          ),
+        ),
+      );
+      expect(read.brand, const Color(0xFFD94F79));
+    });
+  });
+
+  group('에셋', () {
+    test('경로 상수에 중복이 없다', () {
+      expect(AppAssets.all.toSet().length, AppAssets.all.length);
+    });
+
+    test('모든 에셋이 번들에 들어 있고 비어 있지 않다', () async {
+      for (final path in AppAssets.all) {
+        final data = await rootBundle.load(path);
+        expect(data.lengthInBytes, greaterThan(0), reason: path);
+      }
+    });
+
+    test('Pretendard 5개 굵기가 번들에 들어 있다', () async {
+      for (final weight in [
+        'Regular',
+        'Medium',
+        'SemiBold',
+        'Bold',
+        'ExtraBold',
+      ]) {
+        final data = await rootBundle.load(
+          'assets/fonts/Pretendard-$weight.otf',
+        );
+        expect(data.lengthInBytes, greaterThan(100000), reason: weight);
+      }
+    });
+  });
+}
