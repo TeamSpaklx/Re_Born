@@ -13,6 +13,8 @@
 | 아이콘 | `flutter_svg` ^2.3.0 + Figma에서 내려받은 SVG | `assets/icons/ui/`, 경로는 `lib/app/theme/app_assets.dart` |
 | 디자인 기준 | Figma 홈 화면 (100% 일치 목표) | [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md), 값은 `lib/app/theme/` 상수만 사용 |
 | 인증 | Supabase Auth, 이메일 + 비밀번호 | 구글 로그인은 미정 (SPEC 11장 7번) |
+| 상태 관리 | `flutter_riverpod` ^3.4.3 | 앱 최상단 `ProviderScope`, 데이터는 Repository를 Provider로 주입 ([FRONTEND.md](./FRONTEND.md)) |
+| 라우팅 | `go_router` ^18.1.1 | `lib/app/router.dart`, 하단 탭은 `StatefulShellRoute.indexedStack`(탭마다 상태 유지) |
 | DB | Supabase PostgreSQL | 사용자별 접근은 RLS로 제한 |
 | 클라이언트 SDK | `supabase_flutter` 2.17.2 | 초기화: `lib/main.dart`, 설정: `lib/core/config/supabase_config.dart` |
 | 감정 분석·관계 지수 | Flutter 앱 내부 규칙 기반 계산 | 외부 AI·분석 API 없음 |
@@ -31,8 +33,8 @@
 
 ```
 lib/
-  main.dart          앱 진입점, Supabase 초기화
-  app/               앱 전체 설정 (라우팅)
+  main.dart          앱 진입점, 세로 고정·시스템 바 설정, Supabase 초기화
+  app/               앱 전체 설정 (app.dart 앱 위젯, router.dart 라우팅, main_shell.dart 하단 탭 틀)
     theme/           색·글자·모서리·간격·탭 바 치수·에셋 경로 상수, ThemeData
   core/              공통 기반 (config, 상수, 유틸)
   features/<기능>/   기능별 {models, data, presentation} (예: home, relations, record, all)
@@ -51,7 +53,8 @@ docs/                명세서, 디자인 시스템, 프론트 문서 (design/ �
 - **하단 탭 4개:** 투데이(홈) / 관계 / 기록 / 전체. 디자인이 있는 화면은 홈뿐이고, 나머지 탭은 흰 배경의 빈 화면으로 둡니다.
 - **고정 규칙:** 글자 크기 배율 1.0(시스템 글자 크기 설정 무시), 라이트 모드만, 세로 방향만. **다크 모드는 나중에 추가할 예정**이라 색은 `AppColors` 팔레트로만 씁니다.
 - 로그인·회원가입은 디자인이 나올 때까지 제외하고 앱은 홈으로 바로 시작합니다.
-- 하단 탭 바는 플랫폼별로 다릅니다: iOS = Liquid Glass 스타일(Figma 기준), Android = 블러 배경.
+- 하단 탭 바는 플랫폼별로 다릅니다: iOS = Liquid Glass 스타일(Figma 기준), Android = 블러 배경. 위젯은 `lib/shared/widgets/app_bottom_nav_bar.dart` 한 곳입니다.
+- 세로 고정은 세 곳에서 합니다: `main.dart`(SystemChrome), iOS `Info.plist`, Android `AndroidManifest.xml`.
 
 ## 보안 규칙
 
@@ -64,8 +67,6 @@ docs/                명세서, 디자인 시스템, 프론트 문서 (design/ �
 
 | 항목 | 후보 | 비고 |
 |---|---|---|
-| 상태 관리 | Riverpod / Provider / Bloc / setState | 앱 뼈대 작업 시작 때 결정 (추천: flutter_riverpod) |
-| 라우팅 | go_router / Navigator 기본 | 앱 뼈대 작업 시작 때 결정 (추천: go_router, 하단 탭은 StatefulShellRoute) |
 | 그래프 (F-09) | fl_chart 등 | 홈의 주간 막대 그래프는 Figma 그대로 직접 그리므로 라이브러리가 필요 없음 |
 | 푸시 알림 (F-10) | FCM / 로컬 알림 / 미도입 | MVP 이후 확장 기능 |
 | 오류 수집 (F-12) | 앱 내부 처리만 / 외부 도구 | MVP는 앱 내부 처리만 |
