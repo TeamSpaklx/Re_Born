@@ -27,6 +27,14 @@ PR을 올리기 전에 `flutter analyze`와 `flutter test`가 통과해야 합�
 - 감정 분석·관계 지수·패턴 감지(F-05~F-07)는 UI·DB와 분리된 순수 Dart 함수로 작성하고 단위 테스트를 붙입니다.
 - DB 스키마와 RLS 변경은 `supabase/migrations/`에 마이그레이션 파일로 남깁니다. 대시보드에서만 바꾸지 않습니다.
 
+## UI 규칙
+
+- 디자인 기준은 Figma이고, 값은 [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)에 정리되어 있습니다. 화면을 만들 때 Figma에 접속하지 말고 이 문서와 `docs/design/`의 스크린샷을 기준으로 합니다.
+- 색·글자·모서리·간격·에셋 경로는 `lib/app/theme/`의 상수(`context.colors`, `AppTextStyles`, `AppRadii`, `AppSpacing`, `AppAssets`)만 사용합니다. 화면 코드에 `Color(0x...)`, 글자 크기, 경로 문자열을 직접 쓰지 않습니다.
+- 글자 크기 배율 1.0·라이트 모드·세로 방향 고정입니다(다크 모드는 나중에 추가 예정이라 색은 반드시 `context.colors`로 읽습니다).
+- 하단 탭은 4개(투데이/관계/기록/전체)이고, 디자인이 없는 화면은 흰 배경의 빈 화면으로 둡니다.
+- 새 화면의 데이터 모양과 Repository 규칙은 [docs/FRONTEND.md](docs/FRONTEND.md)를 따릅니다.
+
 ## 하지 말 것
 
 - **Firebase / Firestore를 쓰지 않습니다.** SPEC의 `users/{uid}/entries/...` 같은 경로는 PostgreSQL 테이블로 읽습니다.
