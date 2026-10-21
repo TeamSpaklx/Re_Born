@@ -26,6 +26,9 @@ abstract final class AppSpacing {
   /// 맨 위 불투명도가 약 0.40이고 아래로 부드럽게 줄어 120px 근처에서 흰색이 된다. (추정, 확인 필요)
   static const backgroundGradientHeight = 120.0;
 
+  /// 홈 상단 바(고정) 뒤로 지나가는 내용에 주는 블러 강도 (추정, 사용자 첨부 사진 기준).
+  static const topBarBlurSigma = 10.0;
+
   /// 0px부터 10px 간격(0~120px)의 핑크(`backgroundGradientTop`의 RGB) 불투명도.
   static const backgroundGradientAlphas = [
     0.40,

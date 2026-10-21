@@ -11,7 +11,7 @@ import 'home_providers.dart';
 import 'widgets/action_suggestion_card.dart';
 import 'widgets/home_error_view.dart';
 import 'widgets/home_greeting.dart';
-import 'widgets/home_header.dart';
+import 'widgets/home_top_bar.dart';
 import 'widgets/record_card_before.dart';
 import 'widgets/relation_signal_card.dart';
 import 'widgets/section_title_row.dart';
@@ -46,47 +46,18 @@ class _HomeContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
-    final safeTop = MediaQuery.paddingOf(context).top;
     const margin = EdgeInsets.symmetric(horizontal: AppSpacing.pageMargin);
 
     Widget card(Widget child) => Padding(padding: margin, child: child);
 
-    return SingleChildScrollView(
-      child: Stack(
-        children: [
-          // 상단 핑크 그라디언트 (내용과 함께 스크롤, 추정).
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 0,
-            height: AppSpacing.backgroundGradientHeight,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    for (final a in AppSpacing.backgroundGradientAlphas)
-                      colors.backgroundGradientTop.withValues(alpha: a),
-                  ],
-                  stops: [
-                    for (
-                      var i = 0;
-                      i < AppSpacing.backgroundGradientAlphas.length;
-                      i++
-                    )
-                      i / (AppSpacing.backgroundGradientAlphas.length - 1),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Column(
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SizedBox(height: safeTop),
-              const HomeHeader(),
+              // 상단 바(고정)가 차지하는 자리.
+              SizedBox(height: HomeTopBar.heightOf(context)),
               const SizedBox(height: HomeLayout.headerToDate),
               HomeGreeting(today: summary.today, nickname: summary.nickname),
               const SizedBox(height: HomeLayout.greetingToRecordCard),
@@ -113,8 +84,9 @@ class _HomeContent extends StatelessWidget {
               const SizedBox(height: BottomNavTokens.scrollBottomPadding),
             ],
           ),
-        ],
-      ),
+        ),
+        const Positioned(left: 0, right: 0, top: 0, child: HomeTopBar()),
+      ],
     );
   }
 }
