@@ -49,7 +49,7 @@ abstract final class HomeLayout {
   static const recordCardY = 237.0;
   static const signalTitleY = 444.0;
   static const signalCardY = 488.0;
-  static const graphCardY = 613.0;
+  static const graphCardY = 614.0;
   static const actionTitleY = 821.0;
   static const actionCardY1 = 865.0;
   static const actionCardY2 = 967.0;
@@ -90,5 +90,4 @@ abstract final class AttendanceLayout {
   static const pillHeight = 13.0;
   static const pillGap = 5.0;
   static const pillCount = 6;
-  static const fireIconSize = 48.0;
 }
