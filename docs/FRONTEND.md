@@ -122,5 +122,6 @@ abstract interface class HomeRepository {
 
 - 글자 크기 배율 1.0 고정, 라이트 모드만, 세로 방향만. 다크 모드는 나중에 추가하므로 색은 `context.colors`로만 읽습니다.
 - 디자인이 없는 화면은 흰 배경의 빈 `Scaffold`로 둡니다(제목·문구 없이).
+- **햅틱 피드백:** `lib/core/utils/app_haptics.dart`만 씁니다(`HapticFeedback`을 화면에서 직접 부르지 않음). 탭이 다른 탭으로 바뀔 때 `selection()`, 버튼·링크를 누를 때 `tap()`(가벼운 톡). 같은 탭 다시 누르기, 동작 없는 요소(알림, 카드 등)에는 울리지 않습니다.
 - iOS와 Android 둘 다 잘 동작해야 합니다. 플랫폼 전용 설정은 항상 양쪽을 같이 처리합니다.
 - 상태 관리·라우팅 라이브러리는 앱 뼈대 작업에서 확정하고 [TECH_STACK.md](./TECH_STACK.md)에 기록합니다(추천: `flutter_riverpod`, `go_router`).

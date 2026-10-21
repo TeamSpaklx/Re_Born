@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../core/utils/app_haptics.dart';
 import '../shared/widgets/app_bottom_nav_bar.dart';
 import '../shared/widgets/scroll_edge_effect.dart';
 import 'theme/app_colors.dart';
@@ -51,11 +52,17 @@ class MainShell extends StatelessWidget {
               child: AppBottomNavBar(
                 width: navWidth,
                 currentIndex: navigationShell.currentIndex,
-                onTap: (index) => navigationShell.goBranch(
-                  index,
-                  // 이미 선택된 탭을 다시 누르면 그 탭의 첫 화면으로 돌아간다.
-                  initialLocation: index == navigationShell.currentIndex,
-                ),
+                onTap: (index) {
+                  // 다른 탭으로 바뀔 때만 햅틱. (iOS 네이티브 탭 바도 같은 콜백을 쓴다.)
+                  if (index != navigationShell.currentIndex) {
+                    AppHaptics.selection();
+                  }
+                  navigationShell.goBranch(
+                    index,
+                    // 이미 선택된 탭을 다시 누르면 그 탭의 첫 화면으로 돌아간다.
+                    initialLocation: index == navigationShell.currentIndex,
+                  );
+                },
               ),
             ),
           ),
