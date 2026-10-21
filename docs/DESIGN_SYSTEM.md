@@ -187,10 +187,13 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 | 3 | 기록 | `tab_record.svg` | `tab_record_active.svg` |
 | 4 | 전체 | `tab_all.svg` | `tab_all_active.svg` |
 
-- **iOS (Liquid Glass, Figma 기준):** 배경 `navFill`, 테두리 1px `navBorder`, 그림자 `0 4 25 4 navShadow`. Flutter에는 iOS 26 Liquid Glass(굴절·하이라이트)를 만드는 기본 기능이 없어서, 패키지 없이는 Figma가 보여주는 수준(반투명 흰색 + 테두리 + 그림자)까지 구현합니다.
+- **iOS (Liquid Glass, Figma 기준):** 배경 `navFill`, 테두리 1px `navBorder`, 그림자 `0 4 25 4 navShadow`. Flutter에는 iOS 26 Liquid Glass(굴절·하이라이트)를 만드는 기본 기능이 없어서, 패키지 없이는 Figma가 보여주는 수준(반투명 흰색 + 테두리 + 그림자)에 약한 블러(`iosBlurSigma` 8, **추정**)를 더해 구현합니다.
+- 그림자는 알약 **바깥쪽에만** 그립니다. 반투명 배경 아래로 그림자가 비쳐 회색으로 탁해지는 것을 막기 위해 알약 모양을 even-odd 경로로 오려낸 영역에 그립니다.
+- 선택 알약은 탭을 바꿀 때 200ms `easeOut`으로 옆 탭으로 미끄러집니다(**추정**, Figma에는 동작 정보 없음). 알약 위치는 Figma 값(5/89/174/258)과 같고, 화면 폭이 좁아 탭 바 폭이 줄어도(폭 = min(354, 화면 폭 − 48)) 4등분 비율로 따라갑니다.
+- 탭 바 위치: 화면 아래에서 `max(시스템 하단 여백, 34)`만큼 위. 탭 바에 가려지지 않게 스크롤 화면의 아래 여백은 `scrollBottomPadding`(148)을 씁니다.
 - **Android (블러 배경):** **Figma 시안이 없습니다(추정).** iOS와 같은 크기·치수·아이콘에 `BackdropFilter` 가우시안 블러(`androidBlurSigma` 20)를 더한 배경을 씁니다. 블러 강도·불투명도는 확인 필요.
 - 두 버전은 탭 구조·아이콘·라벨을 공유하고 배경 처리만 다르게 합니다. 플랫폼 분기는 한 곳(탭 바 위젯)에서만 합니다.
-- **스크롤 가장자리 효과:** 탭 바 뒤에서 내용이 흰색으로 흐려지는 구간이 하단 약 185px 있습니다(Figma 컴포넌트 `Scroll Edge Effect - Soft`, 블러 반경 10). **추정:** 투명 → 흰색 그라디언트로 근사합니다.
+- **스크롤 가장자리 효과:** 탭 바 뒤에서 내용이 흰색으로 흐려지는 구간이 하단 약 185px(`scrollEdgeFadeHeight`) 있습니다(Figma 컴포넌트 `Scroll Edge Effect - Soft`, 블러 반경 10). **추정:** 투명 → 배경색 그라디언트(위 0%~70% 구간)로 근사합니다. 앱 뼈대(`lib/app/main_shell.dart`)가 모든 탭 위에 한 번만 깔고, 터치는 그대로 통과합니다.
 
 ## 6. 에셋 목록
 
@@ -218,7 +221,7 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 
 - 폰트: `assets/fonts/Pretendard-{Regular,Medium,SemiBold,Bold,ExtraBold}.otf` (v1.3.9, SIL OFL 1.1, `OFL-LICENSE.txt`). pubspec에서 weight 400/500/600/700/800으로 등록.
 - Figma 에셋 URL은 7일 후 만료되므로 이미 이 레포에 내려받아 두었습니다. 새 에셋이 필요하면 디자이너에게 SVG/PNG를 받아 `assets/icons/ui/`에 넣고 `AppAssets`에 상수를 추가합니다.
-- `tab_selection.svg`에는 배경 블러용 `foreignObject`가 들어 있어 `flutter_svg`가 "unhandled element" 경고를 냅니다. 알약 색(`#EDEDED`)은 정상으로 그려지고 경고는 무시해도 됩니다.
+- `tab_selection.svg`는 Figma가 내려준 파일에서 배경 블러용 `foreignObject`·`mix-blend-mode`를 지우고 알약 도형(`#EDEDED`)만 남겼습니다. `flutter_svg`가 `foreignObject`를 처리하지 못해 "unhandled element" 경고를 냈기 때문이고, 그려지는 모양은 같습니다.
 - 번들에서 앱 아이콘 원본(`assets/icons/reborn_app_icon_1024.png`)은 제외하려고 `assets/icons/ui/` 폴더만 선언했습니다.
 
 ## 7. 확인이 필요한 부분 (추정으로 처리한 것)
@@ -227,7 +230,7 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 2. 헤더가 스크롤과 함께 움직이는지
 3. After의 기록 카드 아래 간격 23 vs Before 35 (→ 35로 통일)
 4. Before에만 있는 "오늘 해볼까요? >" 화살표와 액션 카드 원 색 차이
-5. Android 하단 탭 바 (Figma 시안 없음, 블러 값 추정)
+5. Android 하단 탭 바 (Figma 시안 없음, 블러 값 추정), iOS 탭 바 블러 강도(8)와 알약 이동 애니메이션
 6. 출석 알약의 채움/빈 모양, 샘플 아바타 사진 처리
 7. 스크롤 가장자리(탭 바 뒤) 흰색 페이드의 정확한 모양
 8. 이모지·가변 폰트 설정은 플랫폼에 따라 Figma와 다를 수 있음
