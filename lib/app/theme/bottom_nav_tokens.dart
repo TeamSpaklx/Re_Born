@@ -41,6 +41,14 @@ abstract final class BottomNavTokens {
   /// Figma와 차이가 보이지 않는다.
   static const iosBlurSigma = 8.0;
 
+  /// iOS 26+ 네이티브 탭 바는 시스템이 알약을 플랫폼 뷰 좌우에서 이만큼 안쪽에 그린다
+  /// (iOS 26.5, 27.0 시뮬레이터에서 측정: 뷰 폭 396 → 알약 폭 354). 알약 폭을 [width]로
+  /// 맞추려고 플랫폼 뷰를 양쪽으로 이만큼 더 넓게 만든다. 알약 높이는 시스템이 약 62로 정한다.
+  static const nativeSideInset = 21.0;
+
+  /// 네이티브 탭 바 라벨 글꼴의 PostScript 이름(`AppAssets.pretendardBold` 파일).
+  static const nativeLabelFontName = 'Pretendard-Bold';
+
   /// 탭 바 뒤에서 내용이 흰색으로 흐려지는 구간의 높이 (Scroll Edge Effect, 추정).
   static const scrollEdgeFadeHeight = 185.0;
 

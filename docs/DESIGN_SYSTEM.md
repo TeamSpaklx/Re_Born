@@ -187,12 +187,16 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 | 3 | 기록 | `tab_record.svg` | `tab_record_active.svg` |
 | 4 | 전체 | `tab_all.svg` | `tab_all_active.svg` |
 
-- **iOS (Liquid Glass, Figma 기준):** 배경 `navFill`, 테두리 1px `navBorder`, 그림자 `0 4 25 4 navShadow`. Flutter에는 iOS 26 Liquid Glass(굴절·하이라이트)를 만드는 기본 기능이 없어서, 패키지 없이는 Figma가 보여주는 수준(반투명 흰색 + 테두리 + 그림자)에 약한 블러(`iosBlurSigma` 8, **추정**)를 더해 구현합니다.
-- 그림자는 알약 **바깥쪽에만** 그립니다. 반투명 배경 아래로 그림자가 비쳐 회색으로 탁해지는 것을 막기 위해 알약 모양을 even-odd 경로로 오려낸 영역에 그립니다.
-- 선택 알약은 탭을 바꿀 때 200ms `easeOut`으로 옆 탭으로 미끄러집니다(**추정**, Figma에는 동작 정보 없음). 알약 위치는 Figma 값(5/89/174/258)과 같고, 화면 폭이 좁아 탭 바 폭이 줄어도(폭 = min(354, 화면 폭 − 48)) 4등분 비율로 따라갑니다.
+- **iOS 26 이상 (네이티브 `UITabBar`, Liquid Glass):** 탭 바 전체를 시스템이 그립니다(`ios/Runner/NativeTabBarView.swift`를 `lib/shared/widgets/native_tab_bar.dart`가 `UiKitView`로 얹음). 유리 재질, 선택 알약, 알약 이동 애니메이션, VoiceOver는 시스템이 처리합니다. 앱이 정하는 값은 아래뿐이고 모두 이 문서와 `lib/app/theme/`의 값을 Flutter가 네이티브에 넘깁니다.
+  - 아이콘: 위 표의 Figma SVG를 Flutter가 28×28(기기 배율) PNG로 그려 넘깁니다(기본=검정, 선택=분홍 파일을 각각 사용).
+  - 라벨: Pretendard Bold 10, 자간 −0.1, 색은 기본 `textStrong` / 선택 `brand`. Pretendard는 `CTFontManagerRegisterFontsForURL`로 UIKit에 등록합니다.
+  - 크기: 시스템이 알약을 뷰 안쪽 좌우 21(`nativeSideInset`)에서 그리므로 뷰를 354+42 폭으로 만들어 **알약 폭이 354**가 되게 합니다(iOS 26.5·27.0 시뮬레이터에서 측정). 알약 높이는 시스템이 약 62로 정하고(Figma 64) 뷰 안에서 가운데에 놓입니다.
+  - 이 모양은 Apple이 그리므로 Figma의 회색 테두리 `navBorder`, 그림자 `navShadow`, 선택 알약 색 `navSelection`은 **쓰이지 않습니다.** 선택 알약 크기와 라벨 위치도 시스템 값(**확인 필요**).
+- **iOS 26 미만:** Figma 값(반투명 흰색 `navFill` + 테두리 1px `navBorder` + 그림자 `0 4 25 4 navShadow`)에 약한 블러(`iosBlurSigma` 8, **추정**)를 더한 Flutter 탭 바. 그림자는 알약 **바깥쪽에만** 그립니다(반투명 배경 아래로 비쳐 탁해지는 것을 막으려고 알약 모양을 even-odd 경로로 오려낸 영역에 그림). 선택 알약은 탭을 바꿀 때 200ms `easeOut`으로 옆 탭으로 미끄러집니다(**추정**). 알약 위치는 Figma 값(5/89/174/258)과 같고, 화면 폭이 좁아 탭 바 폭이 줄어도(폭 = min(354, 화면 폭 − 48)) 4등분 비율로 따라갑니다.
+- **Android (블러 배경):** **Figma 시안이 없습니다(추정).** iOS 26 미만과 같은 Flutter 탭 바에 `BackdropFilter` 가우시안 블러(`androidBlurSigma` 20)를 더한 배경을 씁니다. 블러 강도·불투명도는 확인 필요.
 - 탭 바 위치: 화면 아래에서 `max(시스템 하단 여백, 34)`만큼 위. 탭 바에 가려지지 않게 스크롤 화면의 아래 여백은 `scrollBottomPadding`(148)을 씁니다.
-- **Android (블러 배경):** **Figma 시안이 없습니다(추정).** iOS와 같은 크기·치수·아이콘에 `BackdropFilter` 가우시안 블러(`androidBlurSigma` 20)를 더한 배경을 씁니다. 블러 강도·불투명도는 확인 필요.
-- 두 버전은 탭 구조·아이콘·라벨을 공유하고 배경 처리만 다르게 합니다. 플랫폼 분기는 한 곳(탭 바 위젯)에서만 합니다.
+- 플랫폼 분기는 한 곳(`AppBottomNavBar`)에서만 합니다: iOS 26 이상 → 네이티브, 그 외 → Flutter 탭 바.
+- 네이티브 탭 바는 탭을 누르면 Dart로 index를 알리고(`onTap`), Dart에서 탭이 바뀌면(화면 안 버튼 등) 선택 표시를 맞춥니다(`setSelectedIndex`). 같은 탭을 다시 누르면 그 탭의 첫 화면으로 돌아갑니다.
 - **스크롤 가장자리 효과:** 탭 바 뒤에서 내용이 흰색으로 흐려지는 구간이 하단 약 185px(`scrollEdgeFadeHeight`) 있습니다(Figma 컴포넌트 `Scroll Edge Effect - Soft`, 블러 반경 10). **추정:** 투명 → 배경색 그라디언트(위 0%~70% 구간)로 근사합니다. 앱 뼈대(`lib/app/main_shell.dart`)가 모든 탭 위에 한 번만 깔고, 터치는 그대로 통과합니다.
 
 ## 6. 에셋 목록
@@ -230,7 +234,7 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 2. 헤더가 스크롤과 함께 움직이는지
 3. After의 기록 카드 아래 간격 23 vs Before 35 (→ 35로 통일)
 4. Before에만 있는 "오늘 해볼까요? >" 화살표와 액션 카드 원 색 차이
-5. Android 하단 탭 바 (Figma 시안 없음, 블러 값 추정), iOS 탭 바 블러 강도(8)와 알약 이동 애니메이션
+5. Android 하단 탭 바 (Figma 시안 없음, 블러 값 추정), iOS 26 미만 탭 바 블러 강도(8)와 알약 이동 애니메이션, iOS 네이티브 탭 바가 Figma와 달라지는 부분(알약 높이 62 vs 64, 선택 알약 모양·색, 테두리·그림자)
 6. 출석 알약의 채움/빈 모양, 샘플 아바타 사진 처리
 7. 스크롤 가장자리(탭 바 뒤) 흰색 페이드의 정확한 모양
 8. 이모지·가변 폰트 설정은 플랫폼에 따라 Figma와 다를 수 있음

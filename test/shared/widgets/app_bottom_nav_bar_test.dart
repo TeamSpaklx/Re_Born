@@ -6,6 +6,7 @@ import 'package:reborn_app/app/theme/app_colors.dart';
 import 'package:reborn_app/app/theme/app_theme.dart';
 import 'package:reborn_app/app/theme/bottom_nav_tokens.dart';
 import 'package:reborn_app/shared/widgets/app_bottom_nav_bar.dart';
+import 'package:reborn_app/shared/widgets/native_tab_bar.dart';
 
 void main() {
   Future<void> pumpNav(
@@ -13,6 +14,7 @@ void main() {
     int currentIndex = 0,
     ValueChanged<int>? onTap,
     TargetPlatform platform = TargetPlatform.iOS,
+    bool? useNativeTabBar,
   }) {
     return tester.pumpWidget(
       MaterialApp(
@@ -23,6 +25,7 @@ void main() {
               currentIndex: currentIndex,
               onTap: onTap ?? (_) {},
               platform: platform,
+              useNativeTabBar: useNativeTabBar,
             ),
           ),
         ),
@@ -139,5 +142,20 @@ void main() {
       ),
     );
     handle.dispose();
+  });
+
+  testWidgets('네이티브 탭 바를 쓰면 Flutter 탭 바(아이콘·블러)는 그리지 않는다', (tester) async {
+    await pumpNav(tester, useNativeTabBar: true);
+
+    expect(find.byType(NativeTabBar), findsOneWidget);
+    expect(find.byType(BackdropFilter), findsNothing);
+    expect(find.text('투데이'), findsNothing);
+  });
+
+  testWidgets('플랫폼을 지정한 테스트에서는 네이티브 탭 바를 자동으로 쓰지 않는다', (tester) async {
+    await pumpNav(tester, platform: TargetPlatform.iOS);
+
+    expect(find.byType(NativeTabBar), findsNothing);
+    expect(find.byType(BackdropFilter), findsOneWidget);
   });
 }
