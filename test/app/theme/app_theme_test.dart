@@ -18,11 +18,11 @@ void main() {
     const c = AppColors.light;
 
     test('주요 색', () {
-      expect(c.brand, const Color(0xFFD94F79));
-      expect(c.cta, const Color(0xFFCF3F6B));
+      expect(c.brand, const Color(0xFFFF6090));
+      expect(c.cta, const Color(0xFFFF6090));
       expect(c.cardPink, const Color(0xFFFEDAE5));
       expect(c.cardBorder, const Color(0xFFEEE6E9));
-      expect(c.attendancePanel, const Color(0xFFCF9FAE));
+      expect(c.attendancePanel, const Color(0xFFFFB2CA));
     });
 
     test('반투명 색은 Figma rgba 값과 같다', () {
@@ -232,7 +232,7 @@ void main() {
           ),
         ),
       );
-      expect(read.brand, const Color(0xFFD94F79));
+      expect(read.brand, const Color(0xFFFF6090));
     });
   });
 

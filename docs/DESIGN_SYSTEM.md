@@ -4,7 +4,7 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 코드로 옮긴 값은 `lib/app/theme/`에 있으며, 화면 코드는 그 상수만 사용합니다 ([AGENTS.md](../AGENTS.md) UI 규칙).
 
 - 출처 표시: **Figma** = Figma 노드에서 읽은 값, **추정** = Figma에 없어서 정한 값(확인 필요)
-- Figma: [홈 화면 섹션](https://www.figma.com/design/PJNOc5b1S7pmmtoObtP9mw/%EB%A6%AC%EB%B3%B8Re-born-%EB%94%94%EC%9E%90%EC%9D%B8?node-id=654-827) (파일 `PJNOc5b1S7pmmtoObtP9mw`, 섹션 `654:827`)
+- Figma: [홈 화면 섹션](https://www.figma.com/design/W8guqOac0W71P3l7e23ZsN/%E1%84%85%E1%85%B5%E1%84%87%E1%85%A9%E1%86%ABRe_born-%E1%84%83%E1%85%B5%E1%84%8C%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%AB?node-id=654-827) (파일 `W8guqOac0W71P3l7e23ZsN`, 섹션 `654:827`). 2026-10-21에 디자인이 새 Figma 파일로 옮겨지면서 색과 탭 바 "전체" 아이콘이 바뀌었습니다(노드 ID는 그대로, 이전 파일 `PJNOc5b1S7pmmtoObtP9mw`).
 
 | 노드 | ID | 스크린샷 |
 |---|---|---|
@@ -28,8 +28,8 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 
 | 용도 | 필드 | 값 | 출처 |
 |---|---|---|---|
-| 브랜드 핑크 (막대·활성 탭·강조 숫자·출석 알약) | `brand` | `#D94F79` | Figma |
-| 주요 버튼 배경 | `cta` | `#CF3F6B` | Figma |
+| 브랜드 핑크 (막대·활성 탭·강조 숫자·출석 알약) | `brand` | `#FF6090` | Figma |
+| 주요 버튼 배경 | `cta` | `#FF6090` (지금은 `brand`와 같은 값, 나중에 달라질 수 있어 이름을 나눠 둠) | Figma |
 | 버튼 글자 | `onCta` | `#FFFFFF` | Figma |
 | 화면 배경 | `background` | `#FFFFFF` | Figma |
 | 상단 그라디언트 시작 | `backgroundGradientTop` | `rgba(217,79,121,0.8)` → 흰색 | Figma |
@@ -45,7 +45,7 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 | 아바타 배경 | `avatar` | `#D9D9D9` | Figma |
 | 아이콘 타일 배경 | `iconTile` | `rgba(217,217,217,0.5)` | Figma |
 | 그래프 격자선 | `gridLine` | `rgba(160,167,180,0.5)` | Figma |
-| 출석 패널 | `attendancePanel` | `#CF9FAE` | Figma |
+| 출석 패널 | `attendancePanel` | `#FFB2CA` | Figma |
 | 출석 패널 위 글자 | `onAttendancePanel` | `rgba(255,255,255,0.8)` | Figma |
 | 알림 버튼 배경 | `bellButton` | `rgba(153,153,153,0.1)` | Figma |
 | 탭 바 배경 | `navFill` | `rgba(255,255,255,0.7)` | Figma |
@@ -80,7 +80,7 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 | `graphCaptionEmphasis` | 12 SemiBold + 밑줄 | −0.12 | 기본 | "조금씩 증가" | textGraphCaption |
 | `caption` | 10 Regular | −0.25 | 기본 | "마지막 기록 5일 전" | textSecondary |
 | `navLabel` | 10 Bold | −0.1 | 12 | 탭 라벨 | 기본 textStrong, 선택 brand |
-| `attendanceNumber` | 40 Bold | −0.45 | 24 | 출석 숫자 "6" | cta |
+| `attendanceNumber` | 40 Bold | −0.45 | 24 | 출석 숫자 "6" | brand |
 | `attendanceUnit` | 20 Bold | −0.45 | 24 | "일" | textBlack |
 | `graphEmoji` | 22 Regular | −0.22 | 기본 | 그래프 위 😁 | emoji |
 
@@ -117,7 +117,7 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 | "최근 관계 신호" 제목 | 444 | 32 | 기록 카드와 35 |
 | "전체 보기 >" (x 오른쪽 끝 378) | 453 | 14 | |
 | 신호 카드 | 488 | 104 | 제목과 12 |
-| 감정 그래프 카드 | 613 | 180 | 신호 카드와 21 |
+| 감정 그래프 카드 | 614 | 180 | 신호 카드와 22 |
 | "오늘 해볼까요? >" 제목 | 821 | 32 | 그래프 카드와 28 |
 | 액션 카드 1 | 865 | 90 | 제목과 12 |
 | 액션 카드 2 | 967 | 90 | 카드 사이 12 |
@@ -148,8 +148,8 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 - 아바타 행: 원 44(테두리 2px 흰색)가 x 0 / 31 / 62에 겹쳐 있고, 오른쪽 끝에 `seal_check.svg`(44).
 - 문구: "오늘도 기록 완료!" 줄바꿈 "**6**일 연속 마음을 기록하고 있어요." (`recordCardTitleAfter`, 숫자만 `brand`).
 - 버튼: 폭 314, 높이 **48**(Before는 52), `cta`, 글자 "오늘 기록 보기".
-- 출석 패널(313×110, `attendancePanel`, 모서리 12): 왼쪽 15에서 "**6** 일"(`attendanceNumber` cta + `attendanceUnit`), 패널 안 y 약 31 중심. 오른쪽에 `fire.svg`(48) x 약 256·y 약 11. 설명 "최장 기록 20일 · 6/20일"(`body` 14 Medium, `onAttendancePanel`) y 약 65 중심, 왼쪽 15. 진행 알약 6개 왼쪽 15·패널 안 y 약 86(43×13, `brand`, 간격 5). 연속 일수는 기록 작성 날짜로 앱에서 계산합니다([FRONTEND.md](./FRONTEND.md)).
-- 알약 6개는 "이번 연속 기록 6일 / 최장 20일" 중 6을 표시하는 것으로 보이며, 채운 알약과 빈 알약의 모양은 Figma에 없습니다(추정, 확인 필요).
+- 출석 패널(314×110, `attendancePanel`, 모서리 12): 왼쪽 15에서 "**6** 일"(`attendanceNumber` brand + `attendanceUnit`), 패널 안 y 약 31 중심. 2026-10-21 디자인부터 **오른쪽 불꽃 아이콘(`fire.svg`)은 없습니다.** 설명 "최장 기록 20일 · 6/20일"(`body` 14 Medium, `onAttendancePanel`) y 약 65 중심, 왼쪽 15. 진행 알약 6개 왼쪽 15·패널 안 y 약 86(43×13, `brand`, 간격 5). 연속 일수는 기록 작성 날짜로 앱에서 계산합니다([FRONTEND.md](./FRONTEND.md)).
+- 알약 6개는 모두 `brand`로 채워져 있고(연속 기록 6일일 때의 모습), 연속 일수가 6 미만일 때 빈 알약 모양은 Figma에 없습니다(추정: 앞에서부터 `min(current, 6)`개만 채우고 나머지는 비움, 확인 필요).
 
 ### 5.4 신호 카드 ("최근 관계 신호")
 - 354×104, 배경 `cardWhite`, 테두리 2px `cardBorder`, 모서리 24.
@@ -178,7 +178,7 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 ### 5.8 하단 탭 바 (`BottomNavTokens`)
 - 354×64, 가운데 정렬, 화면 아래에서 34 위(그 아래에 홈 인디케이터 34). 모서리 100(알약).
 - 항목 4개: 폭 68, 간격 17, 아이콘 28 + 라벨(`navLabel`), 항목 영역 323×40(위 12). 선택 알약 92×56(`tab_selection.svg`, 선택된 탭 뒤, 왼쪽 x 5 / 89 / 174 / 258).
-- 선택된 탭: 아이콘이 `*_active.svg`(분홍 `#D94F79`)로 바뀌고 라벨 색이 `brand`. 나머지는 검정 아이콘 + `textStrong` 라벨.
+- 선택된 탭: 아이콘이 `*_active.svg`(분홍 `#FF6090`)로 바뀌고 라벨 색이 `brand`. 나머지는 검정 아이콘 + `textStrong` 라벨.
 
 | 탭 | 라벨 | 기본 아이콘 | 선택 아이콘 |
 |---|---|---|---|
@@ -192,7 +192,7 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
   - 라벨: Pretendard Bold 10, 자간 −0.1, 색은 기본 `textStrong` / 선택 `brand`. Pretendard는 `CTFontManagerRegisterFontsForURL`로 UIKit에 등록합니다.
   - 크기: 시스템이 알약을 뷰 안쪽 좌우 21(`nativeSideInset`)에서 그리므로 뷰를 354+42 폭으로 만들어 **알약 폭이 354**가 되게 합니다(iOS 26.5·27.0 시뮬레이터에서 측정). 알약 높이는 시스템이 약 62로 정하고(Figma 64) 뷰 안에서 가운데에 놓입니다.
   - 이 모양은 Apple이 그리므로 Figma의 회색 테두리 `navBorder`, 그림자 `navShadow`, 선택 알약 색 `navSelection`은 **쓰이지 않습니다.** 선택 알약 크기와 라벨 위치도 시스템 값(**확인 필요**).
-- **iOS 26 미만:** Figma 값(반투명 흰색 `navFill` + 테두리 1px `navBorder` + 그림자 `0 4 25 4 navShadow`)에 약한 블러(`iosBlurSigma` 8, **추정**)를 더한 Flutter 탭 바. 그림자는 알약 **바깥쪽에만** 그립니다(반투명 배경 아래로 비쳐 탁해지는 것을 막으려고 알약 모양을 even-odd 경로로 오려낸 영역에 그림). 선택 알약은 탭을 바꿀 때 200ms `easeOut`으로 옆 탭으로 미끄러집니다(**추정**). 알약 위치는 Figma 값(5/89/174/258)과 같고, 화면 폭이 좁아 탭 바 폭이 줄어도(폭 = min(354, 화면 폭 − 48)) 4등분 비율로 따라갑니다.
+- **iOS 26 미만:** Android와 같은 Flutter 탭 바(배경 블러 강도만 다름)로, Figma 값(반투명 흰색 `navFill` + 테두리 1px `navBorder` + 그림자 `0 4 25 4 navShadow`)에 약한 블러(`iosBlurSigma` 8, **추정**)를 더한 Flutter 탭 바. 그림자는 알약 **바깥쪽에만** 그립니다(반투명 배경 아래로 비쳐 탁해지는 것을 막으려고 알약 모양을 even-odd 경로로 오려낸 영역에 그림). 선택 알약은 탭을 바꿀 때 200ms `easeOut`으로 옆 탭으로 미끄러집니다(**추정**). 알약 위치는 Figma 값(5/89/174/258)과 같고, 화면 폭이 좁아 탭 바 폭이 줄어도(폭 = min(354, 화면 폭 − 48)) 4등분 비율로 따라갑니다.
 - **Android (블러 배경):** **Figma 시안이 없습니다(추정).** iOS 26 미만과 같은 Flutter 탭 바에 `BackdropFilter` 가우시안 블러(`androidBlurSigma` 20)를 더한 배경을 씁니다. 블러 강도·불투명도는 확인 필요.
 - 탭 바 위치: 화면 아래에서 `max(시스템 하단 여백, 34)`만큼 위. 탭 바에 가려지지 않게 스크롤 화면의 아래 여백은 `scrollBottomPadding`(148)을 씁니다.
 - 플랫폼 분기는 한 곳(`AppBottomNavBar`)에서만 합니다: iOS 26 이상 → 네이티브, 그 외 → Flutter 탭 바.
@@ -208,13 +208,12 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 | `tabHome` / `tabHomeActive` | `assets/icons/ui/tab_home(_active).svg` | 28 | 탭 1 (`house-fill`) |
 | `tabRelations` / `tabRelationsActive` | `tab_relations(_active).svg` | 28 | 탭 2 (`users-fill`) |
 | `tabRecord` / `tabRecordActive` | `tab_record(_active).svg` | 28 | 탭 3 (기록) |
-| `tabAll` / `tabAllActive` | `tab_all(_active).svg` | 28 | 탭 4 (`account_circle`) |
+| `tabAll` / `tabAllActive` | `tab_all(_active).svg` | 28 | 탭 4 (Iconsax `menu`, 가로줄 3개). Figma는 마스크+선 SVG 두 장으로 내보내서 `flutter_svg`가 마스크를 못 그릴 수 있어, 선 SVG를 28×28 뷰박스의 Figma 위치(2.75, 7.4167)에 놓아 한 파일로 합쳤습니다 |
 | `tabSelection` | `tab_selection.svg` | 92×56 | 선택 알약 |
 | `person` | `person.svg` | 36 | 신호 카드 아바타 |
 | `forum` | `forum.svg` | 36 | 액션 카드 |
 | `bell` | `bell.svg` | 28 | 알림 버튼 |
 | `sealCheck` | `seal_check.svg` | 44 | After 기록 카드 |
-| `fire` | `fire.svg` | 48 | 출석 패널 |
 | `chevronSignal` | `chevron_signal.svg` | 20 | 신호 카드 |
 | `chevronGraph` | `chevron_graph.svg` | 17 | 그래프 제목 |
 | `chevronSeeAll` | `chevron_see_all.svg` | 11.3×14 | "전체 보기" |
@@ -223,6 +222,7 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 | `radioCircle` / `radioCircleAfter` | `radio_circle(_after).svg` | 20 | 액션 카드 오른쪽 원 |
 | `logo` | `assets/images/logo_reborn.png` | 1000×250 | 헤더 로고 |
 
+- **아이콘 출처:** 하단 탭 바의 투데이·관계·기록은 Phosphor Icons(`house-fill`, `users-fill`, 기록), 전체는 Iconsax(`menu`)입니다. 그 밖의 홈 아이콘(`person`, `forum`, `bell`, 화살표류, `seal-check-fill`)의 출처는 확인하지 못했습니다(확인 필요). 새 아이콘이 필요하면 두 라이브러리에서 SVG로 받아 `assets/icons/ui/`에 넣습니다(Flutter 패키지는 쓰지 않음).
 - 폰트: `assets/fonts/Pretendard-{Regular,Medium,SemiBold,Bold,ExtraBold}.otf` (v1.3.9, SIL OFL 1.1, `OFL-LICENSE.txt`). pubspec에서 weight 400/500/600/700/800으로 등록.
 - Figma 에셋 URL은 7일 후 만료되므로 이미 이 레포에 내려받아 두었습니다. 새 에셋이 필요하면 디자이너에게 SVG/PNG를 받아 `assets/icons/ui/`에 넣고 `AppAssets`에 상수를 추가합니다.
 - `tab_selection.svg`는 Figma가 내려준 파일에서 배경 블러용 `foreignObject`·`mix-blend-mode`를 지우고 알약 도형(`#EDEDED`)만 남겼습니다. `flutter_svg`가 `foreignObject`를 처리하지 못해 "unhandled element" 경고를 냈기 때문이고, 그려지는 모양은 같습니다.
@@ -235,9 +235,12 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 3. After의 기록 카드 아래 간격 23 vs Before 35 (→ 35로 통일)
 4. Before에만 있는 "오늘 해볼까요? >" 화살표와 액션 카드 원 색 차이
 5. Android 하단 탭 바 (Figma 시안 없음, 블러 값 추정), iOS 26 미만 탭 바 블러 강도(8)와 알약 이동 애니메이션, iOS 네이티브 탭 바가 Figma와 달라지는 부분(알약 높이 62 vs 64, 선택 알약 모양·색, 테두리·그림자)
-6. 출석 알약의 채움/빈 모양, 샘플 아바타 사진 처리
+6. 연속 일수가 6 미만일 때 출석 알약의 빈 모양, 샘플 아바타 사진 처리
 7. 스크롤 가장자리(탭 바 뒤) 흰색 페이드의 정확한 모양
 8. 이모지·가변 폰트 설정은 플랫폼에 따라 Figma와 다를 수 있음
+9. 스크롤 가장자리 효과 높이: Before 185, After 147로 달라서(2026-10-21) 구현은 185로 통일
+10. 상단 그라디언트 색은 `rgba(217,79,121,0.8)`로 그대로이고 `brand`(`#FF6090`)로 바뀌지 않았습니다(Figma 값을 따름, 디자이너 확인 필요)
+11. Figma 섹션 메모 "그날 적어놓았던 기록을 보여줌 →": 섹션 밖의 화면으로 가는 동작으로 보이며 디자인을 아직 못 봄
 
 ## 8. 지켜야 할 규칙
 

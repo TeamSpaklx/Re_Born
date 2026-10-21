@@ -3,7 +3,7 @@
 abstract final class AppAssets {
   static const _icons = 'assets/icons/ui';
 
-  // 하단 탭 (기본 / 선택[분홍])
+  // 하단 탭 (기본 / 선택[분홍]). 투데이·관계·기록은 Phosphor Icons, 전체는 Iconsax(menu).
   static const tabHome = '$_icons/tab_home.svg';
   static const tabHomeActive = '$_icons/tab_home_active.svg';
   static const tabRelations = '$_icons/tab_relations.svg';
@@ -21,7 +21,6 @@ abstract final class AppAssets {
   static const forum = '$_icons/forum.svg';
   static const bell = '$_icons/bell.svg';
   static const sealCheck = '$_icons/seal_check.svg';
-  static const fire = '$_icons/fire.svg';
 
   // 화살표: 쓰이는 자리마다 크기·색이 달라 파일이 나뉘어 있다.
   static const chevronSignal = '$_icons/chevron_signal.svg';
@@ -55,7 +54,6 @@ abstract final class AppAssets {
     forum,
     bell,
     sealCheck,
-    fire,
     chevronSignal,
     chevronGraph,
     chevronSeeAll,

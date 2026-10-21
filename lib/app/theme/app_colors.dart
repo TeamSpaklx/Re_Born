@@ -76,8 +76,8 @@ class AppColors extends ThemeExtension<AppColors> {
 
   /// Figma 홈 화면에서 읽은 라이트 팔레트.
   static const light = AppColors(
-    brand: Color(0xFFD94F79),
-    cta: Color(0xFFCF3F6B),
+    brand: Color(0xFFFF6090),
+    cta: Color(0xFFFF6090),
     onCta: Color(0xFFFFFFFF),
     background: Color(0xFFFFFFFF),
     backgroundGradientTop: Color(0xCCD94F79), // rgba(217,79,121,0.8)
@@ -94,7 +94,7 @@ class AppColors extends ThemeExtension<AppColors> {
     avatar: Color(0xFFD9D9D9),
     iconTile: Color(0x80D9D9D9), // rgba(217,217,217,0.5)
     gridLine: Color(0x80A0A7B4), // rgba(160,167,180,0.5)
-    attendancePanel: Color(0xFFCF9FAE),
+    attendancePanel: Color(0xFFFFB2CA),
     onAttendancePanel: Color(0xCCFFFFFF), // rgba(255,255,255,0.8)
     bellButton: Color(0x1A999999), // rgba(153,153,153,0.1)
     navFill: Color(0xB3FFFFFF), // rgba(255,255,255,0.7)
