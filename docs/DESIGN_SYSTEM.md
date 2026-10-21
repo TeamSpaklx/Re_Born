@@ -198,8 +198,8 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 - 플랫폼 분기는 한 곳(`AppBottomNavBar`)에서만 합니다: iOS 26 이상 → 네이티브, 그 외 → Flutter 탭 바.
 - 네이티브 탭 바는 탭을 누르면 Dart로 index를 알리고(`onTap`), Dart에서 탭이 바뀌면(화면 안 버튼 등) 선택 표시를 맞춥니다(`setSelectedIndex`). 같은 탭을 다시 누르면 그 탭의 첫 화면으로 돌아갑니다.
 - **스크롤 가장자리 효과 (`ScrollEdgeEffect`):** 탭 바 뒤에서 내용이 흐려지며 배경색으로 옅어지는 구간이 하단 185px(`scrollEdgeFadeHeight`) 있습니다(Figma 컴포넌트 `Scroll Edge Effect - Soft`). 앱 뼈대(`lib/app/main_shell.dart`)가 모든 탭 위에 한 번만 깔고 터치는 통과합니다.
-  - **iOS:** 점진 블러(위에서 아래로 8개 띠, 블러 강도가 `scrollEdgeBlurSigma` 10까지 커짐, 10은 Figma 변수 `Scroll Edge Effect/Blur Radius`) + 투명 → `background` 그라디언트(위 0%~70%). iOS 26의 시스템 효과(`UIScrollEdgeEffect`)는 네이티브 스크롤 뷰에서만 쓸 수 있어 Flutter로 비슷하게 만든 것입니다(띠 수 `scrollEdgeBlurBands` 8과 그라디언트 구간은 **추정**).
-  - **Android:** 블러 없이 그라디언트만.
+  - **iOS:** 점진 블러(위에서 아래로 8개 띠, 블러 강도가 `scrollEdgeBlurSigma` 10까지 커짐, 10은 Figma 변수 `Scroll Edge Effect/Blur Radius`) + 배경색 베일(투명 → 45% 지점 불투명도 0.7 → 화면 맨 아래 0.4). 맨 아래까지 완전히 가리지 않아 내용이 흐리게 비쳐 보입니다(iOS 시스템 효과처럼). iOS 26의 시스템 효과(`UIScrollEdgeEffect`)는 네이티브 스크롤 뷰에서만 쓸 수 있어 Flutter로 비슷하게 만든 것입니다(띠 수 `scrollEdgeBlurBands` 8과 베일 불투명도 `scrollEdgeVeilPeak`/`scrollEdgeVeilEnd`는 **추정**).
+  - **Android:** 블러 없이 투명 → 불투명도 0.7 → 0.4 베일 그라디언트만.
 
 ## 6. 에셋 목록
 

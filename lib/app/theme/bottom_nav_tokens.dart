@@ -55,6 +55,11 @@ abstract final class BottomNavTokens {
   /// iOS 점진 블러의 최대 강도. Figma 변수 `Scroll Edge Effect/Blur Radius` = 10.
   static const scrollEdgeBlurSigma = 10.0;
 
+  /// 배경색 베일의 최대 불투명도(영역 45% 지점)와 화면 맨 아래 불투명도 (추정값).
+  /// 맨 아래까지 완전히 가리지 않아 내용이 흐리게 비쳐 보인다.
+  static const scrollEdgeVeilPeak = 0.7;
+  static const scrollEdgeVeilEnd = 0.4;
+
   /// 점진 블러를 나누는 띠 개수 (추정값. 많을수록 부드럽지만 BackdropFilter가 늘어난다).
   static const scrollEdgeBlurBands = 8;
 

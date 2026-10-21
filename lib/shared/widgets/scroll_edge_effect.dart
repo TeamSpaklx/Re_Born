@@ -52,8 +52,17 @@ class ScrollEdgeEffect extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [background.withValues(alpha: 0), background],
-                stops: const [0, 0.7],
+                // 중간에서 가장 옅어지고 맨 아래(화면 끝)에서는 내용이 비쳐 보이게 한다.
+                colors: [
+                  background.withValues(alpha: 0),
+                  background.withValues(
+                    alpha: BottomNavTokens.scrollEdgeVeilPeak,
+                  ),
+                  background.withValues(
+                    alpha: BottomNavTokens.scrollEdgeVeilEnd,
+                  ),
+                ],
+                stops: const [0, 0.45, 1],
               ),
             ),
           ),
