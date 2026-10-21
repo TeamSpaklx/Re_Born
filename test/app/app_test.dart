@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reborn_app/app/app.dart';
@@ -10,6 +11,25 @@ import 'package:reborn_app/features/record/presentation/record_screen.dart';
 import 'package:reborn_app/features/relations/presentation/relations_screen.dart';
 
 void main() {
+  /// 햅틱 호출을 기록한다 (`HapticFeedback.xxx`는 platform 채널의 `HapticFeedback.vibrate`).
+  late List<String> haptics;
+
+  setUp(() {
+    haptics = [];
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(SystemChannels.platform, (call) async {
+          if (call.method == 'HapticFeedback.vibrate') {
+            haptics.add(call.arguments as String);
+          }
+          return null;
+        });
+  });
+
+  tearDown(() {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(SystemChannels.platform, null);
+  });
+
   Future<ProviderContainer> pumpApp(WidgetTester tester) async {
     await tester.pumpWidget(const ProviderScope(child: RebornApp()));
     await tester.pumpAndSettle();
@@ -70,6 +90,33 @@ void main() {
     await tester.tap(find.text('전체 보기'));
     await tester.pumpAndSettle();
     expect(currentPath(container), AppRoutes.relations);
+  });
+
+  testWidgets('다른 탭으로 바꿀 때만 선택 햅틱이 울린다', (tester) async {
+    await pumpApp(tester);
+
+    await tester.tap(find.text('관계'));
+    await tester.pumpAndSettle();
+    expect(haptics, ['HapticFeedbackType.selectionClick']);
+
+    await tester.tap(find.text('관계')); // 같은 탭을 다시 누르면 울리지 않는다
+    await tester.pumpAndSettle();
+    expect(haptics, hasLength(1));
+  });
+
+  testWidgets('버튼과 "전체 보기"를 누르면 가벼운 햅틱이 울린다', (tester) async {
+    await pumpApp(tester);
+
+    await tester.tap(find.text('전체 보기'));
+    await tester.pumpAndSettle();
+    expect(haptics, ['HapticFeedbackType.lightImpact']);
+
+    await tester.tap(find.text('투데이'));
+    await tester.pumpAndSettle();
+    haptics.clear();
+    await tester.tap(find.text('감정 기록하기'));
+    await tester.pumpAndSettle();
+    expect(haptics, ['HapticFeedbackType.lightImpact']);
   });
 
   testWidgets('디자인이 없는 탭은 흰 배경의 빈 화면이다', (tester) async {

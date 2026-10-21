@@ -5,6 +5,7 @@ import '../../../../app/theme/app_assets.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../../../../core/utils/app_haptics.dart';
 
 /// 섹션 제목 줄. 오른쪽에 "전체 보기 >"가 있거나("최근 관계 신호"),
 /// 제목 옆에 화살표가 붙는다("오늘 해볼까요? >", Before 디자인).
@@ -54,7 +55,10 @@ class SectionTitleRow extends StatelessWidget {
                 onTap: onSeeAll,
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onTap: onSeeAll,
+                  onTap: () {
+                    AppHaptics.tap();
+                    onSeeAll!();
+                  },
                   child: Row(
                     children: [
                       Text(
