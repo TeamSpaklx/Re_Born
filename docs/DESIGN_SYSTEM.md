@@ -198,7 +198,7 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 - 탭 바 위치: 화면 아래에서 `max(시스템 하단 여백, 34)`만큼 위. 탭 바에 가려지지 않게 스크롤 화면의 아래 여백은 `scrollBottomPadding`(148)을 씁니다.
 - 플랫폼 분기는 한 곳(`AppBottomNavBar`)에서만 합니다: iOS 26 이상 → 네이티브, 그 외 → Flutter 탭 바.
 - 네이티브 탭 바는 탭을 누르면 Dart로 index를 알리고(`onTap`), Dart에서 탭이 바뀌면(화면 안 버튼 등) 선택 표시를 맞춥니다(`setSelectedIndex`). 같은 탭을 다시 누르면 그 탭의 첫 화면으로 돌아갑니다.
-- **스크롤 가장자리 효과 (`ScrollEdgeEffect`):** 탭 바 뒤에서 내용이 흐려지며 배경색으로 옅어지는 구간이 하단 120px(`scrollEdgeFadeHeight`) 있습니다. 탭 바(아래 34 + 높이 64 = 98px)보다 22px 위까지입니다. Figma 컴포넌트 `Scroll Edge Effect - Soft`는 Before 185, After 147인데 화면에 비해 너무 커 보여서 줄였습니다(추정, 확인 필요). 앱 뼈대(`lib/app/main_shell.dart`)가 모든 탭 위에 한 번만 깔고 터치는 통과합니다.
+- **스크롤 가장자리 효과 (`ScrollEdgeEffect`):** 탭 바 뒤에서 내용이 흐려지며 배경색으로 옅어지는 구간이 하단 145px(`scrollEdgeFadeHeight`) 있습니다. 탭 바(아래 34 + 높이 64 = 98px)보다 47px 위까지입니다. Figma 컴포넌트 `Scroll Edge Effect - Soft`는 Before 185, After 147인데 화면에 비해 너무 커 보여서 줄였습니다(추정, 확인 필요). 앱 뼈대(`lib/app/main_shell.dart`)가 모든 탭 위에 한 번만 깔고 터치는 통과합니다.
   - **iOS:** 점진 블러(위에서 아래로 8개 띠, 블러 강도가 `scrollEdgeBlurSigma` 10까지 커짐, 10은 Figma 변수 `Scroll Edge Effect/Blur Radius`) + 배경색 베일(투명 → 45% 지점 불투명도 0.7 → 화면 맨 아래 0.4). 맨 아래까지 완전히 가리지 않아 내용이 흐리게 비쳐 보입니다(iOS 시스템 효과처럼). iOS 26의 시스템 효과(`UIScrollEdgeEffect`)는 네이티브 스크롤 뷰에서만 쓸 수 있어 Flutter로 비슷하게 만든 것입니다(띠 수 `scrollEdgeBlurBands` 8과 베일 불투명도 `scrollEdgeVeilPeak`/`scrollEdgeVeilEnd`는 **추정**).
   - **Android:** 블러 없이 투명 → 불투명도 0.7 → 0.4 베일 그라디언트만.
 
@@ -241,7 +241,7 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 6. 연속 일수가 6 미만일 때 출석 알약의 빈 모양, 샘플 아바타 사진 처리
 7. 스크롤 가장자리(탭 바 뒤) 효과의 정확한 모양(iOS 점진 블러는 근사, 그라디언트 구간은 추정)
 8. 이모지·가변 폰트 설정은 플랫폼에 따라 Figma와 다를 수 있음
-9. 스크롤 가장자리 효과 높이: Figma는 Before 185, After 147로 서로 다르고 화면에 비해 커서, 구현은 120으로 줄여 통일(사용자 요청, 2026-10-22)
+9. 스크롤 가장자리 효과 높이: Figma는 Before 185, After 147로 서로 다르고 화면에 비해 커서, 구현은 145로 줄여 통일(사용자 요청, 2026-10-22)
 10. 상단 그라디언트 색은 `rgba(217,79,121,0.8)`로 그대로이고 `brand`(`#FF6090`)로 바뀌지 않았습니다(Figma 값을 따름, 디자이너 확인 필요)
 11. Figma 섹션 메모 "그날 적어놓았던 기록을 보여줌 →": 섹션 밖의 화면으로 가는 동작으로 보이며 디자인을 아직 못 봄
 

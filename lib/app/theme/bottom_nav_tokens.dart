@@ -50,7 +50,7 @@ abstract final class BottomNavTokens {
   static const nativeLabelFontName = 'Pretendard-Bold';
 
   /// 탭 바 뒤에서 내용이 흰색으로 흐려지는 구간의 높이 (Scroll Edge Effect, 추정).
-  static const scrollEdgeFadeHeight = 120.0;
+  static const scrollEdgeFadeHeight = 145.0;
 
   /// iOS 점진 블러의 최대 강도. Figma 변수 `Scroll Edge Effect/Blur Radius` = 10.
   static const scrollEdgeBlurSigma = 10.0;
