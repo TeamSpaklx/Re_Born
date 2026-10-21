@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../shared/widgets/app_bottom_nav_bar.dart';
+import '../shared/widgets/scroll_edge_effect.dart';
 import 'theme/app_colors.dart';
 import 'theme/app_spacing.dart';
 import 'theme/bottom_nav_tokens.dart';
@@ -35,26 +36,12 @@ class MainShell extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           navigationShell,
-          Positioned(
+          const Positioned(
             left: 0,
             right: 0,
             bottom: 0,
             height: BottomNavTokens.scrollEdgeFadeHeight,
-            child: IgnorePointer(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      colors.background.withValues(alpha: 0),
-                      colors.background,
-                    ],
-                    stops: const [0, 0.7],
-                  ),
-                ),
-              ),
-            ),
+            child: ScrollEdgeEffect(),
           ),
           Positioned(
             left: 0,
