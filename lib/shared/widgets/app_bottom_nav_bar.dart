@@ -9,12 +9,17 @@ import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_radii.dart';
 import '../../app/theme/app_text_styles.dart';
 import '../../app/theme/bottom_nav_tokens.dart';
+import '../../core/platform/native_ui_support.dart';
+import 'nav_tabs.dart';
+import 'native_tab_bar.dart';
 
 /// 하단 탭 바 (Figma `ButtonNavigator[Liquid Glass]`, docs/DESIGN_SYSTEM.md 5.8).
 ///
-/// iOS와 Android는 배경 블러 강도만 다르고 구조·아이콘·라벨은 같다.
-/// - iOS: Figma 값(반투명 흰색 + 테두리 + 그림자) + 약한 블러
+/// - iOS 26 이상: 시스템 `UITabBar`(Liquid Glass)를 네이티브로 그린다([NativeTabBar]).
+/// - iOS 26 미만: Figma 값(반투명 흰색 + 테두리 + 그림자) + 약한 블러
 /// - Android: 같은 모양에 더 강한 블러 배경
+///
+/// Flutter가 그리는 쪽은 iOS와 Android가 배경 블러 강도만 다르고 구조·아이콘·라벨은 같다.
 class AppBottomNavBar extends StatelessWidget {
   const AppBottomNavBar({
     super.key,
@@ -22,6 +27,7 @@ class AppBottomNavBar extends StatelessWidget {
     required this.onTap,
     this.width = BottomNavTokens.width,
     this.platform,
+    this.useNativeTabBar,
   });
 
   final int currentIndex;
@@ -31,15 +37,22 @@ class AppBottomNavBar extends StatelessWidget {
   /// 테스트에서 플랫폼을 바꿔 볼 때만 지정한다. 비우면 현재 플랫폼을 쓴다.
   final TargetPlatform? platform;
 
-  static const _tabs = [
-    _NavTab(AppAssets.tabHome, AppAssets.tabHomeActive),
-    _NavTab(AppAssets.tabRelations, AppAssets.tabRelationsActive),
-    _NavTab(AppAssets.tabRecord, AppAssets.tabRecordActive),
-    _NavTab(AppAssets.tabAll, AppAssets.tabAllActive),
-  ];
+  /// 네이티브 탭 바 사용 여부. 비우면 실제 기기가 iOS 26 이상일 때만 쓴다
+  /// (`platform`을 지정한 테스트에서는 자동으로 쓰지 않는다).
+  final bool? useNativeTabBar;
 
   @override
   Widget build(BuildContext context) {
+    final native =
+        useNativeTabBar ?? (platform == null && supportsNativeTabBar());
+    if (native) {
+      return NativeTabBar(
+        width: width,
+        currentIndex: currentIndex,
+        onTap: onTap,
+      );
+    }
+
     final colors = context.colors;
     final isAndroid =
         (platform ?? defaultTargetPlatform) == TargetPlatform.android;
@@ -120,10 +133,10 @@ class AppBottomNavBar extends StatelessWidget {
                         height: BottomNavTokens.menusHeight,
                         child: Row(
                           children: [
-                            for (var i = 0; i < _tabs.length; i++)
+                            for (var i = 0; i < NavTab.all.length; i++)
                               Expanded(
                                 child: _NavItem(
-                                  tab: _tabs[i],
+                                  tab: NavTab.all[i],
                                   label: BottomNavTokens.labels[i],
                                   selected: i == currentIndex,
                                   onTap: () => onTap(i),
@@ -144,13 +157,6 @@ class AppBottomNavBar extends StatelessWidget {
   }
 }
 
-class _NavTab {
-  const _NavTab(this.icon, this.activeIcon);
-
-  final String icon;
-  final String activeIcon;
-}
-
 class _NavItem extends StatelessWidget {
   const _NavItem({
     required this.tab,
@@ -159,7 +165,7 @@ class _NavItem extends StatelessWidget {
     required this.onTap,
   });
 
-  final _NavTab tab;
+  final NavTab tab;
   final String label;
   final bool selected;
   final VoidCallback onTap;

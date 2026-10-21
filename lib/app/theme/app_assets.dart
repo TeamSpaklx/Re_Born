@@ -37,6 +37,9 @@ abstract final class AppAssets {
   /// 헤더 로고 (1000×250, 안쪽 여백 포함).
   static const logo = 'assets/images/logo_reborn.png';
 
+  /// iOS 네이티브 탭 바 라벨용 글꼴 파일(UIKit에 직접 등록한다). Flutter 글자는 pubspec의 Pretendard를 쓴다.
+  static const pretendardBold = 'assets/fonts/Pretendard-Bold.otf';
+
   /// 번들에 포함되어야 하는 모든 에셋 (존재 여부 테스트용).
   static const all = [
     tabHome,
@@ -61,5 +64,6 @@ abstract final class AppAssets {
     radioCircle,
     radioCircleAfter,
     logo,
+    pretendardBold,
   ];
 }
