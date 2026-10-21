@@ -58,6 +58,20 @@ void main() {
     expect(currentPath(container), AppRoutes.today);
   });
 
+  testWidgets('"감정 기록하기"는 기록 탭으로, "전체 보기"는 관계 탭으로 이동한다', (tester) async {
+    final container = await pumpApp(tester);
+
+    await tester.tap(find.text('감정 기록하기'));
+    await tester.pumpAndSettle();
+    expect(currentPath(container), AppRoutes.record);
+
+    await tester.tap(find.text('투데이'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('전체 보기'));
+    await tester.pumpAndSettle();
+    expect(currentPath(container), AppRoutes.relations);
+  });
+
   testWidgets('디자인이 없는 탭은 흰 배경의 빈 화면이다', (tester) async {
     await pumpApp(tester);
 
