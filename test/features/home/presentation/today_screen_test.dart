@@ -12,6 +12,8 @@ import 'package:reborn_app/features/home/models/home_summary.dart';
 import 'package:reborn_app/features/home/presentation/home_providers.dart';
 import 'package:reborn_app/features/home/presentation/today_screen.dart';
 import 'package:reborn_app/features/home/presentation/widgets/action_suggestion_card.dart';
+import 'package:reborn_app/features/home/presentation/widgets/home_header.dart';
+import 'package:reborn_app/features/home/presentation/widgets/home_top_bar.dart';
 import 'package:reborn_app/features/home/presentation/widgets/record_card_before.dart';
 import 'package:reborn_app/features/home/presentation/widgets/relation_signal_card.dart';
 import 'package:reborn_app/features/home/presentation/widgets/weekly_emotion_card.dart';
@@ -174,6 +176,35 @@ void main() {
     final scrollable = tester.state<ScrollableState>(find.byType(Scrollable));
     // 내용 높이 1205(Figma 프레임) − 화면 874
     expect(scrollable.position.maxScrollExtent, closeTo(1205 - 874, 1));
+  });
+
+  testWidgets('상단 바는 스크롤해도 화면 위에 고정되고 블러 배경을 가진다', (tester) async {
+    useDesignScreen(tester);
+    await pumpHome(tester);
+
+    final bar = find.byType(HomeTopBar);
+    expect(tester.getTopLeft(bar).dy, 0);
+    expect(tester.getSize(bar).height, 62 + HomeLayout.headerHeight);
+    expect(
+      find.descendant(of: bar, matching: find.byType(BackdropFilter)),
+      findsOneWidget,
+    );
+    final headerY = tester.getTopLeft(find.byType(HomeHeader)).dy;
+    final recordCardY = tester.getTopLeft(find.byType(RecordCardBefore)).dy;
+
+    await tester.drag(
+      find.byType(SingleChildScrollView),
+      const Offset(0, -200),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.getTopLeft(find.byType(HomeHeader)).dy, headerY);
+    expect(tester.getTopLeft(bar).dy, 0);
+    expect(
+      tester.getTopLeft(find.byType(RecordCardBefore)).dy,
+      closeTo(recordCardY - 200, 1),
+      reason: '내용은 스크롤된다',
+    );
   });
 
   testWidgets('불러오는 동안은 배경만 보인다', (tester) async {
