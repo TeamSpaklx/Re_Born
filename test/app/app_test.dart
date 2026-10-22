@@ -124,7 +124,6 @@ void main() {
 
     final screens = {
       '관계': find.byType(RelationsScreen),
-      '기록': find.byType(RecordScreen),
       '전체': find.byType(AllScreen),
     };
     for (final entry in screens.entries) {
