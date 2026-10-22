@@ -70,6 +70,26 @@ class AnalysisService {
     if (target?.personId != null) await recomputePerson(target!.personId!);
   }
 
+  /// 인물을 지운다. [deleteEntries]가 true면 그 인물의 기록도 함께 지우고,
+  /// false면 기록은 남기고 "인물 없음"으로 바꾼다(SPEC 11장 8번: 사용자가 선택).
+  /// 그 인물의 지수 이력과 인사이트는 함께 지운다.
+  Future<void> deletePerson(
+    String personId, {
+    required bool deleteEntries,
+  }) async {
+    final own = await entries.list(personId: personId);
+    for (final e in own) {
+      if (deleteEntries) {
+        await entries.delete(e.id);
+      } else {
+        await entries.update(e.copyWith(personId: null));
+      }
+    }
+    await indexHistory.deleteForPerson(personId);
+    await insights.deleteForPerson(personId);
+    await people.delete(personId);
+  }
+
   /// 분석에 실패한 기록을 처음부터 다시 분석한다.
   Future<Entry> retryAnalysis(String id) async {
     final target = await entries.get(id);

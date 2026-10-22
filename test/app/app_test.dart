@@ -5,12 +5,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:reborn_app/app/app.dart';
 import 'package:reborn_app/app/main_shell.dart';
 import 'package:reborn_app/app/router.dart';
+import 'package:reborn_app/shared/widgets/app_bottom_nav_bar.dart';
 import 'package:reborn_app/features/all/presentation/all_screen.dart';
 import 'package:reborn_app/features/home/presentation/today_screen.dart';
 import 'package:reborn_app/features/record/presentation/record_screen.dart';
 import 'package:reborn_app/features/relations/presentation/relations_screen.dart';
 
 void main() {
+  /// 하단 탭 바의 라벨 (탭 화면의 제목과 글자가 같을 수 있어 탭 바 안에서만 찾는다).
+  Finder navTab(String label) => find.descendant(
+    of: find.byType(AppBottomNavBar),
+    matching: find.text(label),
+  );
+
   /// 햅틱 호출을 기록한다 (`HapticFeedback.xxx`는 platform 채널의 `HapticFeedback.vibrate`).
   late List<String> haptics;
 
@@ -58,22 +65,22 @@ void main() {
   testWidgets('탭을 누르면 해당 화면으로 이동한다', (tester) async {
     final container = await pumpApp(tester);
 
-    await tester.tap(find.text('관계'));
+    await tester.tap(navTab('관계'));
     await tester.pumpAndSettle();
     expect(currentPath(container), AppRoutes.relations);
     expect(find.byType(RelationsScreen), findsOneWidget);
 
-    await tester.tap(find.text('기록'));
+    await tester.tap(navTab('기록'));
     await tester.pumpAndSettle();
     expect(currentPath(container), AppRoutes.record);
     expect(find.byType(RecordScreen), findsOneWidget);
 
-    await tester.tap(find.text('전체'));
+    await tester.tap(navTab('전체'));
     await tester.pumpAndSettle();
     expect(currentPath(container), AppRoutes.all);
     expect(find.byType(AllScreen), findsOneWidget);
 
-    await tester.tap(find.text('투데이'));
+    await tester.tap(navTab('투데이'));
     await tester.pumpAndSettle();
     expect(currentPath(container), AppRoutes.today);
   });
@@ -85,7 +92,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(currentPath(container), AppRoutes.record);
 
-    await tester.tap(find.text('투데이'));
+    await tester.tap(navTab('투데이'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('전체 보기'));
     await tester.pumpAndSettle();
@@ -95,11 +102,11 @@ void main() {
   testWidgets('다른 탭으로 바꿀 때만 선택 햅틱이 울린다', (tester) async {
     await pumpApp(tester);
 
-    await tester.tap(find.text('관계'));
+    await tester.tap(navTab('관계'));
     await tester.pumpAndSettle();
     expect(haptics, ['HapticFeedbackType.selectionClick']);
 
-    await tester.tap(find.text('관계')); // 같은 탭을 다시 누르면 울리지 않는다
+    await tester.tap(navTab('관계')); // 같은 탭을 다시 누르면 울리지 않는다
     await tester.pumpAndSettle();
     expect(haptics, hasLength(1));
   });
@@ -111,7 +118,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(haptics, ['HapticFeedbackType.lightImpact']);
 
-    await tester.tap(find.text('투데이'));
+    await tester.tap(navTab('투데이'));
     await tester.pumpAndSettle();
     haptics.clear();
     await tester.tap(find.text('감정 기록하기'));
@@ -122,10 +129,7 @@ void main() {
   testWidgets('디자인이 없는 탭은 흰 배경의 빈 화면이다', (tester) async {
     await pumpApp(tester);
 
-    final screens = {
-      '관계': find.byType(RelationsScreen),
-      '전체': find.byType(AllScreen),
-    };
+    final screens = {'전체': find.byType(AllScreen)};
     for (final entry in screens.entries) {
       await tester.tap(find.text(entry.key));
       await tester.pumpAndSettle();
