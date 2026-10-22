@@ -126,19 +126,18 @@ void main() {
     expect(haptics, ['HapticFeedbackType.lightImpact']);
   });
 
-  testWidgets('디자인이 없는 탭은 흰 배경의 빈 화면이다', (tester) async {
+  testWidgets('관계·기록·전체 탭은 각자의 화면을 보여 준다', (tester) async {
     await pumpApp(tester);
 
-    final screens = {'전체': find.byType(AllScreen)};
+    final screens = {
+      '관계': find.byType(RelationsScreen),
+      '기록': find.byType(RecordScreen),
+      '전체': find.byType(AllScreen),
+    };
     for (final entry in screens.entries) {
-      await tester.tap(find.text(entry.key));
+      await tester.tap(navTab(entry.key));
       await tester.pumpAndSettle();
-      final scaffold = tester.widget<Scaffold>(
-        find.descendant(of: entry.value, matching: find.byType(Scaffold)),
-      );
-      expect(scaffold.backgroundColor, Colors.white, reason: entry.key);
-      expect(scaffold.appBar, isNull, reason: entry.key);
-      expect(scaffold.body, isNull, reason: entry.key);
+      expect(entry.value, findsOneWidget, reason: entry.key);
     }
   });
 
