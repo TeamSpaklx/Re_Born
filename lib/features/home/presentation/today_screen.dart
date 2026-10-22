@@ -6,12 +6,19 @@ import '../../../app/router.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../app/theme/bottom_nav_tokens.dart';
+import '../../../app/theme/app_text_styles.dart';
+import '../../../core/providers/clock_provider.dart';
+import '../../../shared/widgets/app_dialogs.dart';
+import '../../todos/models/todo.dart';
+import '../../todos/presentation/todos_providers.dart';
+import '../models/action_suggestion.dart';
 import '../models/home_summary.dart';
 import 'home_providers.dart';
 import 'widgets/action_suggestion_card.dart';
 import 'widgets/home_error_view.dart';
 import 'widgets/home_greeting.dart';
 import 'widgets/home_top_bar.dart';
+import 'widgets/record_card_after.dart';
 import 'widgets/record_card_before.dart';
 import 'widgets/relation_signal_card.dart';
 import 'widgets/section_title_row.dart';
@@ -39,13 +46,33 @@ class TodayScreen extends ConsumerWidget {
   }
 }
 
-class _HomeContent extends StatelessWidget {
+class _HomeContent extends ConsumerWidget {
   const _HomeContent({required this.summary});
 
   final HomeSummary summary;
 
+  /// 제안을 체크리스트에 담는다(이미 담았으면 아무 일도 하지 않는다).
+  Future<void> _add(
+    BuildContext context,
+    WidgetRef ref,
+    ActionSuggestion suggestion,
+  ) async {
+    if (suggestion.added) return;
+    await ref
+        .read(todoActionsProvider)
+        .add(
+          title: suggestion.title,
+          personId: suggestion.personId,
+          source: TodoSource.suggestion,
+          insightId: suggestion.insightId,
+          now: ref.read(clockProvider)(),
+        );
+    if (context.mounted) showAppSnackBar(context, '체크리스트에 담았어요');
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.colors;
     const margin = EdgeInsets.symmetric(horizontal: AppSpacing.pageMargin);
 
     Widget card(Widget child) => Padding(padding: margin, child: child);
@@ -62,7 +89,20 @@ class _HomeContent extends StatelessWidget {
               HomeGreeting(today: summary.today, nickname: summary.nickname),
               const SizedBox(height: HomeLayout.greetingToRecordCard),
               card(
-                RecordCardBefore(onRecord: () => context.go(AppRoutes.record)),
+                summary.todayRecorded
+                    ? RecordCardAfter(
+                        streak: summary.streak,
+                        peopleCount: summary.todayPeopleCount,
+                        onViewToday: () {
+                          final id = summary.todayEntryId;
+                          if (id != null) {
+                            context.push(AppRoutes.recordDetail(id));
+                          }
+                        },
+                      )
+                    : RecordCardBefore(
+                        onRecord: () => context.go(AppRoutes.record),
+                      ),
               ),
               const SizedBox(height: HomeLayout.recordCardToSignalTitle),
               SectionTitleRow(
@@ -70,16 +110,50 @@ class _HomeContent extends StatelessWidget {
                 onSeeAll: () => context.go(AppRoutes.relations),
               ),
               const SizedBox(height: HomeLayout.sectionTitleToCard),
-              for (final signal in summary.relationSignals)
-                card(RelationSignalCard(signal: signal)),
+              if (summary.relationSignals.isEmpty)
+                card(
+                  Text(
+                    '아직 감지된 관계 변화가 없어요. 기록이 쌓이면 알려 드릴게요.',
+                    style: AppTextStyles.body.copyWith(
+                      color: colors.textSecondary,
+                    ),
+                  ),
+                )
+              else
+                for (final signal in summary.relationSignals)
+                  card(
+                    RelationSignalCard(
+                      signal: signal,
+                      onTap: () => context.push(
+                        AppRoutes.insightDetail(signal.insightId),
+                      ),
+                    ),
+                  ),
               const SizedBox(height: HomeLayout.signalCardToGraph),
               card(WeeklyEmotionCard(flow: summary.weeklyEmotion)),
               const SizedBox(height: HomeLayout.graphToActionTitle),
               const SectionTitleRow(title: '오늘 해볼까요?', trailingChevron: true),
               const SizedBox(height: HomeLayout.sectionTitleToCard),
+              if (summary.suggestions.isEmpty)
+                card(
+                  Text(
+                    '관계 변화가 감지되면 해 볼 만한 일을 제안해 드려요.',
+                    style: AppTextStyles.body.copyWith(
+                      color: colors.textSecondary,
+                    ),
+                  ),
+                ),
               for (var i = 0; i < summary.suggestions.length; i++) ...[
                 if (i > 0) const SizedBox(height: AppSpacing.actionCardGap),
-                card(ActionSuggestionCard(suggestion: summary.suggestions[i])),
+                card(
+                  ActionSuggestionCard(
+                    suggestion: summary.suggestions[i],
+                    onTap: () => context.push(
+                      AppRoutes.insightDetail(summary.suggestions[i].insightId),
+                    ),
+                    onAdd: () => _add(context, ref, summary.suggestions[i]),
+                  ),
+                ),
               ],
               const SizedBox(height: BottomNavTokens.scrollBottomPadding),
             ],

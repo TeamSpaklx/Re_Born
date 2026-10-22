@@ -13,6 +13,8 @@ class HomeSummary {
     required this.relationSignals,
     required this.weeklyEmotion,
     required this.suggestions,
+    this.todayEntryId,
+    this.todayPeopleCount = 0,
   });
 
   /// 인사말 "규리님, …"의 규리.
@@ -25,4 +27,10 @@ class HomeSummary {
   final List<RelationSignal> relationSignals;
   final WeeklyEmotionFlow weeklyEmotion;
   final List<ActionSuggestion> suggestions;
+
+  /// 오늘 가장 최근에 쓴 기록("오늘 기록 보기"로 연다). 오늘 기록이 없으면 null.
+  final String? todayEntryId;
+
+  /// 오늘 기록에 나온 서로 다른 인물 수(After 카드의 동그란 아바타 개수, 최대 3개를 그린다).
+  final int todayPeopleCount;
 }

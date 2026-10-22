@@ -118,6 +118,8 @@ abstract interface class HomeRepository {
 - 교체: `homeRepositoryProvider`의 한 줄(`FakeHomeRepository()` → `SupabaseHomeRepository(...)`).
 - 오류: 불러오기에 실패하면 예외를 던지고, 화면이 오류 화면과 "다시 시도" 버튼을 보여줍니다(SPEC의 재시도 규칙).
 
+> **2026-10-23 갱신:** 아래 4장의 `HomeRepository.fetchHome`은 **없어졌습니다.** 홈 요약은 `lib/features/analysis/home_summary_builder.dart`(`buildHomeSummary`)가 저장소들에서 앱 안에서 조립합니다(백엔드는 4-1장의 저장소만 구현). `FakeHomeRepository`도 없어지고 샘플은 `sample_data.dart`에 있습니다.
+
 ## 4-1. 저장소 계약 (백엔드가 구현할 것) — 2026-10-22 갱신
 
 MVP 데이터 처리는 SPEC 6.4대로 **분석·지수·인사이트 계산은 앱(순수 Dart)** 이 하고, 백엔드는 **저장소(읽기·쓰기 + RLS)** 만 구현합니다.
