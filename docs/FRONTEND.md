@@ -118,6 +118,25 @@ abstract interface class HomeRepository {
 - 교체: `homeRepositoryProvider`의 한 줄(`FakeHomeRepository()` → `SupabaseHomeRepository(...)`).
 - 오류: 불러오기에 실패하면 예외를 던지고, 화면이 오류 화면과 "다시 시도" 버튼을 보여줍니다(SPEC의 재시도 규칙).
 
+## 4-1. 저장소 계약 (백엔드가 구현할 것) — 2026-10-22 갱신
+
+MVP 데이터 처리는 SPEC 6.4대로 **분석·지수·인사이트 계산은 앱(순수 Dart)** 이 하고, 백엔드는 **저장소(읽기·쓰기 + RLS)** 만 구현합니다.
+위 4장의 `HomeRepository`는 홈 화면 연결 작업에서 없어지고, 홈 요약은 아래 저장소들에서 앱이 조립합니다.
+
+| 인터페이스 (파일) | 테이블 | 하는 일 |
+|---|---|---|
+| `PeopleRepository` (`lib/features/people/data/people_repository.dart`) | `people` | 인물 목록·추가·수정·삭제·전체 삭제 |
+| `EntriesRepository` (`lib/features/entries/data/entries_repository.dart`) | `entries` | 기록 목록(인물별)·조회·추가(pending)·수정·삭제 |
+| `TodosRepository` (`lib/features/todos/data/todos_repository.dart`) | `todos` | 체크리스트 목록·추가·수정(완료)·삭제 |
+| `InsightsRepository` (`lib/features/insights/data/insights_repository.dart`) | `insights` | 인사이트 목록·조회·저장·읽음 처리 |
+| `IndexHistoryRepository` (같은 파일) | `index_history` | 인물·날짜별 지수 목록·덮어쓰기·삭제 |
+| `SettingsRepository` (`lib/features/settings/data/settings_repository.dart`) | `profiles` | 닉네임·동의 |
+
+- **교체 지점은 한 곳:** `lib/app/data_providers.dart`의 provider 한 줄씩(`InMemory…` → `Supabase…`). 화면과 분석 코드는 건드리지 않습니다.
+- 메모리 구현과 샘플 데이터(`lib/features/analysis/data/sample_data.dart`)는 백엔드 연결 전 시연용입니다.
+- 기록 저장 → 분석 → 지수 → 인사이트 순서는 `AnalysisService`(`lib/features/analysis/analysis_service.dart`)가 저장소 호출 순서로 처리하므로, 백엔드는 이 로직을 만들지 않아도 됩니다.
+- 분석 규칙은 `lib/features/analysis/`의 순수 함수(`emotion_analyzer`, `relation_index`, `insight_detector`, `suggestion_pool`, `crisis_checker`, `record_streak_calculator`)이고 임계값은 **제안값**입니다(팀 테스트로 조정).
+
 ## 5. 화면 공통 규칙
 
 - 글자 크기 배율 1.0 고정, 라이트 모드만, 세로 방향만. 다크 모드는 나중에 추가하므로 색은 `context.colors`로만 읽습니다.

@@ -1,15 +1,4 @@
-/// 인물과의 관계 유형. 칩 글자로 쓴다.
-enum RelationType {
-  friend('친구'),
-  family('가족'),
-  teacher('선생님'),
-  coworker('직장 동료'),
-  other('기타');
-
-  const RelationType(this.label);
-
-  final String label;
-}
+import '../../people/models/relation_type.dart';
 
 /// "최근 관계 신호" 카드 하나.
 class RelationSignal {

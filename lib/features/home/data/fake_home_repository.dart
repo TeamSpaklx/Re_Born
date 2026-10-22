@@ -5,6 +5,7 @@ import '../models/record_streak.dart';
 import '../models/relation_signal.dart';
 import '../models/weekly_emotion_flow.dart';
 import 'home_repository.dart';
+import '../../people/models/relation_type.dart';
 
 /// Figma 샘플 값으로 홈을 채우는 메모리 구현. 백엔드 연결 전에 화면을 만들 때 쓴다.
 class FakeHomeRepository implements HomeRepository {
