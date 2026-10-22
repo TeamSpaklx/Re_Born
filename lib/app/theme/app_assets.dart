@@ -22,6 +22,10 @@ abstract final class AppAssets {
   static const bell = '$_icons/bell.svg';
   static const sealCheck = '$_icons/seal_check.svg';
 
+  // 임시 디자인 화면용 아이콘 (Phosphor Icons, MIT). 한 가지 색(currentColor)이라 쓰는 곳에서 색을 입힌다.
+  static const check = '$_icons/check.svg';
+  static const trash = '$_icons/trash.svg';
+
   // 화살표: 쓰이는 자리마다 크기·색이 달라 파일이 나뉘어 있다.
   static const chevronSignal = '$_icons/chevron_signal.svg';
   static const chevronGraph = '$_icons/chevron_graph.svg';
@@ -54,6 +58,8 @@ abstract final class AppAssets {
     forum,
     bell,
     sealCheck,
+    check,
+    trash,
     chevronSignal,
     chevronGraph,
     chevronSeeAll,

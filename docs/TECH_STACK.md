@@ -10,7 +10,7 @@
 | 앱 | Flutter (stable 3.47.4), Dart `^3.12.0` | CI와 같은 버전 사용 |
 | 대상 OS | **iOS와 Android 둘 다 (확정, SPEC 11장 3번)** | 코드는 둘 다 잘 동작해야 하고 플랫폼 설정(Info.plist, AndroidManifest)은 항상 양쪽 다 처리합니다. **확인은 팀원 기기에 따라 나눕니다: Windows 기기는 Android만, Mac 기기는 Android와 iOS 둘 다.** iOS 전용 코드는 `ios/`와 `Platform` 분기 안에만 두어 Windows에서도 Android 빌드가 깨지지 않게 합니다 |
 | 폰트 | Pretendard (400·500·600·700·800) | `assets/fonts/`, 라이선스 SIL OFL 1.1 (`OFL-LICENSE.txt`) |
-| 아이콘 | `flutter_svg` ^2.3.0 + Figma에서 내려받은 SVG | `assets/icons/ui/`, 경로는 `lib/app/theme/app_assets.dart`. 원본 라이브러리: 탭 바 투데이·관계·기록 = Phosphor Icons, 전체 = Iconsax (SVG로 받아 사용, 아이콘 패키지는 쓰지 않음) |
+| 아이콘 | `flutter_svg` ^2.3.0 + Figma에서 내려받은 SVG | `assets/icons/ui/`, 경로는 `lib/app/theme/app_assets.dart`. 원본 라이브러리: 탭 바 투데이·관계·기록 = Phosphor Icons, 전체 = Iconsax, 임시 디자인 화면의 새 아이콘(check, trash)도 Phosphor(MIT)에서 SVG로 받음 (아이콘 패키지는 쓰지 않음) |
 | 디자인 기준 | Figma 홈 화면 (100% 일치 목표) | [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md), 값은 `lib/app/theme/` 상수만 사용 |
 | 인증 | Supabase Auth, 이메일 + 비밀번호 | 구글 로그인은 미정 (SPEC 11장 7번) |
 | 상태 관리 | `flutter_riverpod` ^3.4.3 | 앱 최상단 `ProviderScope`, 데이터는 Repository를 Provider로 주입 ([FRONTEND.md](./FRONTEND.md)) |

@@ -22,3 +22,16 @@ final insightsForPersonProvider = FutureProvider.family<List<Insight>, String>((
   ref.watch(dataRevisionProvider);
   return ref.watch(insightsRepositoryProvider).list(personId: personId);
 });
+
+/// 인사이트 한 건. 없으면 null.
+final insightProvider = FutureProvider.family<Insight?, String>((ref, id) {
+  ref.watch(dataRevisionProvider);
+  return ref.watch(insightsRepositoryProvider).get(id);
+});
+
+/// 읽음 처리.
+final markInsightReadProvider = Provider<Future<void> Function(String)>((ref) {
+  return (id) async {
+    await ref.read(insightsRepositoryProvider).markRead(id);
+  };
+});
