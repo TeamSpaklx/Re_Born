@@ -3,6 +3,7 @@ import '../../people/models/relation_type.dart';
 /// "최근 관계 신호" 카드 하나.
 class RelationSignal {
   const RelationSignal({
+    required this.insightId,
     required this.personId,
     required this.personName,
     required this.relationType,
@@ -10,6 +11,8 @@ class RelationSignal {
     required this.daysSinceLastRecord,
   });
 
+  /// 이 신호를 만든 인사이트(카드를 누르면 상세로 간다).
+  final String insightId;
   final String personId;
   final String personName;
   final RelationType relationType;
