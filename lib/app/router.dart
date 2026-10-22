@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/all/presentation/all_screen.dart';
 import '../features/home/presentation/today_screen.dart';
+import '../features/insights/presentation/insight_detail_screen.dart';
 import '../features/record/presentation/record_detail_screen.dart';
 import '../features/record/presentation/record_form_screen.dart';
 import '../features/record/presentation/record_screen.dart';
@@ -24,6 +25,7 @@ abstract final class AppRoutes {
   static const recordNew = '/record/new';
   static String recordDetail(String id) => '/record/$id';
   static String recordEdit(String id) => '/record/$id/edit';
+  static String insightDetail(String id) => '/insight/$id';
   static const relationsNew = '/relations/new';
   static String relationsDetail(String id) => '/relations/$id';
   static String relationsEdit(String id) => '/relations/$id/edit';
@@ -37,6 +39,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.recordNew,
         builder: (context, state) => const RecordFormScreen(),
+      ),
+      GoRoute(
+        path: '/insight/:id',
+        builder: (context, state) =>
+            InsightDetailScreen(insightId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: '/record/:id/edit',

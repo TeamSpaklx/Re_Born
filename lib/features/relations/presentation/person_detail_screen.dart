@@ -261,7 +261,10 @@ class _PersonDetailScreenState extends ConsumerState<PersonDetailScreen> {
               )
             else
               for (final i in insights) ...[
-                _InsightTile(insight: i),
+                _InsightTile(
+                  insight: i,
+                  onTap: () => context.push(AppRoutes.insightDetail(i.id)),
+                ),
                 const SizedBox(height: AppSpacing.actionCardGap),
               ],
           ],
@@ -272,9 +275,10 @@ class _PersonDetailScreenState extends ConsumerState<PersonDetailScreen> {
 }
 
 class _InsightTile extends StatelessWidget {
-  const _InsightTile({required this.insight});
+  const _InsightTile({required this.insight, required this.onTap});
 
   final Insight insight;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -283,23 +287,27 @@ class _InsightTile extends StatelessWidget {
     final detail = insight.type == InsightType.negativeTrend
         ? '최근 10일 부정 기록 ${e.negCount}건 · 지수 ${e.indexFrom} → ${e.indexTo}'
         : '지수 ${e.indexFrom} → ${e.indexTo}';
-    return AppCard.white(
-      padding: const EdgeInsets.all(18),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            insight.message,
-            style: AppTextStyles.recordCardTitleBefore.copyWith(
-              color: colors.textBlack,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: AppCard.white(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              insight.message,
+              style: AppTextStyles.recordCardTitleBefore.copyWith(
+                color: colors.textBlack,
+              ),
             ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            detail,
-            style: AppTextStyles.body.copyWith(color: colors.textSecondary),
-          ),
-        ],
+            const SizedBox(height: 6),
+            Text(
+              detail,
+              style: AppTextStyles.body.copyWith(color: colors.textSecondary),
+            ),
+          ],
+        ),
       ),
     );
   }
