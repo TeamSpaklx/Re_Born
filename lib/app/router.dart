@@ -7,6 +7,8 @@ import '../features/home/presentation/today_screen.dart';
 import '../features/record/presentation/record_detail_screen.dart';
 import '../features/record/presentation/record_form_screen.dart';
 import '../features/record/presentation/record_screen.dart';
+import '../features/relations/presentation/person_detail_screen.dart';
+import '../features/relations/presentation/person_form_screen.dart';
 import '../features/relations/presentation/relations_screen.dart';
 import 'main_shell.dart';
 
@@ -22,6 +24,9 @@ abstract final class AppRoutes {
   static const recordNew = '/record/new';
   static String recordDetail(String id) => '/record/$id';
   static String recordEdit(String id) => '/record/$id/edit';
+  static const relationsNew = '/relations/new';
+  static String relationsDetail(String id) => '/relations/$id';
+  static String relationsEdit(String id) => '/relations/$id/edit';
 }
 
 /// 앱 라우터. 로그인 화면은 디자인이 나올 때까지 없고, 앱은 투데이(홈)로 바로 시작한다.
@@ -37,6 +42,20 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/record/:id/edit',
         builder: (context, state) =>
             RecordFormScreen(entryId: state.pathParameters['id']),
+      ),
+      GoRoute(
+        path: AppRoutes.relationsNew,
+        builder: (context, state) => const PersonFormScreen(),
+      ),
+      GoRoute(
+        path: '/relations/:id/edit',
+        builder: (context, state) =>
+            PersonFormScreen(personId: state.pathParameters['id']),
+      ),
+      GoRoute(
+        path: '/relations/:id',
+        builder: (context, state) =>
+            PersonDetailScreen(personId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: '/record/:id',

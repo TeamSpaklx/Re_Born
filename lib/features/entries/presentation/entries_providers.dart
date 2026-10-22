@@ -11,6 +11,15 @@ final entriesProvider = FutureProvider<List<Entry>>((ref) {
   return ref.watch(entriesRepositoryProvider).list();
 });
 
+/// 한 인물의 기록(최근 것이 먼저).
+final entriesForPersonProvider = FutureProvider.family<List<Entry>, String>((
+  ref,
+  personId,
+) {
+  ref.watch(dataRevisionProvider);
+  return ref.watch(entriesRepositoryProvider).list(personId: personId);
+});
+
 /// 기록 한 건. 없으면 null.
 final entryProvider = FutureProvider.family<Entry?, String>((ref, id) {
   ref.watch(dataRevisionProvider);
