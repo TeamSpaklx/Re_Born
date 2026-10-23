@@ -1,13 +1,13 @@
-/// 감정 종류와 극성 (SPEC F-03). 7종은 캐릭터 시안(RebornMood)에 맞췄고 극성은 **팀 확인 전까지 제안값**이다(SPEC 11장 4번).
-/// 순서는 시안 순서(기쁨·슬픔·무표정·화남·불안함·사랑·신남)다.
+/// 감정 종류와 극성 (SPEC F-03). 8종과 극성은 **팀 확인 전까지 제안값**이다(SPEC 11장 4번).
 enum Emotion {
   joy('기쁨', 1),
-  sadness('슬픔', -1),
-  neutral('무표정', 0),
-  anger('화남', -1),
-  anxiety('불안함', -1),
-  love('사랑', 1),
-  excited('신남', 1);
+  gratitude('감사', 1),
+  excitement('설렘', 1),
+  calm('평온', 0),
+  hurt('서운함', -1),
+  anxiety('불안', -1),
+  anger('분노', -1),
+  sadness('슬픔', -1);
 
   const Emotion(this.label, this.polarity);
 

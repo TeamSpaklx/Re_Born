@@ -50,7 +50,7 @@ void main() {
 
     final saved = await service.saveEntry(
       body: '하은이가 고맙다는 말이 없어 서운했다',
-      emotion: Emotion.sadness,
+      emotion: Emotion.hurt,
       intensity: 2,
       personId: person.id,
     );

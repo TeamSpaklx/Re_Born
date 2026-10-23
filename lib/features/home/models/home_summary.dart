@@ -13,7 +13,6 @@ class HomeSummary {
     required this.relationSignals,
     required this.weeklyEmotion,
     required this.suggestions,
-    this.suggestionsDone = false,
     this.todayEntryId,
     this.todayPeopleCount = 0,
   });
@@ -28,9 +27,6 @@ class HomeSummary {
   final List<RelationSignal> relationSignals;
   final WeeklyEmotionFlow weeklyEmotion;
   final List<ActionSuggestion> suggestions;
-
-  /// 제안할 인사이트는 있는데 문구를 모두 체크리스트에 담은 경우("오늘 제안을 모두 담았어요").
-  final bool suggestionsDone;
 
   /// 오늘 가장 최근에 쓴 기록("오늘 기록 보기"로 연다). 오늘 기록이 없으면 null.
   final String? todayEntryId;

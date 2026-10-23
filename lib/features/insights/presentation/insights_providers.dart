@@ -33,6 +33,5 @@ final insightProvider = FutureProvider.family<Insight?, String>((ref, id) {
 final markInsightReadProvider = Provider<Future<void> Function(String)>((ref) {
   return (id) async {
     await ref.read(insightsRepositoryProvider).markRead(id);
-    ref.read(dataRevisionProvider.notifier).bump();
   };
 });

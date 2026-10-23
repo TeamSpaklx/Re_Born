@@ -8,11 +8,9 @@ import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/centered_line.dart';
-import '../../../../app/theme/app_motion.dart';
-import '../../../../core/utils/app_haptics.dart';
 import '../../models/action_suggestion.dart';
 
-/// "오늘 해볼까요?" 카드 하나 (높이 90, docs/DESIGN_HOME.md 5.6).
+/// "오늘 해볼까요?" 카드 하나 (높이 90, docs/DESIGN_SYSTEM.md 5.6).
 class ActionSuggestionCard extends StatelessWidget {
   const ActionSuggestionCard({
     super.key,
@@ -83,58 +81,41 @@ class ActionSuggestionCard extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 16),
             Semantics(
               button: true,
               checked: suggestion.added,
-              label: suggestion.added ? '체크리스트에 담았어요' : '체크리스트에 담기',
+              label: '체크리스트에 담기',
               excludeSemantics: true,
               onTap: onAdd,
               child: GestureDetector(
                 key: const Key('suggestion-add'),
                 behavior: HitTestBehavior.opaque,
-                onTap: suggestion.added
-                    ? null
-                    : () {
-                        AppHaptics.tap();
-                        onAdd();
-                      },
+                onTap: onAdd,
                 child: SizedBox(
-                  width: AppSpacing.minTouchTarget,
-                  height: AppSpacing.minTouchTarget,
+                  width: 36,
+                  height: 44,
                   child: Center(
-                    child: AnimatedSwitcher(
-                      duration: AppMotion.fast,
-                      switchInCurve: AppMotion.enter,
-                      transitionBuilder: (child, animation) => ScaleTransition(
-                        scale: animation,
-                        child: FadeTransition(opacity: animation, child: child),
-                      ),
-                      child: suggestion.added
-                          ? Container(
-                              key: const ValueKey('added'),
-                              width: HomeLayout.radioSize + 4,
-                              height: HomeLayout.radioSize + 4,
-                              decoration: BoxDecoration(
-                                color: colors.brand,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(5),
-                                child: SvgPicture.asset(
-                                  AppAssets.check,
-                                  colorFilter: ColorFilter.mode(
-                                    colors.onCta,
-                                    BlendMode.srcIn,
-                                  ),
+                    child: suggestion.added
+                        ? Container(
+                            width: HomeLayout.radioSize,
+                            height: HomeLayout.radioSize,
+                            decoration: BoxDecoration(
+                              color: colors.brand,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(4),
+                              child: SvgPicture.asset(
+                                AppAssets.check,
+                                colorFilter: ColorFilter.mode(
+                                  colors.onCta,
+                                  BlendMode.srcIn,
                                 ),
                               ),
-                            )
-                          : SvgPicture.asset(
-                              AppAssets.radioCircle,
-                              key: const ValueKey('open'),
                             ),
-                    ),
+                          )
+                        : SvgPicture.asset(AppAssets.radioCircle),
                   ),
                 ),
               ),

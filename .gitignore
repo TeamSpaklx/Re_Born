@@ -3,6 +3,10 @@
 *.log
 *.pyc
 *.swp
+# Local secrets and environment configuration
+.env
+.env.*
+!.env.example
 .DS_Store
 .atom/
 .build/
@@ -45,10 +49,6 @@ app.*.map.json
 /android/app/release
 # Widget Preview related
 .widget_preview/
-
-# 디자인 레퍼런스 이미지(남의 앱 화면, 저작권). 출처·메모가 담긴 INDEX.md만 커밋한다.
-/docs/design/references/**/*.png
-/docs/design/references/**/*.jpg
-/docs/design/references/**/*.jpeg
-/docs/design/references/**/*.webp
-/docs/design/references/fragment-*.md
+".tools/" 
+".tools/" 
+.tools/ 

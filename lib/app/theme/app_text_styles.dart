@@ -35,7 +35,6 @@ abstract final class AppTextStyles {
 
   /// "규리님, 오늘도 즐거운 하루 보내세요!"
   static final greeting = _style(26, _extraBold, -0.65, lineHeight: 32);
-  static final homeGreeting = _style(26, _semiBold, -0.65, lineHeight: 32);
 
   /// 섹션 제목("최근 관계 신호"), 인물 이름("지민").
   static final sectionTitle = _style(20, _semiBold, -0.5, lineHeight: 32);
@@ -57,20 +56,6 @@ abstract final class AppTextStyles {
 
   /// 버튼 글자.
   static final button = _style(14, _semiBold, -0.35);
-
-  /// 연한 핑크 버튼 글자 16 SemiBold ("감정 기록하기", 수정안).
-  static final buttonLarge = _style(16, _semiBold, -0.4);
-
-  /// 기록 카드(Before) 부제 16 Medium ("1분만 천천히 돌아볼까요?", 수정안).
-  static final recordCardSubtitle = _style(16, _medium, -0.4);
-
-  /// 설정 행 제목 16 Medium, 설정 묶음 제목 16 Bold (Figma에 없음, 토스 구조 참고, 추정).
-  static final rowTitle = _style(16, _medium, -0.4);
-  static final groupTitle = _style(16, _bold, -0.4);
-
-  /// 목록 구획 머리글("오늘", "지난 알림") 14 SemiBold, 뱃지 숫자 11 Bold.
-  static final sectionLabel = _style(14, _semiBold, -0.35);
-  static final badge = _style(11, _bold, -0.2);
 
   /// 감정 그래프 카드 제목.
   static final graphTitle = _style(14, _semiBold, -0.35);

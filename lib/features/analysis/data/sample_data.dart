@@ -85,19 +85,19 @@ SampleData buildSampleData(DateTime now) {
       entry(
         d,
         jimin.id,
-        d.isEven ? Emotion.joy : Emotion.love,
+        d.isEven ? Emotion.joy : Emotion.gratitude,
         2,
         '지민이와 즐거운 하루였다. 고마운 마음이 들었다.',
       ),
     // 최근 5일 연속: 지민에게 서운한 기록.
     for (var d = 5; d >= 1; d--)
-      entry(d, jimin.id, Emotion.sadness, 2, '지민이가 답장을 늦게 해서 서운했다.'),
+      entry(d, jimin.id, Emotion.hurt, 2, '지민이가 답장을 늦게 해서 서운했다.'),
     // 승현과의 기록 3건.
-    entry(9, seunghyun.id, Emotion.love, 2, '승현이가 도와줘서 고마웠다.'),
+    entry(9, seunghyun.id, Emotion.gratitude, 2, '승현이가 도와줘서 고마웠다.'),
     entry(4, seunghyun.id, Emotion.joy, 2, '승현이와 점심을 먹어서 기뻤다.'),
-    entry(2, seunghyun.id, Emotion.excited, 1, '승현이와 주말 약속이 설렌다.'),
+    entry(2, seunghyun.id, Emotion.excitement, 1, '승현이와 주말 약속이 설렌다.'),
     // 인물 없는 기록.
-    entry(3, null, Emotion.neutral, 1, '조용히 산책을 하며 마음이 평온했다.'),
+    entry(3, null, Emotion.calm, 1, '조용히 산책을 하며 마음이 평온했다.'),
   ];
 
   // 일별 관계 지수 이력(최근 30일, 계산할 수 있는 날만).

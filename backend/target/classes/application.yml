@@ -1,17 +1,33 @@
 spring:
+  config:
+    import: optional:classpath:application-local.yml
+
   application:
     name: reborn-backend
   datasource:
-    url: ${SUPABASE_DB_URL:jdbc:postgresql://localhost:5432/postgres}
-    username: ${SUPABASE_DB_USERNAME:postgres}
+    url: ${SUPABASE_DB_URL:jdbc:postgresql://aws-0-ap-south-1.pooler.supabase.com:5432/postgres?sslmode=require}
+    username: ${SUPABASE_DB_USERNAME:postgres.cblolxoebahefwbyhoqe}
     password: ${SUPABASE_DB_PASSWORD:}
     driver-class-name: org.postgresql.Driver
   sql:
     init:
       mode: never
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${SUPABASE_ISSUER_URI:https://cblolxoebahefwbyhoqe.supabase.co/auth/v1}
 server:
-  port: ${PORT:8080}
+  port: 8000
+
+springdoc:
+  swagger-ui:
+    path: /swagger
 
 reborn:
   ai:
-    enabled: ${AI_ANALYSIS_ENABLED:false}
+    enabled: ${AI_ANALYSIS_ENABLED:true}
+    openai:
+      api-key: ${OPENAI_API_KEY:}
+      model: ${OPENAI_MODEL:gpt-6-luna}
+      base-url: https://api.openai.com/v1

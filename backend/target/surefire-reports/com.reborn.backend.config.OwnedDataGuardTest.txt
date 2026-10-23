@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.reborn.backend.config.OwnedDataGuardTest
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.289 s -- in com.reborn.backend.config.OwnedDataGuardTest

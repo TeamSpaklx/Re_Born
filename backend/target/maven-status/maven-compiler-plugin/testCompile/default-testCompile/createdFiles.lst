@@ -1,0 +1,5 @@
+com\reborn\backend\api\CrudApiControllerTest.class
+com\reborn\backend\config\SecurityConfigTest.class
+com\reborn\backend\diary\DiaryServiceTest.class
+com\reborn\backend\config\OwnedDataGuardTest.class
+com\reborn\backend\diary\DiaryControllerTest.class
