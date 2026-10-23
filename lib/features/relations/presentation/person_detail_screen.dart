@@ -1,28 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/router.dart';
+import '../../../app/theme/app_assets.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../app/theme/app_text_styles.dart';
 import '../../../core/providers/clock_provider.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/app_dialogs.dart';
-import '../../../shared/widgets/choice_chip_button.dart';
-import '../../../shared/widgets/cta_button.dart';
+import '../../../shared/widgets/donut_chart.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/page_scaffold.dart';
+import '../../../shared/widgets/pressable.dart';
+import '../../../shared/widgets/segmented_control.dart';
 import '../../analysis/relation_index.dart';
+import '../../entries/models/emotion.dart';
+import '../../entries/models/entry.dart';
 import '../../entries/presentation/entries_providers.dart';
+import '../../entries/presentation/widgets/emotion_chip.dart';
+import '../../entries/presentation/widgets/entry_card.dart';
 import '../../insights/models/graph_period.dart';
 import '../../insights/models/insight.dart';
 import '../../insights/presentation/insights_providers.dart';
 import '../../people/presentation/people_providers.dart';
 import 'widgets/index_line_chart.dart';
+import 'widgets/person_avatar.dart';
 
-/// 인물 상세 = 관계 히스토리 (F-09). **임시 디자인**.
-/// 오늘 지수, 기간(1주·1개월·3개월·전체) 선택, 지수 선 그래프, 시작 대비 변화량, 인사이트 목록.
+/// 인물 상세 = 관계 히스토리 (F-09).
+/// 오늘 지수, 기간(1주·1개월·3개월·전체) 선택, 지수 곡선 그래프와 시작 대비 변화량, 감정 분포(도넛),
+/// 인사이트 목록, 최근 기록.
 class PersonDetailScreen extends ConsumerStatefulWidget {
   const PersonDetailScreen({super.key, required this.personId});
 
@@ -85,9 +94,28 @@ class _PersonDetailScreenState extends ConsumerState<PersonDetailScreen> {
     final insights =
         ref.watch(insightsForPersonProvider(widget.personId)).value ??
         const <Insight>[];
+    final people = ref.watch(peopleProvider).value ?? const [];
+    final names = {for (final p in people) p.id: p.name};
+
+    final counts = <Emotion, int>{};
+    for (final e in entries ?? const <Entry>[]) {
+      counts[e.emotion] = (counts[e.emotion] ?? 0) + 1;
+    }
+    final recent = (entries ?? const <Entry>[]).take(3).toList();
+
+    Widget sectionTitle(String text) => Padding(
+      padding: const EdgeInsets.only(
+        top: AppSpacing.space32,
+        bottom: AppSpacing.space12,
+      ),
+      child: Text(
+        text,
+        style: AppTextStyles.sectionTitle.copyWith(color: colors.textBlack),
+      ),
+    );
 
     return PageScaffold(
-      title: person.name,
+      title: '',
       actions: [
         PageAction(
           label: '수정',
@@ -98,69 +126,129 @@ class _PersonDetailScreenState extends ConsumerState<PersonDetailScreen> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(
           AppSpacing.pageMargin,
-          8,
+          AppSpacing.space8,
           AppSpacing.pageMargin,
-          40,
+          AppSpacing.space40,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              person.relationType.label,
-              style: AppTextStyles.date.copyWith(color: colors.textDate),
-            ),
-            const SizedBox(height: 12),
-            AppCard.pink(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '오늘의 관계 지수',
-                          style: AppTextStyles.body.copyWith(
-                            color: colors.textSecondary,
+            Row(
+              children: [
+                PersonAvatar(person: person, size: 64),
+                const SizedBox(width: AppSpacing.space16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Semantics(
+                        header: true,
+                        child: Text(
+                          person.name,
+                          style: AppTextStyles.greeting.copyWith(
+                            color: colors.textBlack,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          index == null ? '데이터 부족' : '${index.index}',
-                          key: const Key('person-index'),
-                          style: AppTextStyles.attendanceNumber.copyWith(
-                            color: colors.brand,
-                            height: 1.2,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (index == null)
-                    Flexible(
-                      child: Text(
-                        '기록이 3건 이상 쌓이면 지수가 계산돼요.',
-                        style: AppTextStyles.caption.copyWith(
+                      ),
+                      Text(
+                        person.relationType.label,
+                        style: AppTextStyles.recordCardSubtitle.copyWith(
                           color: colors.textSecondary,
                         ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            if (person.memo != null && person.memo!.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.space12),
+              Text(
+                person.memo!,
+                style: AppTextStyles.body.copyWith(
+                  color: colors.textSecondary,
+                  height: 1.5,
+                ),
+              ),
+            ],
+            const SizedBox(height: AppSpacing.space20),
+            AppCard.pink(
+              padding: const EdgeInsets.all(AppSpacing.space20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '오늘의 관계 지수',
+                    style: AppTextStyles.body.copyWith(
+                      color: colors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.space8),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        index == null ? '데이터 부족' : '${index.index}',
+                        key: const Key('person-index'),
+                        style:
+                            (index == null
+                                    ? AppTextStyles.sectionTitle
+                                    : AppTextStyles.attendanceNumber)
+                                .copyWith(
+                                  color: colors.brand,
+                                  height: index == null ? 1.3 : 1.1,
+                                ),
+                      ),
+                      if (index != null)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 4, bottom: 2),
+                          child: Text(
+                            '/ 100',
+                            style: AppTextStyles.body.copyWith(
+                              color: colors.textSecondary,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.space12),
+                  if (index != null)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: SizedBox(
+                        height: 8,
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              child: ColoredBox(color: colors.cardWhite),
+                            ),
+                            FractionallySizedBox(
+                              widthFactor: (index.index / 100)
+                                  .clamp(0, 1)
+                                  .toDouble(),
+                              child: ColoredBox(color: colors.brand),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  else
+                    Text(
+                      '기록이 3건 이상 쌓이면 지수가 계산돼요.',
+                      style: AppTextStyles.body.copyWith(
+                        color: colors.textSecondary,
                       ),
                     ),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
-            Wrap(
-              spacing: 8,
-              children: [
-                for (final p in GraphPeriod.values)
-                  ChoiceChipButton(
-                    label: p.label,
-                    selected: _period == p,
-                    onTap: () => setState(() => _period = p),
-                  ),
-              ],
+            sectionTitle('관계 변화'),
+            SegmentedControl(
+              labels: [for (final p in GraphPeriod.values) p.label],
+              selectedIndex: GraphPeriod.values.indexOf(_period),
+              onChanged: (i) => setState(() => _period = GraphPeriod.values[i]),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.space12),
             history.when(
               data: (all) {
                 final points = _period.filter(all, now);
@@ -183,7 +271,7 @@ class _PersonDetailScreenState extends ConsumerState<PersonDetailScreen> {
                               ? '변화량을 보려면 점이 2개 이상 필요해요'
                               : '시작 대비 ${change >= 0 ? '+' : ''}$change',
                           key: const Key('index-change'),
-                          style: AppTextStyles.graphTitle.copyWith(
+                          style: AppTextStyles.groupTitle.copyWith(
                             color: colors.textBlack,
                           ),
                         ),
@@ -197,26 +285,42 @@ class _PersonDetailScreenState extends ConsumerState<PersonDetailScreen> {
                 );
               },
               loading: () => const SizedBox(height: IndexLineChart.height),
-              error: (e, st) => Column(
-                children: [
-                  const EmptyState(message: '불러오지 못했어요'),
-                  CtaButton(
-                    label: '다시 시도',
-                    height: 48,
-                    onPressed: () =>
-                        ref.invalidate(indexHistoryProvider(widget.personId)),
-                  ),
-                ],
+              error: (e, st) => ErrorState(
+                onRetry: () =>
+                    ref.invalidate(indexHistoryProvider(widget.personId)),
               ),
             ),
-            const SizedBox(height: 28),
-            Text(
-              '인사이트',
-              style: AppTextStyles.sectionTitle.copyWith(
-                color: colors.textBlack,
+            if (counts.isNotEmpty) ...[
+              sectionTitle('자주 느낀 감정'),
+              AppCard.white(
+                padding: const EdgeInsets.all(AppSpacing.space20),
+                child: Row(
+                  children: [
+                    DonutChart(
+                      size: 104,
+                      strokeWidth: 16,
+                      segments: [
+                        for (final e in Emotion.values)
+                          if ((counts[e] ?? 0) > 0)
+                            DonutSegment(
+                              value: counts[e]!.toDouble(),
+                              color: emotionColor(e, colors),
+                            ),
+                      ],
+                      center: Text(
+                        '${entries!.length}건',
+                        style: AppTextStyles.groupTitle.copyWith(
+                          color: colors.textBlack,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.space20),
+                    Expanded(child: _Legend(counts: counts)),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
+            ],
+            sectionTitle('인사이트'),
             if (insights.isEmpty)
               Text(
                 '아직 감지된 변화가 없어요.',
@@ -230,9 +334,62 @@ class _PersonDetailScreenState extends ConsumerState<PersonDetailScreen> {
                 ),
                 const SizedBox(height: AppSpacing.actionCardGap),
               ],
+            if (recent.isNotEmpty) ...[
+              sectionTitle('최근 기록'),
+              for (final e in recent) ...[
+                EntryCard(
+                  entry: e,
+                  personName: names[e.personId],
+                  onTap: () => context.push(AppRoutes.recordDetail(e.id)),
+                ),
+                const SizedBox(height: AppSpacing.actionCardGap),
+              ],
+            ],
           ],
         ),
       ),
+    );
+  }
+}
+
+/// 감정 분포 범례: 개수가 많은 순으로 최대 4개.
+class _Legend extends StatelessWidget {
+  const _Legend({required this.counts});
+
+  final Map<Emotion, int> counts;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final total = counts.values.fold<int>(0, (a, b) => a + b);
+    final top = counts.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final e in top.take(4))
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 3),
+            child: Row(
+              children: [
+                EmotionDot(emotion: e.key, size: 10),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    e.key.label,
+                    style: AppTextStyles.body.copyWith(color: colors.textBlack),
+                  ),
+                ),
+                Text(
+                  '${(e.value * 100 / total).round()}%',
+                  style: AppTextStyles.body.copyWith(
+                    color: colors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }
@@ -250,26 +407,40 @@ class _InsightTile extends StatelessWidget {
     final detail = insight.type == InsightType.negativeTrend
         ? '최근 10일 부정 기록 ${e.negCount}건 · 지수 ${e.indexFrom} → ${e.indexTo}'
         : '지수 ${e.indexFrom} → ${e.indexTo}';
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
+    return Semantics(
+      button: true,
+      label: '${insight.message}, $detail',
+      excludeSemantics: true,
       onTap: onTap,
-      child: AppCard.white(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              insight.message,
-              style: AppTextStyles.recordCardTitleBefore.copyWith(
-                color: colors.textBlack,
+      child: Pressable(
+        onTap: onTap,
+        child: AppCard.white(
+          padding: const EdgeInsets.all(AppSpacing.space16),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      insight.message,
+                      style: AppTextStyles.groupTitle.copyWith(
+                        color: colors.textBlack,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      detail,
+                      style: AppTextStyles.body.copyWith(
+                        color: colors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              detail,
-              style: AppTextStyles.body.copyWith(color: colors.textSecondary),
-            ),
-          ],
+              SvgPicture.asset(AppAssets.chevronSignal),
+            ],
+          ),
         ),
       ),
     );
