@@ -67,9 +67,13 @@ class _ConsentScreenState extends ConsumerState<ConsentScreen> {
     setState(() => _busy = true);
     final router = GoRouter.of(context);
     try {
-      await ref
-          .read(authActionsProvider)
-          .signUp(ref.read(signupDraftProvider).copyWith(consents: _consents));
+      final draft = ref.read(signupDraftProvider).copyWith(consents: _consents);
+      final actions = ref.read(authActionsProvider);
+      if (draft.social != null) {
+        await actions.completeSocialSignup(draft);
+      } else {
+        await actions.signUp(draft);
+      }
     } on AuthFailure catch (failure) {
       if (!mounted) return;
       setState(() => _busy = false);

@@ -76,17 +76,19 @@
 | 출석 패널 / 그 위 글자 | `attendancePanel` / `onAttendancePanel` | `#FFB2CA` / `rgba(255,255,255,0.8)` | Figma |
 | 그래프 이모지 (지금은 안 씀) | `emoji` | `#A0A7B4` | Figma |
 
-### 1.6 감정 8색 (임시, 캐릭터 에셋 대기)
-감정마다 대표색을 하나 갖고, 감정 칩·달력·그래프·목록의 색 점에 씁니다. **감정 캐릭터 에셋을 팀이 준비하는 중이라, 에셋이 오면 에셋의 대표색으로 교체**합니다(추정).
+### 1.6 감정 7색과 캐릭터
+감정은 캐릭터 시안(`RebornMood`)의 7종입니다: 기쁨·슬픔·무표정·화남·불안함·사랑·신남. 색은 시안의 이름표 색에서 뽑았고, 감정 카드 배경·비율 막대·범례에 씁니다. 캐릭터 이미지는 시안을 캐릭터별로 잘라 번짐을 정리한 PNG(`assets/images/emotions/`, 320×320)입니다.
 
 | 감정 | 필드 | 값 | | 감정 | 필드 | 값 |
 |---|---|---|---|---|---|---|
-| 기쁨 | `emotionJoy` | `#FFD66B` | | 서운함 | `emotionHurt` | `#9DB4F2` |
-| 감사 | `emotionGratitude` | `#FFB38A` | | 불안 | `emotionAnxiety` | `#C5A8EE` |
-| 설렘 | `emotionExcitement` | `#FF9CC2` | | 분노 | `emotionAnger` | `#F27B72` |
-| 평온 | `emotionCalm` | `#9FD8C0` | | 슬픔 | `emotionSadness` | `#9FB7C9` |
+| 기쁨 | `emotionJoy` | `#F4B1CB` | | 화남 | `emotionAnger` | `#FDA4AC` |
+| 슬픔 | `emotionSadness` | `#BBD5ED` | | 불안함 | `emotionAnxiety` | `#B9E5C6` |
+| 무표정 | `emotionNeutral` | `#D1BDF3` | | 사랑 | `emotionLove` | `#FF9EC4` |
+| 신남 | `emotionExcited` | `#FAD599` | | | | |
 
-코드: `emotionColor(emotion, colors)`, `EmotionDot`, `EmotionChip` (`lib/features/entries/presentation/widgets/emotion_chip.dart`). 감정 8종과 극성은 팀 확인 전 제안값입니다(SPEC 11장).
+코드: `emotionColor(emotion, colors)`, `EmotionDot`, `EmotionChip`(`emotion_chip.dart`), `EmotionFace`(캐릭터 이미지, `emotion_face.dart`). 극성은 팀 확인 전 제안값입니다(SPEC 11장 4번). 시안 원본은 `docs/design/references/user/RebornMood_source.png`(git 제외, 번들 밖)이며 알파에 번짐 잡음이 있어 그대로 쓰지 않습니다.
+
+**임시 프로필 이미지:** 인물·사용자 아바타는 같은 캐릭터 7종을 `CharacterAvatar(seed)`로 고정 배정해 씁니다(인물 id가 seed). 사용자 본인은 사진을 고르면 `UserAvatar`가 사진, 없으면 캐릭터를 보여 줍니다.
 
 ### 1.7 사용 규칙
 - 핑크(`brand`)는 **행동·선택·강조**에만 씁니다(버튼, 선택된 칩, 체크, 활성 탭, 막대). 본문 글자를 핑크로 칠하지 않습니다(링크처럼 눌리는 글자와 선택 상태만 예외).
@@ -175,9 +177,9 @@
 
 ## 6. 아이콘·일러스트
 
-- **아이콘:** 하단 탭 투데이·관계·기록은 Phosphor, 전체는 Iconsax(`menu`). 새 아이콘은 두 라이브러리에서 SVG로 받아 `assets/icons/ui/`에 넣고 `AppAssets`에 상수를 추가합니다(새 패키지 금지). 크기 20(행 화살표·체크), 24(체크 원), 28(탭·벨).
+- **아이콘:** 하단 탭 투데이·관계·기록은 Phosphor, 전체는 Iconsax(`menu`). **앱에 새 아이콘이 필요하면 Iconsax(Linear)를 씁니다**: Iconsax 공개 저장소(`lusaxweb/iconsax`)의 SVG를 받아 `assets/icons/ui/ix_*.svg`로 넣고 `AppAssets`에 상수를 추가합니다(아이콘 패키지는 쓰지 않음). 지금 쓰는 것: add, edit, camera, gallery, eye, eye-off, trash. 소셜 로그인 마크(`google_g`, `kakao_bubble`)는 단순화한 로고라 출시 전 브랜드 가이드 확인이 필요합니다. 크기 20(행 화살표·체크), 24(체크 원), 28(탭·벨).
 - **마스코트(여우원숭이, `AppAssets.mascotLemur`):** 홈 기록 카드(버튼 뒤에서 얼굴만), 빈·오류 상태(120×120, `EmptyState(showMascot: true)`). 스플래시에는 쓰지 않습니다(R 로고만).
-- **감정 캐릭터 8종:** 팀이 에셋을 준비 중입니다(정사각 PNG/SVG, 배경 투명, 감정별 대표색). 에셋이 올 때까지 감정 색 원(`EmotionDot`)이 그 자리를 맡습니다. 에셋이 오면 `emotionColor`를 에셋 기반으로 교체하고 `AppAssets`에 등록합니다.
+- **감정 캐릭터 7종:** `assets/images/emotions/`의 PNG(`AppAssets.emotionImages`)를 `EmotionFace`로 그립니다(달력 20, 카드 44, 상세 64, 선택 격자 칸). 정식 에셋이 오면 같은 파일 이름으로 교체합니다.
 - 이모지는 쓰지 않습니다(8장 글자 규칙).
 
 ## 7. 컴포넌트 카탈로그
@@ -195,7 +197,7 @@
 | 세그먼트 `SegmentedControl` | `segmented_control.dart` | 2~4칸, 선택 칸에 흰 알약이 200ms로 이동 | 높이 44, 안쪽 4, 모서리 12, `AppShadows.subtle` | 칸마다 `button`+`selected` | ✅ |
 | 토글 `AppToggle` | `app_toggle.dart` | 켜짐(`brand`) / 꺼짐(`toggleOff`) / 비활성 | 51×31, 동그라미 27, 터치 44, 200ms | `toggled`, `enabled` | ✅ |
 | 체크 행 `CheckRow` | `check_row.dart` | 미완료(빈 원) / 완료(핑크 채움 + 체크 + 취소선 + 흐림), 보조 문구·trailing | 원 24, 행 최소 56, 200ms, 행 전체가 터치 영역 | `checked` | ✅ |
-| 감정 칩 `EmotionChip` · 색 점 `EmotionDot` | `emotion_chip.dart` | 감정 8종 | 옅은 감정색 배경 + 색 점 + 이름 | label | ✅ (캐릭터 에셋 대기) |
+| 감정 칩 `EmotionChip` · 색 점 `EmotionDot` | `emotion_chip.dart` | 감정 7종 | 옅은 감정색 배경 + 색 점 + 이름 | label | ✅ |
 
 ### 7.2 카드 · 목록 · 설정
 | 컴포넌트 | 파일 | 변형·규칙 | 상태 |
@@ -236,7 +238,9 @@
 ### 7.6 화면 흐름용 컴포넌트 (구현됨, 디버그 갤러리 "감정·기록" 이하에서 확인)
 | 컴포넌트 | 파일 | 쓰는 곳 |
 |---|---|---|
-| `EmotionFace` | `features/entries/.../emotion_face.dart` | 감정 캐릭터 자리 표시(색 원 + 표정 8종). 정식 에셋이 오면 이 위젯 안쪽만 이미지로 교체 |
+| `EmotionFace` | `features/entries/.../emotion_face.dart` | 감정 캐릭터 이미지 7종 |
+| `CharacterAvatar` · `UserAvatar` | `shared/widgets/` | 캐릭터 기반 임시 프로필 · 사용자 사진/기본 캐릭터 |
+| `SocialLoginButtons` | `features/auth/.../social_login_buttons.dart` | 카카오·Google 로그인 버튼 + "또는" 구분선 |
 | `EmotionPicker`, `EmotionRatioBar` | `emotion_picker.dart` | 기록 작성의 감정 선택(4열×2행), 감정 비율 막대 |
 | `MonthCalendar` | `shared/widgets/month_calendar.dart` | 기록 탭 달력(날짜 아래 마커, 미래 날짜 비활성) |
 | `DonutChart` | `donut_chart.dart` | 인물 상세 감정 분포 |
@@ -296,7 +300,7 @@
 
 ## 10. 확인이 필요한 것 (추정으로 처리한 것)
 
-1. 감정 8종·극성, 감정 8색·캐릭터 에셋(팀이 준비 중).
+1. 감정 7종의 극성(제안값), 감정 7색(시안 이름표 색), 소셜 로그인 버튼·마크의 브랜드 가이드 준수.
 2. 위험·오류 색(`danger`/`dangerTile`), 토스트·가림막 색, 스켈레톤 색, 토글 꺼짐 색, 모달 확인 버튼 색.
 3. 모션 값(지속시간·곡선)과 "움직임 줄이기" 전체 대응.
 4. 핑크 on 흰색의 대비(AA 미달 가능), 접근성 검사.

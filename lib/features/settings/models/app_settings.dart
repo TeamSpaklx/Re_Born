@@ -55,9 +55,13 @@ class AppSettings {
     required this.nickname,
     this.consents = const Consents(),
     this.notifications = const NotificationPrefs(),
+    this.profileImagePath,
   });
 
   final String nickname;
+
+  /// 프로필 사진 파일 경로. 없으면 기본 캐릭터. 지금은 메모리 저장이라 앱을 다시 켜면 사라진다.
+  final String? profileImagePath;
   final Consents consents;
   final NotificationPrefs notifications;
 
@@ -65,11 +69,16 @@ class AppSettings {
     String? nickname,
     Consents? consents,
     NotificationPrefs? notifications,
+    String? profileImagePath,
+    bool clearProfileImage = false,
   }) {
     return AppSettings(
       nickname: nickname ?? this.nickname,
       consents: consents ?? this.consents,
       notifications: notifications ?? this.notifications,
+      profileImagePath: clearProfileImage
+          ? null
+          : (profileImagePath ?? this.profileImagePath),
     );
   }
 }

@@ -26,12 +26,12 @@
 |---|---|---|
 | `profiles` | `user_id`(PK), `nickname text`, `consent_privacy bool`, `consent_ai_analysis bool`, `consent_analytics bool`, `created_at` | 앱 `AppSettings`·`Consents` |
 | `people` | `id`(uuid PK), `user_id`, `name text`(1~20자), `relation_type text` (`friend`/`family`/`teacher`/`coworker`/`other`), `memo text null`, `created_at` | 같은 사용자 안에서 `name` 중복 불가(unique `user_id, name`) |
-| `entries` | `id`, `user_id`, `body text`(1~2000자), `person_id uuid null → people`, `emotion text`, `intensity smallint`(1~3), `score smallint`(−3~3), `created_at`, `analysis_status text`(`pending`/`done`/`failed`), `analysis_keywords text[]`, `analyzed_at timestamptz null` | `emotion` 값은 아래 감정 8종 영문 키 |
+| `entries` | `id`, `user_id`, `body text`(1~2000자), `person_id uuid null → people`, `emotion text`, `intensity smallint`(1~3), `score smallint`(−3~3), `created_at`, `analysis_status text`(`pending`/`done`/`failed`), `analysis_keywords text[]`, `analyzed_at timestamptz null` | `emotion` 값은 아래 감정 7종 영문 키 |
 | `index_history` | `person_id → people`, `date date`, `user_id`, `index smallint`(0~100), `entry_count int`, PK(`person_id, date`) | **앱이 쓰는 값**(SPEC 6.2는 "서버"라고 되어 있으나 앱 계산으로 정리됨) |
 | `insights` | `id`, `user_id`, `type text`(`negative_trend`/`recovery`), `person_id`, `message text`, `evidence_index_from smallint`, `evidence_index_to smallint`, `evidence_neg_count int null`, `created_at`, `read bool` | 앱이 계산해서 저장 |
 | `todos` | `id`, `user_id`, `title text`(1~100자), `person_id null`, `done bool`, `done_at null`, `source text`(`manual`/`suggestion`), `insight_id uuid null`, `created_at` | |
 
-- **감정 키(앱 `Emotion` enum 이름):** `joy`, `gratitude`, `excitement`, `calm`, `hurt`, `anxiety`, `anger`, `sadness` (표시 이름: 기쁨·감사·설렘·평온·서운함·불안·분노·슬픔). 이 8종과 극성은 **제안값**이라 팀 확정 시 같이 바꿉니다.
+- **감정 키(앱 `Emotion` enum 이름, 2026-10-24 캐릭터 시안에 맞춰 7종으로 변경):** `joy`(기쁨, +1), `sadness`(슬픔, −1), `neutral`(무표정, 0), `anger`(화남, −1), `anxiety`(불안함, −1), `love`(사랑, +1), `excited`(신남, +1). 예전 키 `gratitude`·`excitement`·`calm`·`hurt`는 없어졌습니다(CHECK 제약이 있다면 새 키로). 이 7종과 극성은 **제안값**이라 팀 확정 시 같이 바꿉니다.
 - 인물을 지울 때 그 인물의 기록을 어떻게 할지는 아직 미정(SPEC 11장 8번). 앱은 `entries.person_id`를 null로 두는 쪽(기록 유지)을 기본으로 합니다 → 외래키는 `on delete set null` 제안.
 
 ### 1-3. RLS 정책 (테이블마다)

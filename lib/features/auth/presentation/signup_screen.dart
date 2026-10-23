@@ -11,6 +11,7 @@ import '../../../shared/widgets/step_progress_bar.dart';
 import '../models/auth_validator.dart';
 import 'auth_providers.dart';
 import 'password_field.dart';
+import 'social_login_buttons.dart';
 
 /// 가입 1/4: 이메일·닉네임·비밀번호. 검증을 통과해야 다음 단계(동의)로 간다(F-01, T-02).
 class SignupScreen extends ConsumerStatefulWidget {
@@ -97,6 +98,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            const SocialLoginButtons(
+              dividerLabel: '또는 이메일로 가입',
+              dividerOnTop: true,
+            ),
             AppTextField(
               fieldKey: const Key('signup-email'),
               controller: _email,

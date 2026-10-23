@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_motion.dart';
+import '../../../../app/theme/app_radii.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../core/utils/app_haptics.dart';
@@ -30,6 +31,7 @@ class EmotionPicker extends StatelessWidget {
         const gap = AppSpacing.space12;
         final cell = (constraints.maxWidth - gap * (columns - 1)) / columns;
         return Wrap(
+          alignment: WrapAlignment.center,
           spacing: gap,
           runSpacing: AppSpacing.space16,
           children: [
@@ -51,26 +53,32 @@ class EmotionPicker extends StatelessWidget {
                     },
                     child: Column(
                       children: [
-                        AnimatedScale(
-                          scale: selected == emotion ? 1.06 : 1,
+                        AnimatedContainer(
                           duration: AppMotion.fast,
                           curve: AppMotion.enter,
-                          child: AnimatedContainer(
-                            duration: AppMotion.fast,
-                            padding: const EdgeInsets.all(3),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: selected == emotion
-                                    ? colors.brand
-                                    : Colors.transparent,
-                                width: 2,
-                              ),
+                          width: cell,
+                          height: cell,
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: selected == emotion
+                                ? emotionColor(
+                                    emotion,
+                                    colors,
+                                  ).withValues(alpha: 0.35)
+                                : colors.cardWhite,
+                            borderRadius: BorderRadius.circular(
+                              AppRadii.card - 8,
                             ),
-                            child: EmotionFace(
-                              emotion: emotion,
-                              size: cell - 14,
+                            border: Border.all(
+                              color: selected == emotion
+                                  ? colors.brand
+                                  : colors.cardBorder,
+                              width: selected == emotion ? 2 : 1,
                             ),
+                          ),
+                          child: EmotionFace(
+                            emotion: emotion,
+                            size: cell - 12 - 3,
                           ),
                         ),
                         const SizedBox(height: AppSpacing.space8),

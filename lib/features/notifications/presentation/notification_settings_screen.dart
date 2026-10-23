@@ -5,6 +5,7 @@ import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../app/theme/app_text_styles.dart';
 import '../../../shared/widgets/app_bottom_sheet.dart';
+import '../../../shared/widgets/app_dialogs.dart';
 import '../../../shared/widgets/page_scaffold.dart';
 import '../../../shared/widgets/settings_group.dart';
 import '../../settings/models/app_settings.dart';
@@ -43,9 +44,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
       ),
     );
     if (picked == null) return;
-    await ref
-        .read(settingsActionsProvider)
-        .saveNotifications(prefs.copyWith(reminderTime: picked));
+    await ref.read(settingsActionsProvider).setReminderTime(picked);
   }
 
   @override
@@ -83,8 +82,12 @@ class NotificationSettingsScreen extends ConsumerWidget {
                   key: const Key('notify-reminder'),
                   title: '기록 리마인드',
                   value: prefs.reminder,
-                  onChanged: (v) =>
-                      actions.saveNotifications(prefs.copyWith(reminder: v)),
+                  onChanged: (v) async {
+                    final ok = await actions.setReminder(v);
+                    if (!ok && context.mounted) {
+                      showAppToast(context, '알림 권한이 꺼져 있어요. 기기 설정에서 켜 주세요.');
+                    }
+                  },
                 ),
                 if (prefs.reminder)
                   SettingsRow.link(

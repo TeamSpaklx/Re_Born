@@ -28,6 +28,7 @@ class SignupDraft {
       aiAnalysis: false,
       analytics: false,
     ),
+    this.social,
   });
 
   final String email;
@@ -35,17 +36,22 @@ class SignupDraft {
   final String nickname;
   final Consents consents;
 
+  /// 소셜 로그인으로 들어온 신규 가입이면 그 종류(비밀번호 입력 없이 약관 동의부터 이어 간다).
+  final SocialProvider? social;
+
   SignupDraft copyWith({
     String? email,
     String? password,
     String? nickname,
     Consents? consents,
+    SocialProvider? social,
   }) {
     return SignupDraft(
       email: email ?? this.email,
       password: password ?? this.password,
       nickname: nickname ?? this.nickname,
       consents: consents ?? this.consents,
+      social: social ?? this.social,
     );
   }
 }
@@ -95,13 +101,47 @@ class AuthActions {
     _ref.read(dataRevisionProvider.notifier).bump();
   }
 
+  /// 구글·카카오 로그인. 처음 온 사용자면 `true`를 돌려주고, 약관 동의부터 이어 가도록 가입 임시 보관함에 표시한다.
+  Future<bool> signInWithSocial(SocialProvider provider) async {
+    final result = await _ref
+        .read(authRepositoryProvider)
+        .signInWithSocial(provider);
+    _ref.read(sessionProvider.notifier).set(result.user);
+    if (result.isNewUser) {
+      _ref
+          .read(signupDraftProvider.notifier)
+          .update(
+            (d) => d.copyWith(
+              social: provider,
+              nickname: '${provider.label} 사용자',
+              email: result.user.email,
+            ),
+          );
+    }
+    return result.isNewUser;
+  }
+
+  /// 소셜 신규 가입의 약관 동의를 저장하고 가입을 마친다(계정은 로그인 때 이미 만들어졌다).
+  Future<void> completeSocialSignup(SignupDraft draft) async {
+    final settings = _ref.read(settingsRepositoryProvider);
+    final current = await settings.get();
+    await settings.save(
+      current.copyWith(
+        nickname: draft.nickname.trim(),
+        consents: draft.consents,
+      ),
+    );
+    _ref.read(signupDraftProvider.notifier).clear();
+    _ref.read(dataRevisionProvider.notifier).bump();
+  }
+
   Future<void> signOut() async {
     await _ref.read(authRepositoryProvider).signOut();
     _ref.read(sessionProvider.notifier).set(null);
   }
 
   /// 비밀번호로 다시 확인한 뒤 계정과 모든 데이터를 지운다(F-11).
-  Future<void> deleteAccount(String password) async {
+  Future<void> deleteAccount(String? password) async {
     await _ref.read(authRepositoryProvider).deleteAccount(password: password);
     await _ref.read(entriesRepositoryProvider).deleteAll();
     await _ref.read(indexHistoryRepositoryProvider).deleteAll();

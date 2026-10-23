@@ -10,6 +10,7 @@ import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../auth/presentation/auth_providers.dart';
 import '../../home/presentation/home_providers.dart';
+import '../../settings/presentation/settings_providers.dart';
 
 /// 스플래시 화면: 흰 배경 한가운데에 로고만 보여 주고, 로그인되어 있으면 홈 화면 데이터가 준비되는 대로
 /// 투데이(홈)로, 아니면 로그인 화면으로 넘어간다.
@@ -26,6 +27,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    // 저장된 설정대로 기록 리마인드 예약을 맞춘다(실패해도 앱 시작은 막지 않는다).
+    unawaited(
+      ref.read(settingsActionsProvider).syncReminder().catchError((_) {}),
+    );
     unawaited(_goHomeWhenReady());
   }
 

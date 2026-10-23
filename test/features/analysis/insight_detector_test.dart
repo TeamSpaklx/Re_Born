@@ -19,7 +19,7 @@ void main() {
   Entry e(int daysAgo, int score) => Entry(
     id: 'e${n++}',
     body: '본문',
-    emotion: score < 0 ? Emotion.hurt : Emotion.joy,
+    emotion: score < 0 ? Emotion.sadness : Emotion.joy,
     intensity: score.abs().clamp(1, 3),
     score: score,
     createdAt: ago(daysAgo),

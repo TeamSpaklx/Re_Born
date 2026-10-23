@@ -46,11 +46,12 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.topBarTint,
     required this.splashBackground,
     required this.skeleton,
+    required this.kakaoYellow,
+    required this.onKakao,
     required this.emotionJoy,
-    required this.emotionGratitude,
-    required this.emotionExcitement,
-    required this.emotionCalm,
-    required this.emotionHurt,
+    required this.emotionLove,
+    required this.emotionExcited,
+    required this.emotionNeutral,
     required this.emotionAnxiety,
     required this.emotionAnger,
     required this.emotionSadness,
@@ -131,25 +132,26 @@ class AppColors extends ThemeExtension<AppColors> {
   /// 로딩 스켈레톤 블록 (흰 카드·#FFF8F8 배경 둘 다에서 보이는 연한 핑크 회색, 추정).
   final Color skeleton;
 
-  /// 감정 8색(캐릭터 에셋이 오면 에셋의 대표색으로 교체, 지금은 임시 파스텔·추정): 기쁨
+  /// 카카오 로그인 버튼 배경(브랜드 노랑)과 글자색.
+  final Color kakaoYellow;
+  final Color onKakao;
+
+  /// 감정 7색(RebornMood 캐릭터의 이름표 색에서 뽑음): 기쁨
   final Color emotionJoy;
 
-  /// 감사
-  final Color emotionGratitude;
+  /// 사랑
+  final Color emotionLove;
 
-  /// 설렘
-  final Color emotionExcitement;
+  /// 신남
+  final Color emotionExcited;
 
-  /// 평온
-  final Color emotionCalm;
+  /// 무표정
+  final Color emotionNeutral;
 
-  /// 서운함
-  final Color emotionHurt;
-
-  /// 불안
+  /// 불안함
   final Color emotionAnxiety;
 
-  /// 분노
+  /// 화남
   final Color emotionAnger;
 
   /// 슬픔
@@ -195,14 +197,15 @@ class AppColors extends ThemeExtension<AppColors> {
     topBarTint: Color(0x1AFFFFFF),
     splashBackground: Color(0xFFFFFFFF),
     skeleton: Color(0xFFF1EAED),
-    emotionJoy: Color(0xFFFFD66B),
-    emotionGratitude: Color(0xFFFFB38A),
-    emotionExcitement: Color(0xFFFF9CC2),
-    emotionCalm: Color(0xFF9FD8C0),
-    emotionHurt: Color(0xFF9DB4F2),
-    emotionAnxiety: Color(0xFFC5A8EE),
-    emotionAnger: Color(0xFFF27B72),
-    emotionSadness: Color(0xFF9FB7C9),
+    kakaoYellow: Color(0xFFFEE500),
+    onKakao: Color(0xFF191919),
+    emotionJoy: Color(0xFFF4B1CB),
+    emotionLove: Color(0xFFFF9EC4),
+    emotionExcited: Color(0xFFFAD599),
+    emotionNeutral: Color(0xFFD1BDF3),
+    emotionAnxiety: Color(0xFFB9E5C6),
+    emotionAnger: Color(0xFFFDA4AC),
+    emotionSadness: Color(0xFFBBD5ED),
   );
 
   @override
@@ -245,11 +248,12 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? topBarTint,
     Color? splashBackground,
     Color? skeleton,
+    Color? kakaoYellow,
+    Color? onKakao,
     Color? emotionJoy,
-    Color? emotionGratitude,
-    Color? emotionExcitement,
-    Color? emotionCalm,
-    Color? emotionHurt,
+    Color? emotionLove,
+    Color? emotionExcited,
+    Color? emotionNeutral,
     Color? emotionAnxiety,
     Color? emotionAnger,
     Color? emotionSadness,
@@ -293,11 +297,12 @@ class AppColors extends ThemeExtension<AppColors> {
       topBarTint: topBarTint ?? this.topBarTint,
       splashBackground: splashBackground ?? this.splashBackground,
       skeleton: skeleton ?? this.skeleton,
+      kakaoYellow: kakaoYellow ?? this.kakaoYellow,
+      onKakao: onKakao ?? this.onKakao,
       emotionJoy: emotionJoy ?? this.emotionJoy,
-      emotionGratitude: emotionGratitude ?? this.emotionGratitude,
-      emotionExcitement: emotionExcitement ?? this.emotionExcitement,
-      emotionCalm: emotionCalm ?? this.emotionCalm,
-      emotionHurt: emotionHurt ?? this.emotionHurt,
+      emotionLove: emotionLove ?? this.emotionLove,
+      emotionExcited: emotionExcited ?? this.emotionExcited,
+      emotionNeutral: emotionNeutral ?? this.emotionNeutral,
       emotionAnxiety: emotionAnxiety ?? this.emotionAnxiety,
       emotionAnger: emotionAnger ?? this.emotionAnger,
       emotionSadness: emotionSadness ?? this.emotionSadness,
@@ -347,11 +352,12 @@ class AppColors extends ThemeExtension<AppColors> {
       topBarTint: mix(topBarTint, other.topBarTint),
       splashBackground: mix(splashBackground, other.splashBackground),
       skeleton: mix(skeleton, other.skeleton),
+      kakaoYellow: mix(kakaoYellow, other.kakaoYellow),
+      onKakao: mix(onKakao, other.onKakao),
       emotionJoy: mix(emotionJoy, other.emotionJoy),
-      emotionGratitude: mix(emotionGratitude, other.emotionGratitude),
-      emotionExcitement: mix(emotionExcitement, other.emotionExcitement),
-      emotionCalm: mix(emotionCalm, other.emotionCalm),
-      emotionHurt: mix(emotionHurt, other.emotionHurt),
+      emotionLove: mix(emotionLove, other.emotionLove),
+      emotionExcited: mix(emotionExcited, other.emotionExcited),
+      emotionNeutral: mix(emotionNeutral, other.emotionNeutral),
       emotionAnxiety: mix(emotionAnxiety, other.emotionAnxiety),
       emotionAnger: mix(emotionAnger, other.emotionAnger),
       emotionSadness: mix(emotionSadness, other.emotionSadness),

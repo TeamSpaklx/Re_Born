@@ -111,7 +111,7 @@ class _DesignGalleryScreenState extends State<DesignGalleryScreen> {
               ],
             ),
           ]),
-          section('감정 8색 (임시)', [
+          section('감정 7색', [
             Wrap(
               spacing: AppSpacing.space8,
               runSpacing: AppSpacing.space8,
@@ -395,7 +395,7 @@ class _DesignGalleryScreenState extends State<DesignGalleryScreen> {
             ),
             gap(AppSpacing.space16),
             const EmotionRatioBar(
-              counts: {Emotion.joy: 4, Emotion.calm: 3, Emotion.hurt: 2},
+              counts: {Emotion.joy: 4, Emotion.neutral: 3, Emotion.sadness: 2},
             ),
             gap(AppSpacing.space16),
             AppCard.white(

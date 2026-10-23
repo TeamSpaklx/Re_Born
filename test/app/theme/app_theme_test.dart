@@ -60,18 +60,17 @@ void main() {
     });
   });
 
-  group('감정 8색 · 간격 스케일 · 모션 (docs/DESIGN_SYSTEM.md 1·3·5장)', () {
+  group('감정 7색 · 간격 스케일 · 모션 (docs/DESIGN_SYSTEM.md 1·3·5장)', () {
     const c = AppColors.light;
 
-    test('감정 8색', () {
-      expect(c.emotionJoy, const Color(0xFFFFD66B));
-      expect(c.emotionGratitude, const Color(0xFFFFB38A));
-      expect(c.emotionExcitement, const Color(0xFFFF9CC2));
-      expect(c.emotionCalm, const Color(0xFF9FD8C0));
-      expect(c.emotionHurt, const Color(0xFF9DB4F2));
-      expect(c.emotionAnxiety, const Color(0xFFC5A8EE));
-      expect(c.emotionAnger, const Color(0xFFF27B72));
-      expect(c.emotionSadness, const Color(0xFF9FB7C9));
+    test('감정 7색', () {
+      expect(c.emotionJoy, const Color(0xFFF4B1CB));
+      expect(c.emotionSadness, const Color(0xFFBBD5ED));
+      expect(c.emotionNeutral, const Color(0xFFD1BDF3));
+      expect(c.emotionAnger, const Color(0xFFFDA4AC));
+      expect(c.emotionAnxiety, const Color(0xFFB9E5C6));
+      expect(c.emotionLove, const Color(0xFFFF9EC4));
+      expect(c.emotionExcited, const Color(0xFFFAD599));
     });
 
     test('간격은 4pt 스케일이고 화면 좌우 여백은 24', () {

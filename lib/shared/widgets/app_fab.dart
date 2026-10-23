@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+import '../../app/theme/app_assets.dart';
 
 import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_radii.dart';
@@ -41,11 +44,13 @@ class AppFab extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CustomPaint(
-                size: const Size(16, 16),
-                painter: _PlusPainter(colors.onCta),
+              SvgPicture.asset(
+                AppAssets.ixAdd,
+                width: 22,
+                height: 22,
+                colorFilter: ColorFilter.mode(colors.onCta, BlendMode.srcIn),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               Text(
                 label,
                 style: AppTextStyles.buttonLarge.copyWith(color: colors.onCta),
@@ -56,31 +61,4 @@ class AppFab extends StatelessWidget {
       ),
     );
   }
-}
-
-class _PlusPainter extends CustomPainter {
-  _PlusPainter(this.color);
-
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 2.2
-      ..strokeCap = StrokeCap.round;
-    canvas.drawLine(
-      Offset(size.width / 2, 1),
-      Offset(size.width / 2, size.height - 1),
-      paint,
-    );
-    canvas.drawLine(
-      Offset(1, size.height / 2),
-      Offset(size.width - 1, size.height / 2),
-      paint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _PlusPainter old) => old.color != color;
 }

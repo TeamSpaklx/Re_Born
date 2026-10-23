@@ -10,8 +10,12 @@ abstract interface class AuthRepository {
 
   Future<AuthUser> signUp({required String email, required String password});
 
+  /// 구글·카카오로 로그인(처음이면 계정이 만들어진다). 실제 연결은 Supabase OAuth로 교체한다.
+  Future<SocialSignInResult> signInWithSocial(SocialProvider provider);
+
   Future<void> signOut();
 
   /// 비밀번호로 다시 확인한 뒤 계정을 지운다(F-11). 비밀번호가 다르면 invalidCredentials.
-  Future<void> deleteAccount({required String password});
+  /// 소셜 계정은 비밀번호가 없어 [password]를 생략한다.
+  Future<void> deleteAccount({String? password});
 }
