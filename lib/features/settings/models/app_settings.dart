@@ -19,17 +19,57 @@ class Consents {
   }
 }
 
-/// 사용자 설정 (SPEC 사용자 문서: 닉네임, 동의).
+/// 알림 설정 (SPEC F-10, 확장 범위). 앱 안에서 보여 주는 알림 목록의 종류를 켜고 끈다.
+class NotificationPrefs {
+  const NotificationPrefs({
+    this.insight = true,
+    this.reminder = false,
+    this.reminderTime = '21:00',
+  });
+
+  /// 새 인사이트가 생기면 알린다.
+  final bool insight;
+
+  /// 기록을 남기도록 정해진 시각에 알린다.
+  final bool reminder;
+
+  /// "HH:mm".
+  final String reminderTime;
+
+  NotificationPrefs copyWith({
+    bool? insight,
+    bool? reminder,
+    String? reminderTime,
+  }) {
+    return NotificationPrefs(
+      insight: insight ?? this.insight,
+      reminder: reminder ?? this.reminder,
+      reminderTime: reminderTime ?? this.reminderTime,
+    );
+  }
+}
+
+/// 사용자 설정 (SPEC 사용자 문서: 닉네임, 동의, 알림).
 class AppSettings {
-  const AppSettings({required this.nickname, this.consents = const Consents()});
+  const AppSettings({
+    required this.nickname,
+    this.consents = const Consents(),
+    this.notifications = const NotificationPrefs(),
+  });
 
   final String nickname;
   final Consents consents;
+  final NotificationPrefs notifications;
 
-  AppSettings copyWith({String? nickname, Consents? consents}) {
+  AppSettings copyWith({
+    String? nickname,
+    Consents? consents,
+    NotificationPrefs? notifications,
+  }) {
     return AppSettings(
       nickname: nickname ?? this.nickname,
       consents: consents ?? this.consents,
+      notifications: notifications ?? this.notifications,
     );
   }
 }

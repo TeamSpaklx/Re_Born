@@ -4,8 +4,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/all/presentation/all_screen.dart';
+import '../features/auth/presentation/account_delete_screen.dart';
+import '../features/auth/presentation/consent_screen.dart';
+import '../features/auth/presentation/login_screen.dart';
+import '../features/auth/presentation/onboarding_screen.dart';
+import '../features/auth/presentation/permission_screen.dart';
+import '../features/auth/presentation/signup_screen.dart';
 import '../features/home/presentation/today_screen.dart';
 import '../features/insights/presentation/insight_detail_screen.dart';
+import '../features/notifications/presentation/notification_settings_screen.dart';
+import '../features/notifications/presentation/notifications_screen.dart';
 import '../features/record/presentation/record_detail_screen.dart';
 import '../features/record/presentation/record_form_screen.dart';
 import '../features/record/presentation/record_screen.dart';
@@ -24,6 +32,16 @@ abstract final class AppRoutes {
 
   /// 디자인 갤러리(개발용). 디버그 빌드에서만 등록된다.
   static const devGallery = '/dev/gallery';
+
+  // 인증·온보딩
+  static const login = '/login';
+  static const signup = '/signup';
+  static const signupConsent = '/signup/consent';
+  static const onboarding = '/onboarding';
+  static const onboardingPermission = '/onboarding/permission';
+  static const accountDelete = '/account/delete';
+  static const notifications = '/notifications';
+  static const notificationSettings = '/notifications/settings';
 
   static const today = '/today';
   static const relations = '/relations';
@@ -58,6 +76,38 @@ final routerProvider = Provider<GoRouter>((ref) {
           path: AppRoutes.devGallery,
           builder: (context, state) => const DesignGalleryScreen(),
         ),
+      GoRoute(
+        path: AppRoutes.login,
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.signup,
+        builder: (context, state) => const SignupScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.signupConsent,
+        builder: (context, state) => const ConsentScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.onboarding,
+        builder: (context, state) => const OnboardingScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.onboardingPermission,
+        builder: (context, state) => const PermissionScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.notifications,
+        builder: (context, state) => const NotificationsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.notificationSettings,
+        builder: (context, state) => const NotificationSettingsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.accountDelete,
+        builder: (context, state) => const AccountDeleteScreen(),
+      ),
       GoRoute(
         path: AppRoutes.recordNew,
         builder: (context, state) => const RecordFormScreen(),

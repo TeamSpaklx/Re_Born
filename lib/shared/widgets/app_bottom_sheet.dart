@@ -22,6 +22,8 @@ Future<T?> showAppBottomSheet<T>(
   final colors = context.colors;
   return showModalBottomSheet<T>(
     context: context,
+    // 탭 화면 안에서 열어도 하단 탭 바 위로 올라오도록 가장 바깥 Navigator에 올린다.
+    useRootNavigator: true,
     isScrollControlled: true,
     useSafeArea: true,
     backgroundColor: Colors.transparent,

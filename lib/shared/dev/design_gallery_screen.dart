@@ -6,14 +6,28 @@ import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_text_styles.dart';
 import '../../features/entries/models/emotion.dart';
 import '../../features/entries/presentation/widgets/emotion_chip.dart';
+import '../../app/theme/app_assets.dart';
+import '../../features/entries/presentation/widgets/emotion_face.dart';
+import '../../features/entries/presentation/widgets/emotion_picker.dart';
 import '../widgets/app_badge.dart';
 import '../widgets/app_bottom_sheet.dart';
 import '../widgets/app_card.dart';
 import '../widgets/app_dialogs.dart';
+import '../widgets/app_fab.dart';
+import '../widgets/app_tab_bar.dart';
 import '../widgets/app_text_button.dart';
 import '../widgets/app_text_field.dart';
 import '../widgets/bottom_cta_bar.dart';
 import '../widgets/check_row.dart';
+import '../widgets/consent_row.dart';
+import '../widgets/donut_chart.dart';
+import '../widgets/month_calendar.dart';
+import '../widgets/notification_row.dart';
+import '../widgets/permission_row.dart';
+import '../widgets/select_card.dart';
+import '../widgets/step_progress_bar.dart';
+import '../widgets/summary_card.dart';
+import '../widgets/swipe_to_delete.dart';
 import '../widgets/choice_chip_button.dart';
 import '../widgets/cta_button.dart';
 import '../widgets/empty_state.dart';
@@ -44,6 +58,11 @@ class _DesignGalleryScreenState extends State<DesignGalleryScreen> {
   bool _checkB = false;
   int _segment = 0;
   int _chip = 0;
+  Emotion? _emotion;
+  DateTime _month = DateTime(2026, 10);
+  DateTime _day = DateTime(2026, 10, 24);
+  int _select = 0;
+  int _tab = 0;
 
   @override
   void dispose() {
@@ -359,6 +378,138 @@ class _DesignGalleryScreenState extends State<DesignGalleryScreen> {
               height: 48,
               variant: CtaVariant.secondary,
               onPressed: () => showAppToast(context, '체크리스트에 담았어요'),
+            ),
+          ]),
+          section('감정 · 기록', [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                for (final e in Emotion.values)
+                  EmotionFace(emotion: e, size: 36),
+              ],
+            ),
+            gap(),
+            EmotionPicker(
+              selected: _emotion,
+              onChanged: (e) => setState(() => _emotion = e),
+            ),
+            gap(AppSpacing.space16),
+            const EmotionRatioBar(
+              counts: {Emotion.joy: 4, Emotion.calm: 3, Emotion.hurt: 2},
+            ),
+            gap(AppSpacing.space16),
+            AppCard.white(
+              padding: const EdgeInsets.all(AppSpacing.space12),
+              child: MonthCalendar(
+                month: _month,
+                selected: _day,
+                today: DateTime(2026, 10, 24),
+                onSelected: (d) => setState(() => _day = d),
+                onMonthChanged: (m) => setState(() => _month = m),
+                markerFor: (d) => d.day % 5 == 0
+                    ? EmotionFace(emotion: Emotion.joy, size: 20)
+                    : null,
+              ),
+            ),
+          ]),
+          section('선택 · 진행 · 동의', [
+            const StepProgressBar(current: 2, total: 4),
+            gap(AppSpacing.space16),
+            SelectCard(
+              title: '친구',
+              description: '편하게 마음을 나누는 친구',
+              selected: _select == 0,
+              onTap: () => setState(() => _select = 0),
+            ),
+            gap(),
+            SelectCard(
+              title: '가족',
+              description: '가장 가까이 있는 가족',
+              selected: _select == 1,
+              onTap: () => setState(() => _select = 1),
+            ),
+            gap(AppSpacing.space16),
+            ConsentRow(
+              label: '전체 동의',
+              emphasized: true,
+              checked: _checkA && _checkB,
+              onChanged: (v) => setState(() => _checkA = _checkB = v),
+            ),
+            ConsentRow(
+              tag: '필수',
+              label: '개인정보 수집·이용',
+              checked: _checkA,
+              onChanged: (v) => setState(() => _checkA = v),
+              onView: _noop,
+            ),
+            ConsentRow(
+              tag: '선택',
+              label: '사용 분석',
+              checked: _checkB,
+              onChanged: (v) => setState(() => _checkB = v),
+            ),
+            const PermissionRow(
+              iconAsset: AppAssets.bell,
+              title: '인사이트 알림',
+              description: '관계의 변화가 감지되면 알려 드려요.',
+            ),
+          ]),
+          section('요약 · 탭 · 알림 · 차트', [
+            const SummaryCard(
+              items: [
+                SummaryItem(value: '12', label: '기록'),
+                SummaryItem(value: '3', label: '인물'),
+                SummaryItem(value: '1/2', label: '체크 완료'),
+              ],
+            ),
+            gap(),
+            AppTabBar(
+              labels: const ['전체', '안 읽음'],
+              selectedIndex: _tab,
+              onChanged: (i) => setState(() => _tab = i),
+            ),
+            gap(),
+            NotificationRow(
+              iconAsset: AppAssets.forum,
+              title: '지민님과의 관계를 살펴보세요',
+              body: '최근 부정적인 기록이 늘었어요',
+              timeLabel: '3시간 전',
+              unread: true,
+              onTap: _noop,
+            ),
+            gap(AppSpacing.space8),
+            NotificationRow(
+              iconAsset: AppAssets.sealCheck,
+              title: '승현님과의 관계가 나아지고 있어요',
+              body: '관계 지수가 올랐어요',
+              timeLabel: '2일 전',
+              unread: false,
+              onTap: _noop,
+            ),
+            gap(),
+            SwipeToDelete(
+              dismissKey: const Key('gallery-swipe'),
+              onDelete: _noop,
+              child: AppCard.white(
+                padding: const EdgeInsets.all(AppSpacing.space16),
+                child: const Row(children: [Text('← 밀어서 삭제')]),
+              ),
+            ),
+            gap(AppSpacing.space16),
+            const Center(
+              child: DonutChart(
+                segments: [
+                  DonutSegment(value: 5, color: Color(0xFFFF80A6)),
+                  DonutSegment(value: 3, color: Color(0xFFFFB3CA)),
+                  DonutSegment(value: 2, color: Color(0xFFD94F79)),
+                ],
+                center: Text('10건'),
+              ),
+            ),
+            gap(AppSpacing.space16),
+            const Align(
+              alignment: Alignment.centerRight,
+              child: AppFab(label: '기록하기', onTap: _noop),
             ),
           ]),
           const SizedBox(height: AppSpacing.space24),
