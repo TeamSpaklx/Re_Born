@@ -12,6 +12,11 @@ spring:
   sql:
     init:
       mode: never
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${SUPABASE_ISSUER_URI:https://cblolxoebahefwbyhoqe.supabase.co/auth/v1}
 server:
   port: 8000
 
