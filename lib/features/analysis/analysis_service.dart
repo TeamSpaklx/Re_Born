@@ -20,6 +20,7 @@ class AnalysisService {
     required this.indexHistory,
     required this.insights,
     required this.clock,
+    this.onError,
   });
 
   final EntriesRepository entries;
@@ -27,6 +28,9 @@ class AnalysisService {
   final IndexHistoryRepository indexHistory;
   final InsightsRepository insights;
   final Clock clock;
+
+  /// 분석 중 오류를 알리는 곳(앱 안 오류 기록). 없어도 동작한다.
+  final void Function(Object error, StackTrace stack)? onError;
 
   /// 새 기록을 저장하고 분석한다. 분석이 실패해도 기록은 남고 `failed`로 표시된다.
   Future<Entry> saveEntry({
@@ -117,7 +121,8 @@ class AnalysisService {
       analyzed = analyzed.copyWith(analysisStatus: AnalysisStatus.done);
       await entries.update(analyzed);
       return analyzed;
-    } catch (_) {
+    } catch (error, stack) {
+      onError?.call(error, stack);
       final failed = entry.copyWith(analysisStatus: AnalysisStatus.failed);
       await entries.update(failed);
       return failed;

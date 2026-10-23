@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/theme/app_colors.dart';
+import '../../../core/errors/app_error_log.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../app/theme/app_text_styles.dart';
 import '../../../shared/widgets/app_card.dart';
@@ -110,7 +111,8 @@ class _RecordFormScreenState extends ConsumerState<RecordFormScreen> {
           ),
         );
       }
-    } catch (_) {
+    } catch (error, stack) {
+      ref.read(appErrorLogProvider).record(error, stack, where: 'save-entry');
       if (!mounted) return;
       setState(() => _saving = false);
       messenger.showSnackBar(

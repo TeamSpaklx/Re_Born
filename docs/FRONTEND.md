@@ -139,6 +139,13 @@ MVP 데이터 처리는 SPEC 6.4대로 **분석·지수·인사이트 계산은 
 - 기록 저장 → 분석 → 지수 → 인사이트 순서는 `AnalysisService`(`lib/features/analysis/analysis_service.dart`)가 저장소 호출 순서로 처리하므로, 백엔드는 이 로직을 만들지 않아도 됩니다.
 - 분석 규칙은 `lib/features/analysis/`의 순수 함수(`emotion_analyzer`, `relation_index`, `insight_detector`, `suggestion_pool`, `crisis_checker`, `record_streak_calculator`)이고 임계값은 **제안값**입니다(팀 테스트로 조정).
 
+## 4-2. 앱 내부 오류 처리 (F-12, P-11)
+
+- `main.dart`가 `installErrorHandlers`로 처리되지 않은 오류를 `AppErrorLog`(최근 50건, 메모리)에 남깁니다. 배포판에서는 위젯 오류가 빨간 화면 대신 안내 문구로 보입니다.
+- 기록에는 **오류 종류·위치·호출 스택만** 남고 오류 메시지는 버립니다(메시지에 기록 본문·인물 이름이 섞일 수 있음). 사용자에게 보여 줘도 안전한 문구는 `AppException`으로 던집니다.
+- 저장·분석·체크리스트 저장이 실패하면 오류를 기록하고 화면에는 안내와 재시도를 보여 줍니다(`AnalysisService.onError`, 작성 화면, 체크리스트).
+- 외부 분석 도구로는 보내지 않습니다(확장 기능). 나중에 보낸다면 이 기록만 보냅니다.
+
 ## 5. 화면 공통 규칙
 
 - 글자 크기 배율 1.0 고정, 라이트 모드만, 세로 방향만. 다크 모드는 나중에 추가하므로 색은 `context.colors`로만 읽습니다.
