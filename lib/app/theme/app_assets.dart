@@ -22,9 +22,16 @@ abstract final class AppAssets {
   static const bell = '$_icons/bell.svg';
   static const sealCheck = '$_icons/seal_check.svg';
 
-  // 임시 디자인 화면용 아이콘 (Phosphor Icons, MIT). 한 가지 색(currentColor)이라 쓰는 곳에서 색을 입힌다.
+  // 임시 디자인 화면용 아이콘. check는 Phosphor Icons(MIT), `ix_*`는 Iconsax(Linear)다.
+  // 한 가지 색이라 쓰는 곳에서 `colorFilter`로 색을 입힌다.
   static const check = '$_icons/check.svg';
-  static const trash = '$_icons/trash.svg';
+  static const trash = '$_icons/ix_trash.svg';
+  static const ixAdd = '$_icons/ix_add.svg';
+  static const ixEdit = '$_icons/ix_edit.svg';
+  static const ixCamera = '$_icons/ix_camera.svg';
+  static const ixGallery = '$_icons/ix_gallery.svg';
+  static const ixEye = '$_icons/ix_eye.svg';
+  static const ixEyeOff = '$_icons/ix_eye_off.svg';
 
   // 화살표: 쓰이는 자리마다 크기·색이 달라 파일이 나뉘어 있다.
   static const chevronSignal = '$_icons/chevron_signal.svg';
@@ -85,6 +92,12 @@ abstract final class AppAssets {
     sealCheck,
     check,
     trash,
+    ixAdd,
+    ixEdit,
+    ixCamera,
+    ixGallery,
+    ixEye,
+    ixEyeOff,
     chevronSignal,
     chevronGraph,
     chevronSeeAll,
@@ -95,6 +108,7 @@ abstract final class AppAssets {
     logo,
     logoMark,
     mascotLemur,
+    ...emotionImages,
     pretendardBold,
   ];
 }

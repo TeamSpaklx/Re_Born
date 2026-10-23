@@ -30,6 +30,18 @@ class SettingsActions {
     _ref.read(dataRevisionProvider.notifier).bump();
   }
 
+  /// 프로필 사진을 바꾼다. [path]가 null이면 기본 캐릭터로 되돌린다.
+  Future<void> saveProfileImage(String? path) async {
+    final repo = _ref.read(settingsRepositoryProvider);
+    final current = await repo.get();
+    await repo.save(
+      path == null
+          ? current.copyWith(clearProfileImage: true)
+          : current.copyWith(profileImagePath: path),
+    );
+    _ref.read(dataRevisionProvider.notifier).bump();
+  }
+
   Future<void> saveNotifications(NotificationPrefs prefs) async {
     final repo = _ref.read(settingsRepositoryProvider);
     final current = await repo.get();

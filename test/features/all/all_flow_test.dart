@@ -5,6 +5,7 @@ import 'package:reborn_app/app/app.dart';
 import 'package:reborn_app/app/data_providers.dart';
 import 'package:reborn_app/app/main_shell.dart';
 import 'package:reborn_app/app/theme/app_spacing.dart';
+import 'package:reborn_app/core/platform/image_picker_service.dart';
 import 'package:reborn_app/core/providers/clock_provider.dart';
 import 'package:reborn_app/features/auth/data/in_memory_auth_repository.dart';
 import 'package:reborn_app/features/auth/presentation/auth_providers.dart';
@@ -16,11 +17,28 @@ import 'package:reborn_app/shared/widgets/app_toggle.dart';
 
 final fixedNow = DateTime(2026, 10, 22, 12);
 
+/// 고른 사진 경로를 정해 둔 가짜 선택기. [fail]이면 권한 거부처럼 실패한다.
+class _FakePicker implements ImagePickerService {
+  _FakePicker({this.path, this.fail = false});
+
+  final String? path;
+  final bool fail;
+  final picked = <PhotoSource>[];
+
+  @override
+  Future<String?> pick(PhotoSource source) async {
+    picked.add(source);
+    if (fail) throw PhotoPickException(source);
+    return path;
+  }
+}
+
 void main() {
   Future<ProviderContainer> pumpAll(
     WidgetTester tester, {
     bool emptyTodos = false,
     bool signedIn = false,
+    ImagePickerService? picker,
   }) async {
     tester.view.devicePixelRatio = 1;
     tester.view.physicalSize = const Size(402, 1400);
@@ -29,6 +47,8 @@ void main() {
       ProviderScope(
         overrides: [
           clockProvider.overrideWithValue(() => fixedNow),
+          if (picker != null)
+            imagePickerServiceProvider.overrideWithValue(picker),
           if (signedIn)
             authRepositoryProvider.overrideWithValue(
               InMemoryAuthRepository(
@@ -250,5 +270,48 @@ void main() {
     await pumpAll(tester);
     expect(find.text('체크 완료'), findsOneWidget);
     expect(find.text('1/2'), findsOneWidget);
+  });
+
+  testWidgets('프로필 편집: 앨범에서 사진을 고르면 저장되고, 기본 캐릭터로 되돌릴 수 있다', (tester) async {
+    final picker = _FakePicker(path: '/tmp/none.jpg');
+    final container = await pumpAll(tester, signedIn: true, picker: picker);
+    await tester.tap(find.text('규리'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('profile-reset')), findsNothing);
+
+    await tester.tap(find.byKey(const Key('profile-gallery')));
+    await tester.pumpAndSettle();
+    expect(picker.picked, [PhotoSource.gallery]);
+    expect(
+      (await container.read(settingsRepositoryProvider).get()).profileImagePath,
+      '/tmp/none.jpg',
+    );
+
+    await tester.tap(find.byKey(const Key('profile-reset')));
+    await tester.pumpAndSettle();
+    expect(
+      (await container.read(settingsRepositoryProvider).get()).profileImagePath,
+      isNull,
+    );
+  });
+
+  testWidgets('프로필 편집: 카메라 권한이 거부되면 안내 토스트가 나온다', (tester) async {
+    final container = await pumpAll(
+      tester,
+      signedIn: true,
+      picker: _FakePicker(fail: true),
+    );
+    await tester.tap(find.text('규리'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('profile-camera')));
+    await tester.pump();
+    await tester.pump(ComponentLayout.toastFade);
+
+    expect(find.textContaining('카메라를 쓸 수 없어요'), findsOneWidget);
+    expect(
+      (await container.read(settingsRepositoryProvider).get()).profileImagePath,
+      isNull,
+    );
+    await tester.pump(const Duration(seconds: 4));
   });
 }
