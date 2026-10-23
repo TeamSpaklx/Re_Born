@@ -264,6 +264,26 @@ void main() {
       expect(find.byKey(const Key('onboarding-name')), findsOneWidget);
     });
 
+    testWidgets('동의 화면에서 뒤로 간 뒤 같은 소셜 계정으로 재시도해도 동의 화면을 건너뛰지 않는다', (
+      tester,
+    ) async {
+      final c = await pumpAt(tester, AppRoutes.login);
+      await tester.tap(find.byKey(const Key('social-kakao')));
+      await tester.pumpAndSettle();
+      expect(find.text('약관에\n동의해 주세요'), findsOneWidget);
+
+      await tester.tap(find.bySemanticsLabel('뒤로'));
+      await tester.pumpAndSettle();
+      expect(find.byType(LoginScreen), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('social-kakao')));
+      await tester.pumpAndSettle();
+
+      expect(c.read(sessionProvider)?.provider, SocialProvider.kakao);
+      expect(find.text('약관에\n동의해 주세요'), findsOneWidget);
+      expect(find.byType(TodayScreen), findsNothing);
+    });
+
     testWidgets('이미 가입한 소셜 계정은 바로 홈으로 간다', (tester) async {
       final c = await pumpAt(tester, AppRoutes.login);
       final repo = c.read(authRepositoryProvider);

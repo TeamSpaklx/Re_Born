@@ -103,6 +103,7 @@ class AuthActions {
 
   /// 구글·카카오 로그인. 처음 온 사용자면 `true`를 돌려주고, 약관 동의부터 이어 가도록 가입 임시 보관함에 표시한다.
   Future<bool> signInWithSocial(SocialProvider provider) async {
+    final pendingSignup = _ref.read(signupDraftProvider).social;
     final result = await _ref
         .read(authRepositoryProvider)
         .signInWithSocial(provider);
@@ -117,8 +118,10 @@ class AuthActions {
               email: result.user.email,
             ),
           );
+    } else if (pendingSignup != provider) {
+      _ref.read(signupDraftProvider.notifier).clear();
     }
-    return result.isNewUser;
+    return result.isNewUser || pendingSignup == provider;
   }
 
   /// 소셜 신규 가입의 약관 동의를 저장하고 가입을 마친다(계정은 로그인 때 이미 만들어졌다).
