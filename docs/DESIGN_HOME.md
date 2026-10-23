@@ -26,94 +26,28 @@
 - 상태바와 홈 인디케이터는 시스템 영역이라 구현하지 않습니다. 헤더(로고·알림)가 스크롤과 같이 움직이는지는 Figma에 없어서 **추정**으로 "같이 움직임"입니다.
 - 샘플 글자(규리님, 지민, 9월 13일 목요일 등)는 가짜 데이터 예시입니다.
 
-## 1. 색상
+## 1~3. 색·글자·모서리·간격
 
-`AppColors.light` (`lib/app/theme/app_colors.dart`)
-
-| 용도 | 필드 | 값 | 출처 |
-|---|---|---|---|
-| 브랜드 핑크 (막대·활성 탭·강조 숫자·출석 알약) | `brand` | `#FF6090` | Figma |
-| 주요 버튼 배경 | `cta` | `#FF6090` (지금은 `brand`와 같은 값, 나중에 달라질 수 있어 이름을 나눠 둠) | Figma |
-| 버튼 글자 | `onCta` | `#FFFFFF` | Figma |
-| 화면 배경 | `background` | `#FFF8F8` (수정안, 이전 `#FFFFFF`) | Figma |
-| 기록 카드(핑크, After·상세 화면) | `cardPink` | `#FEDAE5` | Figma |
-| 흰 카드 / 테두리 | `cardWhite` / `cardBorder` | `#FFFFFF` / `#EEE6E9` | Figma |
-| 글자 검정 | `textBlack` | `#000000` | Figma |
-| 글자 진한 회색 | `textStrong` | `#1A1A1A` | Figma |
-| 글자 보조 | `textSecondary` | `rgba(76,83,95,0.8)` | Figma |
-| 날짜 글자 | `textDate` | `rgba(68,68,68,0.6)` | Figma |
-| 그래프 설명 글자 | `textGraphCaption` | `#70757F` | Figma |
-| 그래프 이모지 | `emoji` | `#A0A7B4` | Figma (최신 안에서 이모지가 숨겨져 지금은 화면에 그리지 않음) |
-| 칩 배경 | `chip` | `#F0F2F3` | Figma |
-| 기록 카드(Before) 부제 | `recordCardSubtitle` | `#7D8492` | Figma 수정안 |
-| 연한 핑크 버튼 / 그 위 글자 | `ctaSoft` / `onCtaSoft` | `#FFAFC7` / `#000000` | Figma 수정안 |
-| 그래프 막대 3단계 | `barStrong` / `barMid` / `barLight` | `#D94F79`(Figma 변수 `브랜드 컬러`) / `#FF80A6` / `#FFB3CA` | Figma 수정안 |
-| 홈 상단 바 덮개 | `topBarTint` | `rgba(255,255,255,0.1)` | Figma 수정안 |
-| 토글 꺼짐 | `toggleOff` | `#E8D5DA` (팔레트 색) | **추정** |
-| 위험 글자 / 위험 버튼 배경 | `danger` / `dangerTile` | `#E5484D` / `#FDECEE` | **추정** |
-| 토스트 배경 | `toastFill` | `#1A1A1A` 불투명도 90% | **추정** |
-| 모달 뒤 가림막 | `scrim` | 검정 50% | **추정** |
-| 아바타 배경 | `avatar` | `#D9D9D9` | Figma |
-| 아이콘 타일 배경 | `iconTile` | `rgba(217,217,217,0.5)` | Figma |
-| 그래프 격자선 | `gridLine` | `rgba(160,167,180,0.5)` | Figma |
-| 출석 패널 | `attendancePanel` | `#FFB2CA` | Figma |
-| 출석 패널 위 글자 | `onAttendancePanel` | `rgba(255,255,255,0.8)` | Figma |
-| 알림 버튼 배경 | `bellButton` | `rgba(153,153,153,0.1)` | Figma |
-| 탭 바 배경 | `navFill` | `rgba(255,255,255,0.7)` | Figma |
-| 탭 바 테두리 | `navBorder` | `#D0D0D0` | Figma |
-| 탭 바 그림자 | `navShadow` | `rgba(0,0,0,0.1)` | Figma |
-| 탭 바 선택 알약 | `navSelection` | `#EDEDED` (Figma 변수 `Fills - Vibrant/Tertiary`, SVG에도 같은 색) | Figma |
-
-**배경:** 수정안에서 화면 배경은 `#FFF8F8`이고 상단 핑크 그라디언트는 없습니다(이전 안의 그라디언트는 2026-10-23에 제거, `backgroundGradient*` 상수도 삭제). 상단 바는 흰색 10% 덮개(`topBarTint`)와 블러(`topBarBlurSigma` 10)만 씁니다.
-
-**Figma 팔레트 프레임(수정안, 8색):** `FFB2CA`(`attendancePanel`) / `FF6090`(`brand`) / `FFF5F8` / `E8D5DA`(`toggleOff`로 사용) / `A46273` / `FFF8F8`(`background`) / `FFFF5B`, `FFFFA0`(노랑, 쓰이는 곳을 모름 → 코드에 없음, 확인 필요). `FFF5F8`, `A46273`도 아직 쓰이는 곳이 없어 코드에 넣지 않았습니다.
-
-## 2. 글자 (Pretendard)
-
-`AppTextStyles` (`lib/app/theme/app_text_styles.dart`). 자간은 Figma px 값 그대로이고 줄 높이는 Figma 고정 px입니다(표에서 "기본"은 height를 지정하지 않음). 색은 스타일에 넣지 않고 화면에서 `context.colors`로 지정합니다.
+색(`AppColors`), 글자(`AppTextStyles`), 모서리·간격·그림자·모션 토큰은 **[DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md) 1~5장**으로 옮겼습니다(역할별로 정리하고 홈 밖 화면에도 같은 규칙을 씁니다). 홈에서 쓰는 그래프 전용 글자 스타일은 아래와 같습니다.
 
 | 스타일 | 크기 / 굵기 | 자간 | 줄 높이 | 쓰이는 곳 | 색 |
 |---|---|---|---|---|---|
-| `greeting` | 26 ExtraBold | −0.65 | 32 | "규리님, 오늘도 즐거운 하루 보내세요!" | textBlack |
-| `sectionTitle` | 20 SemiBold | −0.5 | 32 | "최근 관계 신호", "오늘 해볼까요?", 인물 이름 | textBlack |
-| `attendanceTitle` | 20 SemiBold | −0.5 | 기본 | "출석 체크" | textBlack |
-| `recordCardTitleBefore` | 18 Bold | −0.45 | 기본 | "아직 오늘의 마음을 기록하지 않았어요" | textBlack |
-| `recordCardTitleAfter` | 18 Bold | −0.45 | 24 | "오늘도 기록 완료! …" (숫자 6만 brand 색) | textBlack |
-| `actionTitle` | 18 SemiBold | −0.45 | 32 | "지민님에게 가볍게 안부 묻기" | textBlack |
-| `body` | 14 Medium | −0.35 | 기본 | "1분만 천천히 돌아볼까요?" | textSecondary |
-| `button` | 14 SemiBold | −0.35 | 기본 | 버튼 글자 | onCta |
 | `graphTitle` | 14 SemiBold | −0.35 | 기본 | "이번 주 감정 흐름" | textBlack |
 | `weekday` | 14 Medium | −0.35 | 기본 | 월~일 | textStrong |
-| `date` | 14 Regular | −0.35 | 기본 | "9월 13일 목요일" | textDate |
-| `signalText` | 12 Medium | −0.3 | 32 | "최근 대화가 조금 줄었어요" (신호 카드는 textStrong, 액션 카드는 textSecondary) | — |
 | `seeAll` | 12 Medium | −0.3 | 기본 | "전체 보기" | textSecondary |
 | `chipLabel` | 12 SemiBold | −0.3 | 32 | "친구" | textSecondary |
 | `graphMonth` | 12 Regular | −0.3 | 기본 | "✦ 9월" | textStrong |
 | `graphCaption` | 12 Regular | −0.12 | 기본 | "긍정적인 감정이 … 하고 있어요." | textGraphCaption |
 | `graphCaptionEmphasis` | 12 SemiBold + 밑줄 | −0.12 | 기본 | "조금씩 증가" | textGraphCaption |
-| `caption` | 10 Regular | −0.25 | 기본 | "마지막 기록 5일 전" | textSecondary |
-| `navLabel` | 10 Bold | −0.1 | 12 | 탭 라벨 | 기본 textStrong, 선택 brand |
-| `attendanceNumber` | 40 Bold | −0.45 | 24 | 출석 숫자 "6" | brand |
-| `attendanceUnit` | 20 Bold | −0.45 | 24 | "일" | textBlack |
-| `graphEmoji` | 22 Regular | −0.22 | 기본 | (그래프 위 😁, 최신 안에서 숨겨져 지금은 안 씀) | emoji |
+| `attendanceTitle` | 20 SemiBold | −0.5 | 기본 | "출석 체크" | textBlack |
+| `recordCardTitleAfter` | 18 Bold | −0.45 | 24 | "오늘도 기록 완료! …" (숫자 6만 brand) | textBlack |
+| `graphEmoji` | 22 Regular | −0.22 | 기본 | (최신 안에서 숨겨져 지금은 안 씀) | emoji |
 
-참고: Figma에서 "✦ 9월"에는 `CTGR`, `wdth` 가변 폰트 설정이 있지만 Flutter에서는 무시될 수 있습니다(추정, 확인 필요). 이모지는 플랫폼 기본 폰트(Apple Color Emoji / Noto)라 Figma와 모양이 다를 수 있습니다.
+참고: Figma에서 "✦ 9월"에는 `CTGR`, `wdth` 가변 폰트 설정이 있지만 Flutter에서는 무시될 수 있습니다(추정, 확인 필요). 이모지는 플랫폼 기본 폰트라 Figma와 모양이 다를 수 있습니다.
 
-## 3. 모서리·간격·크기
+**배경:** 수정안에서 화면 배경은 `#FFF8F8`이고 상단 핑크 그라디언트는 없습니다(이전 안의 그라디언트는 2026-10-23에 제거). 상단 바는 흰색 10% 덮개(`topBarTint`)와 블러(`topBarBlurSigma` 10)만 씁니다.
 
-`AppRadii`, `AppSpacing`, `HomeLayout`, `GraphLayout`, `AttendanceLayout`, `BottomNavTokens`
-
-| 항목 | 값 |
-|---|---|
-| 카드 모서리 | 24 |
-| 버튼 / 아이콘 타일 / 출석 패널 모서리 | 12 |
-| 칩·아바타·알림 버튼·탭 바 | 100(원형/알약) |
-| 그래프 막대 | 위쪽 모서리만 5 |
-| 출석 알약 | 43×13, 모서리 10, 간격 5, 6개 |
-| 화면 좌우 여백 | 24 |
-| 흰 카드 테두리 | 2px `cardBorder` |
-| 기록 카드 안쪽 여백 | 20 |
-| 액션 카드 사이 간격 | 12 |
+홈 레이아웃 치수(`HomeLayout`, `GraphLayout`, `AttendanceLayout`, `BottomNavTokens`)는 4~5장에 있습니다.
 
 ## 4. 홈 화면 레이아웃
 
