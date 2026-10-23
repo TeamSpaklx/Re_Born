@@ -53,7 +53,7 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 | 탭 바 그림자 | `navShadow` | `rgba(0,0,0,0.1)` | Figma |
 | 탭 바 선택 알약 | `navSelection` | `#EDEDED` (Figma 변수 `Fills - Vibrant/Tertiary`, SVG에도 같은 색) | Figma |
 
-**배경 그라디언트:** Figma 코드값(`rgba(217,79,121,0.8)` → 흰색, 프레임 높이의 4.327%)은 실제 화면과 달랐습니다. 스크린샷(`docs/design/home_before.png`)의 색을 10px 간격으로 재 보니 맨 위 핑크 불투명도가 약 **0.40**이고 아래로 부드럽게 줄어 약 120px에서 흰색이 됩니다. 그래서 `AppSpacing.backgroundGradientHeight`(120)와 `backgroundGradientAlphas`(10px 간격 불투명도)로 구현했고(`backgroundGradientTop`의 RGB 사용), 스크린샷과 맨 위·30·62·100px에서 색이 ±1 이내로 일치합니다. 상단 바(고정)의 배경으로 그려지며, 바 높이가 상태바 영역에 따라 달라지면(Android는 더 낮음) 그 높이 안에서 끝나게 늘이고 줄입니다.
+**배경 그라디언트:** Figma 코드값(`rgba(217,79,121,0.8)` → 흰색, 프레임 높이의 4.327%)은 실제 화면과 달랐습니다. 스크린샷(`docs/design/home_before.png`)의 색을 10px 간격으로 재 보니 맨 위 핑크 불투명도가 약 **0.40**이고 아래로 부드럽게 줄어 약 120px에서 흰색이 됩니다. 그래서 `AppSpacing.backgroundGradientHeight`(120)와 `backgroundGradientAlphas`(10px 간격 불투명도)로 구현했고(`backgroundGradientTop`의 RGB 사용), 스크린샷과 맨 위·30·62·100px에서 색이 ±1 이내로 일치합니다. 상단 바(고정)의 배경으로 그려지며, 바 높이가 상태바 영역에 따라 달라지면(Android는 더 낮음) 그 높이 안에서 끝나게 늘이고 줄입니다. **현재는 상단 바에 이 그라디언트를 그리지 않습니다**(요청으로 제거, 2026-10-23). 토큰은 다시 쓸 수 있게 남겨 둡니다.
 
 ## 2. 글자 (Pretendard)
 
