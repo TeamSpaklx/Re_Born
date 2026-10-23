@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/character_avatar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../app/theme/app_assets.dart';
@@ -10,7 +11,7 @@ import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/centered_line.dart';
 import '../../models/relation_signal.dart';
 
-/// "최근 관계 신호" 카드 하나 (높이 104). 좌표는 테두리 안쪽 기준(docs/DESIGN_SYSTEM.md 5.4).
+/// "최근 관계 신호" 카드 하나 (높이 104). 좌표는 테두리 안쪽 기준(docs/DESIGN_HOME.md 5.4).
 class RelationSignalCard extends StatelessWidget {
   const RelationSignalCard({
     super.key,
@@ -40,18 +41,9 @@ class RelationSignalCard extends StatelessWidget {
               top: 26,
               width: HomeLayout.avatarSize,
               height: HomeLayout.avatarSize,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: colors.avatar,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: SvgPicture.asset(
-                    AppAssets.person,
-                    width: HomeLayout.personIconSize,
-                    height: HomeLayout.personIconSize,
-                  ),
-                ),
+              child: CharacterAvatar(
+                seed: signal.personId,
+                size: HomeLayout.avatarSize,
               ),
             ),
             Positioned(

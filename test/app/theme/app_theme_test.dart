@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reborn_app/app/theme/app_assets.dart';
 import 'package:reborn_app/app/theme/app_colors.dart';
+import 'package:reborn_app/app/theme/app_motion.dart';
 import 'package:reborn_app/app/theme/app_radii.dart';
 import 'package:reborn_app/app/theme/app_spacing.dart';
 import 'package:reborn_app/app/theme/app_text_styles.dart';
@@ -23,6 +24,18 @@ void main() {
       expect(c.cardPink, const Color(0xFFFEDAE5));
       expect(c.cardBorder, const Color(0xFFEEE6E9));
       expect(c.attendancePanel, const Color(0xFFFFB2CA));
+      expect(c.background, const Color(0xFFFFF8F8));
+      expect(c.splashBackground, const Color(0xFFFFFFFF));
+      expect(c.recordCardSubtitle, const Color(0xFF7D8492));
+      expect(c.ctaSoft, const Color(0xFFFFAFC7));
+      expect(c.onCtaSoft, const Color(0xFF000000));
+      expect(c.barStrong, const Color(0xFFD94F79));
+      expect(c.barMid, const Color(0xFFFF80A6));
+      expect(c.barLight, const Color(0xFFFFB3CA));
+      expect(c.toggleOff, const Color(0xFFE8D5DA));
+      expect(c.skeleton, const Color(0xFFF1EAED));
+      expect(c.danger, const Color(0xFFE5484D));
+      expect(c.dangerTile, const Color(0xFFFDECEE));
     });
 
     test('반투명 색은 Figma rgba 값과 같다', () {
@@ -33,7 +46,9 @@ void main() {
         expect(color.a, closeTo(a, 0.005), reason: 'alpha of $color');
       }
 
-      expectRgba(c.backgroundGradientTop, 217, 79, 121, 0.8);
+      expectRgba(c.toastFill, 26, 26, 26, 0.9);
+      expectRgba(c.scrim, 0, 0, 0, 0.5);
+      expectRgba(c.topBarTint, 255, 255, 255, 0.1);
       expectRgba(c.textSecondary, 76, 83, 95, 0.8);
       expectRgba(c.textDate, 68, 68, 68, 0.6);
       expectRgba(c.iconTile, 217, 217, 217, 0.5);
@@ -42,6 +57,66 @@ void main() {
       expectRgba(c.bellButton, 153, 153, 153, 0.1);
       expectRgba(c.navFill, 255, 255, 255, 0.7);
       expectRgba(c.navShadow, 0, 0, 0, 0.1);
+    });
+  });
+
+  group('감정 7색 · 간격 스케일 · 모션 (docs/DESIGN_SYSTEM.md 1·3·5장)', () {
+    const c = AppColors.light;
+
+    test('감정 7색', () {
+      expect(c.emotionJoy, const Color(0xFFF4B1CB));
+      expect(c.emotionSadness, const Color(0xFFBBD5ED));
+      expect(c.emotionNeutral, const Color(0xFFD1BDF3));
+      expect(c.emotionAnger, const Color(0xFFFDA4AC));
+      expect(c.emotionAnxiety, const Color(0xFFB9E5C6));
+      expect(c.emotionLove, const Color(0xFFFF9EC4));
+      expect(c.emotionExcited, const Color(0xFFFAD599));
+    });
+
+    test('간격은 4pt 스케일이고 화면 좌우 여백은 24', () {
+      expect(
+        [
+          AppSpacing.space4,
+          AppSpacing.space8,
+          AppSpacing.space12,
+          AppSpacing.space16,
+          AppSpacing.space20,
+          AppSpacing.space24,
+          AppSpacing.space32,
+          AppSpacing.space40,
+          AppSpacing.space48,
+        ],
+        [4, 8, 12, 16, 20, 24, 32, 40, 48],
+      );
+      expect(AppSpacing.pageMargin, AppSpacing.space24);
+      expect(AppSpacing.minTouchTarget, 44);
+    });
+
+    test('모션 길이와 눌림 값', () {
+      expect(AppMotion.press, const Duration(milliseconds: 100));
+      expect(AppMotion.fast, const Duration(milliseconds: 200));
+      expect(AppMotion.normal, const Duration(milliseconds: 300));
+      expect(AppMotion.slow, const Duration(milliseconds: 500));
+      expect(AppMotion.pressedOpacity, 0.7);
+    });
+
+    test('모서리: 카드 24, 모달·시트 28, 버튼·입력 12, 토스트 16', () {
+      expect(AppRadii.card, 24);
+      expect(AppRadii.dialog, 28);
+      expect(AppRadii.button, 12);
+      expect(AppRadii.toast, 16);
+    });
+
+    test('컴포넌트 치수', () {
+      expect(ComponentLayout.toggleWidth, 51);
+      expect(ComponentLayout.toggleHeight, 31);
+      expect(ComponentLayout.segmentedHeight, 44);
+      expect(ComponentLayout.settingsRowHeight, 56);
+      expect(ComponentLayout.ctaButtonHeight, 52);
+      expect(ComponentLayout.dialogButtonHeight, 52);
+      expect(ComponentLayout.sheetHandleWidth, 40);
+      expect(ComponentLayout.checkSize, 24);
+      expect(ComponentLayout.profileAvatarSize, 56);
     });
   });
 

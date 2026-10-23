@@ -1,23 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/theme/app_assets.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../core/errors/app_error_log.dart';
+import '../../../core/providers/clock_provider.dart';
+import '../../../core/utils/korean_date.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../app/theme/app_text_styles.dart';
+import '../../../shared/widgets/app_bottom_sheet.dart';
+import '../../../shared/widgets/app_dialogs.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/app_text_field.dart';
-import '../../../shared/widgets/choice_chip_button.dart';
-import '../../../shared/widgets/cta_button.dart';
+import '../../../shared/widgets/bottom_cta_bar.dart';
+import '../../../shared/widgets/pressable.dart';
 import '../../../shared/widgets/page_scaffold.dart';
 import '../../analysis/crisis_checker.dart';
 import '../../entries/models/emotion.dart';
 import '../../entries/models/entry.dart';
 import '../../entries/models/entry_validator.dart';
 import '../../entries/presentation/entries_providers.dart';
+import '../../entries/presentation/widgets/emotion_picker.dart';
 import '../../people/presentation/people_providers.dart';
 import 'crisis_notice.dart';
+import 'intensity_selector.dart';
 
 /// 기록 작성·수정 (F-03). **임시 디자인**.
 /// 본문(1~2000자) · 인물(선택) · 감정 · 강도를 고르고 저장하면 분석까지 이어진다.
@@ -42,8 +50,6 @@ class _RecordFormScreenState extends ConsumerState<RecordFormScreen> {
   String? _emotionError;
   String? _intensityError;
   bool _saving = false;
-
-  static const _intensityLabels = {1: '조금', 2: '보통', 3: '많이'};
 
   @override
   void initState() {
@@ -91,7 +97,6 @@ class _RecordFormScreenState extends ConsumerState<RecordFormScreen> {
 
     final actions = ref.read(recordActionsProvider);
     final editing = _editing;
-    final messenger = ScaffoldMessenger.of(context);
     final router = GoRouter.of(context);
     try {
       if (editing == null) {
@@ -115,9 +120,7 @@ class _RecordFormScreenState extends ConsumerState<RecordFormScreen> {
       ref.read(appErrorLogProvider).record(error, stack, where: 'save-entry');
       if (!mounted) return;
       setState(() => _saving = false);
-      messenger.showSnackBar(
-        const SnackBar(content: Text('저장하지 못했어요. 다시 시도해 주세요.')),
-      );
+      showAppToast(context, '저장하지 못했어요. 다시 시도해 주세요.');
       return;
     }
     if (!mounted) return;
@@ -127,41 +130,33 @@ class _RecordFormScreenState extends ConsumerState<RecordFormScreen> {
   Future<void> _pickPerson() async {
     final people = ref.read(peopleProvider).value ?? const [];
     final colors = context.colors;
-    final picked = await showModalBottomSheet<_PersonChoice>(
-      context: context,
-      backgroundColor: colors.cardWhite,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: Text(
-                '인물 없음',
-                style: AppTextStyles.body.copyWith(color: colors.textBlack),
+    final picked = await showAppBottomSheet<_PersonChoice>(
+      context,
+      title: '누구와의 기록인가요?',
+      builder: (context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SheetOptionRow(
+            title: '인물 없음',
+            selected: _personId == null,
+            onTap: () => Navigator.of(context).pop(const _PersonChoice(null)),
+          ),
+          if (people.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.space16),
+              child: Text(
+                '등록된 인물이 없어요. 인물 없이 저장할 수 있고, 관계 탭에서 인물을 추가할 수 있어요.',
+                style: AppTextStyles.body.copyWith(color: colors.textSecondary),
               ),
-              onTap: () => Navigator.of(context).pop(const _PersonChoice(null)),
             ),
-            if (people.isEmpty)
-              Padding(
-                padding: const EdgeInsets.all(24),
-                child: Text(
-                  '등록된 인물이 없어요. 인물 없이 저장할 수 있고, 관계 탭에서 인물을 추가할 수 있어요.',
-                  style: AppTextStyles.body.copyWith(
-                    color: colors.textSecondary,
-                  ),
-                ),
-              ),
-            for (final p in people)
-              ListTile(
-                title: Text(
-                  p.name,
-                  style: AppTextStyles.body.copyWith(color: colors.textBlack),
-                ),
-                subtitle: Text(p.relationType.label),
-                onTap: () => Navigator.of(context).pop(_PersonChoice(p.id)),
-              ),
-          ],
-        ),
+          for (final p in people)
+            SheetOptionRow(
+              title: p.name,
+              subtitle: p.relationType.label,
+              selected: _personId == p.id,
+              onTap: () => Navigator.of(context).pop(_PersonChoice(p.id)),
+            ),
+        ],
       ),
     );
     if (picked != null) setState(() => _personId = picked.id);
@@ -175,27 +170,51 @@ class _RecordFormScreenState extends ConsumerState<RecordFormScreen> {
         .where((p) => p.id == _personId)
         .map((p) => p.name)
         .firstOrNull;
+    final now = ref.watch(clockProvider)();
 
-    Widget label(String text) => Padding(
-      padding: const EdgeInsets.only(top: 20, bottom: 8),
+    Widget label(String text, {bool first = false}) => Padding(
+      padding: EdgeInsets.only(
+        top: first ? 0 : AppSpacing.space32,
+        bottom: AppSpacing.space12,
+      ),
       child: Text(
         text,
-        style: AppTextStyles.graphTitle.copyWith(color: colors.textBlack),
+        style: AppTextStyles.groupTitle.copyWith(color: colors.textBlack),
       ),
     );
 
     return PageScaffold(
-      title: _editing == null ? '새 기록' : '기록 수정',
+      title: _editing == null ? '지금 마음은\n어떤가요?' : '기록 수정',
+      subtitle: _editing == null ? formatKoreanDate(now) : null,
+      largeTitle: true,
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(
           AppSpacing.pageMargin,
-          0,
+          AppSpacing.space8,
           AppSpacing.pageMargin,
-          40,
+          AppSpacing.space40,
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            label('감정', first: true),
+            EmotionPicker(
+              selected: _emotion,
+              onChanged: (e) => setState(() {
+                _emotion = e;
+                _emotionError = null;
+              }),
+            ),
+            if (_emotionError != null) _error(colors, _emotionError!),
+            label('얼마나 강하게 느꼈나요?'),
+            IntensitySelector(
+              value: _intensity,
+              onChanged: (v) => setState(() {
+                _intensity = v;
+                _intensityError = null;
+              }),
+            ),
+            if (_intensityError != null) _error(colors, _intensityError!),
             label('오늘의 마음'),
             AppTextField(
               fieldKey: const Key('record-body'),
@@ -210,88 +229,44 @@ class _RecordFormScreenState extends ConsumerState<RecordFormScreen> {
               },
             ),
             label('누구와의 일인가요? (선택)'),
-            GestureDetector(
+            Pressable(
               key: const Key('record-person'),
-              behavior: HitTestBehavior.opaque,
               onTap: _pickPerson,
               child: AppCard.white(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
+                  horizontal: AppSpacing.space16,
+                  vertical: AppSpacing.space16,
                 ),
                 child: Row(
                   children: [
                     Expanded(
                       child: Text(
                         personName ?? '인물 없음',
-                        style: AppTextStyles.body.copyWith(
+                        style: AppTextStyles.rowTitle.copyWith(
                           color: personName == null
                               ? colors.textSecondary
                               : colors.textBlack,
                         ),
                       ),
                     ),
-                    Text(
-                      '선택',
-                      style: AppTextStyles.seeAll.copyWith(
-                        color: colors.textSecondary,
-                      ),
-                    ),
+                    SvgPicture.asset(AppAssets.chevronSignal),
                   ],
                 ),
               ),
             ),
-            label('감정'),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final e in Emotion.values)
-                  ChoiceChipButton(
-                    label: e.label,
-                    selected: _emotion == e,
-                    onTap: () => setState(() {
-                      _emotion = e;
-                      _emotionError = null;
-                    }),
-                  ),
-              ],
-            ),
-            if (_emotionError != null) _error(colors, _emotionError!),
-            label('강도'),
-            Wrap(
-              spacing: 8,
-              children: [
-                for (final entry in _intensityLabels.entries)
-                  ChoiceChipButton(
-                    label: '${entry.key} ${entry.value}',
-                    selected: _intensity == entry.key,
-                    onTap: () => setState(() {
-                      _intensity = entry.key;
-                      _intensityError = null;
-                    }),
-                  ),
-              ],
-            ),
-            if (_intensityError != null) _error(colors, _intensityError!),
-            const SizedBox(height: 32),
-            CtaButton(
-              label: _saving ? '저장 중…' : '저장',
-              height: 52,
-              onPressed: _saving ? () {} : _save,
-            ),
           ],
         ),
+      ),
+      bottom: BottomCtaBar(
+        label: _saving ? '저장 중…' : '저장',
+        onPressed: _saving ? null : _save,
       ),
     );
   }
 
   Widget _error(AppColors colors, String text) => Padding(
-    padding: const EdgeInsets.only(top: 6),
-    child: Text(
-      text,
-      style: AppTextStyles.caption.copyWith(color: colors.brand),
-    ),
+    padding: const EdgeInsets.only(top: AppSpacing.space8),
+    child: Text(text, style: AppTextStyles.body.copyWith(color: colors.danger)),
   );
 }
 

@@ -7,7 +7,7 @@ import '../../../app/theme/app_spacing.dart';
 import '../../../app/theme/app_text_styles.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/choice_chip_button.dart';
-import '../../../shared/widgets/cta_button.dart';
+import '../../../shared/widgets/bottom_cta_bar.dart';
 import '../../../shared/widgets/page_scaffold.dart';
 import '../../people/models/person.dart';
 import '../../people/models/person_validator.dart';
@@ -95,43 +95,43 @@ class _PersonFormScreenState extends ConsumerState<PersonFormScreen> {
     if (id != null) _loadOnce(ref.watch(personProvider(id)));
 
     Widget label(String text) => Padding(
-      padding: const EdgeInsets.only(top: 20, bottom: 8),
+      padding: const EdgeInsets.only(
+        top: AppSpacing.space24,
+        bottom: AppSpacing.space12,
+      ),
       child: Text(
         text,
-        style: AppTextStyles.graphTitle.copyWith(color: colors.textBlack),
+        style: AppTextStyles.groupTitle.copyWith(color: colors.textBlack),
       ),
     );
 
     return PageScaffold(
       title: _editing == null ? '인물 추가' : '인물 수정',
+      subtitle: _editing == null ? '기록을 남길 사람을 등록해요.' : null,
+      largeTitle: true,
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(
           AppSpacing.pageMargin,
-          0,
+          AppSpacing.space8,
           AppSpacing.pageMargin,
-          40,
+          AppSpacing.space40,
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            label('이름 (별칭)'),
             AppTextField(
               fieldKey: const Key('person-name'),
               controller: _name,
+              label: '이름 (별칭)',
               hint: '예: 지민',
+              helperText: '실명 대신 별칭을 쓰는 걸 권해요.',
               maxLength: PersonValidator.maxNameLength,
               errorText: _nameError,
               onChanged: (_) {
                 if (_nameError != null) setState(() => _nameError = null);
               },
             ),
-            Text(
-              '실명 대신 별칭을 쓰는 걸 권해요.',
-              style: AppTextStyles.caption.copyWith(
-                color: colors.textSecondary,
-              ),
-            ),
-            label('관계'),
+            label('어떤 사이인가요?'),
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -154,17 +154,16 @@ class _PersonFormScreenState extends ConsumerState<PersonFormScreen> {
             ),
             if (_formError != null)
               Padding(
-                padding: const EdgeInsets.only(top: 12),
+                padding: const EdgeInsets.only(top: AppSpacing.space12),
                 child: Text(
                   _formError!,
-                  style: AppTextStyles.caption.copyWith(color: colors.brand),
+                  style: AppTextStyles.body.copyWith(color: colors.danger),
                 ),
               ),
-            const SizedBox(height: 32),
-            CtaButton(label: '저장', height: 52, onPressed: _save),
           ],
         ),
       ),
+      bottom: BottomCtaBar(label: '저장', onPressed: _save),
     );
   }
 }

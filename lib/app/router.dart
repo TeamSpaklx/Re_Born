@@ -1,10 +1,19 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/all/presentation/all_screen.dart';
+import '../features/auth/presentation/account_delete_screen.dart';
+import '../features/auth/presentation/consent_screen.dart';
+import '../features/auth/presentation/login_screen.dart';
+import '../features/auth/presentation/onboarding_screen.dart';
+import '../features/auth/presentation/permission_screen.dart';
+import '../features/auth/presentation/signup_screen.dart';
 import '../features/home/presentation/today_screen.dart';
 import '../features/insights/presentation/insight_detail_screen.dart';
+import '../features/notifications/presentation/notification_settings_screen.dart';
+import '../features/notifications/presentation/notifications_screen.dart';
 import '../features/record/presentation/record_detail_screen.dart';
 import '../features/record/presentation/record_form_screen.dart';
 import '../features/record/presentation/record_screen.dart';
@@ -12,12 +21,27 @@ import '../features/relations/presentation/person_detail_screen.dart';
 import '../features/relations/presentation/person_form_screen.dart';
 import '../features/relations/presentation/relations_screen.dart';
 import '../features/splash/presentation/splash_screen.dart';
+import '../shared/dev/design_gallery_screen.dart';
 import 'main_shell.dart';
+import 'theme/app_spacing.dart';
 
 /// 화면 경로. 화면 이동은 문자열 대신 이 상수를 사용한다.
 /// 순서는 하단 탭 순서(투데이 / 관계 / 기록 / 전체)와 같다.
 abstract final class AppRoutes {
   static const splash = '/splash';
+
+  /// 디자인 갤러리(개발용). 디버그 빌드에서만 등록된다.
+  static const devGallery = '/dev/gallery';
+
+  // 인증·온보딩
+  static const login = '/login';
+  static const signup = '/signup';
+  static const signupConsent = '/signup/consent';
+  static const onboarding = '/onboarding';
+  static const onboardingPermission = '/onboarding/permission';
+  static const accountDelete = '/account/delete';
+  static const notifications = '/notifications';
+  static const notificationSettings = '/notifications/settings';
 
   static const today = '/today';
   static const relations = '/relations';
@@ -46,6 +70,43 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.splash,
         builder: (context, state) => const SplashScreen(),
+      ),
+      if (kDebugMode)
+        GoRoute(
+          path: AppRoutes.devGallery,
+          builder: (context, state) => const DesignGalleryScreen(),
+        ),
+      GoRoute(
+        path: AppRoutes.login,
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.signup,
+        builder: (context, state) => const SignupScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.signupConsent,
+        builder: (context, state) => const ConsentScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.onboarding,
+        builder: (context, state) => const OnboardingScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.onboardingPermission,
+        builder: (context, state) => const PermissionScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.notifications,
+        builder: (context, state) => const NotificationsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.notificationSettings,
+        builder: (context, state) => const NotificationSettingsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.accountDelete,
+        builder: (context, state) => const AccountDeleteScreen(),
       ),
       GoRoute(
         path: AppRoutes.recordNew,
@@ -81,8 +142,21 @@ final routerProvider = Provider<GoRouter>((ref) {
             RecordDetailScreen(entryId: state.pathParameters['id']!),
       ),
       StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) =>
-            MainShell(navigationShell: navigationShell),
+        // 스플래시에서 넘어올 때 옆에서 밀리지 않고, 로고 화면 위로 서서히 나타난다.
+        pageBuilder: (context, state, navigationShell) =>
+            CustomTransitionPage<void>(
+              key: state.pageKey,
+              transitionDuration: SplashLayout.fadeDuration,
+              reverseTransitionDuration: SplashLayout.fadeDuration,
+              transitionsBuilder: (context, animation, secondary, child) =>
+                  FadeTransition(
+                    opacity: animation.drive(
+                      CurveTween(curve: Curves.easeInOut),
+                    ),
+                    child: child,
+                  ),
+              child: MainShell(navigationShell: navigationShell),
+            ),
         branches: [
           _branch(AppRoutes.today, const TodayScreen()),
           _branch(AppRoutes.relations, const RelationsScreen()),

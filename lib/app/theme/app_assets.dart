@@ -1,5 +1,5 @@
 /// 에셋 경로 상수. 문자열 경로를 화면에서 직접 쓰지 않는다.
-/// 파일과 Figma 노드의 대응은 docs/DESIGN_SYSTEM.md의 에셋 목록 참고.
+/// 파일과 Figma 노드의 대응은 docs/DESIGN_HOME.md의 에셋 목록 참고.
 abstract final class AppAssets {
   static const _icons = 'assets/icons/ui';
 
@@ -22,9 +22,20 @@ abstract final class AppAssets {
   static const bell = '$_icons/bell.svg';
   static const sealCheck = '$_icons/seal_check.svg';
 
-  // 임시 디자인 화면용 아이콘 (Phosphor Icons, MIT). 한 가지 색(currentColor)이라 쓰는 곳에서 색을 입힌다.
+  // 임시 디자인 화면용 아이콘. check는 Phosphor Icons(MIT), `ix_*`는 Iconsax(Linear)다.
+  // 한 가지 색이라 쓰는 곳에서 `colorFilter`로 색을 입힌다.
   static const check = '$_icons/check.svg';
-  static const trash = '$_icons/trash.svg';
+  static const trash = '$_icons/ix_trash.svg';
+  static const ixAdd = '$_icons/ix_add.svg';
+  static const ixEdit = '$_icons/ix_edit.svg';
+  static const ixCamera = '$_icons/ix_camera.svg';
+  static const ixGallery = '$_icons/ix_gallery.svg';
+  static const ixEye = '$_icons/ix_eye.svg';
+  static const ixEyeOff = '$_icons/ix_eye_off.svg';
+
+  /// 소셜 로그인 버튼 마크(단순화한 로고, 출시 전 브랜드 가이드 확인 필요).
+  static const googleG = '$_icons/google_g.svg';
+  static const kakaoBubble = '$_icons/kakao_bubble.svg';
 
   // 화살표: 쓰이는 자리마다 크기·색이 달라 파일이 나뉘어 있다.
   static const chevronSignal = '$_icons/chevron_signal.svg';
@@ -42,6 +53,28 @@ abstract final class AppAssets {
 
   /// 스플래시 화면 로고 마크 (2000×2000, 배경 투명).
   static const logoMark = 'assets/images/logo_mark.png';
+
+  /// 기록 카드(Before)의 여우원숭이 일러스트 (604×604, 배경 투명, 원본 1254×1254를 줄임).
+  static const mascotLemur = 'assets/images/mascot_lemur.png';
+
+  /// 감정 캐릭터 7종 (RebornMood 시안에서 캐릭터별로 잘라 번짐을 정리한 PNG, 320×320 투명 배경).
+  static const _emotions = 'assets/images/emotions';
+  static const emotionJoy = '$_emotions/joy.png';
+  static const emotionSadness = '$_emotions/sadness.png';
+  static const emotionNeutral = '$_emotions/neutral.png';
+  static const emotionAnger = '$_emotions/anger.png';
+  static const emotionAnxiety = '$_emotions/anxiety.png';
+  static const emotionLove = '$_emotions/love.png';
+  static const emotionExcited = '$_emotions/excited.png';
+  static const emotionImages = [
+    emotionJoy,
+    emotionSadness,
+    emotionNeutral,
+    emotionAnger,
+    emotionAnxiety,
+    emotionLove,
+    emotionExcited,
+  ];
 
   /// iOS 네이티브 탭 바 라벨용 글꼴 파일(UIKit에 직접 등록한다). Flutter 글자는 pubspec의 Pretendard를 쓴다.
   static const pretendardBold = 'assets/fonts/Pretendard-Bold.otf';
@@ -63,6 +96,14 @@ abstract final class AppAssets {
     sealCheck,
     check,
     trash,
+    ixAdd,
+    ixEdit,
+    ixCamera,
+    ixGallery,
+    ixEye,
+    ixEyeOff,
+    googleG,
+    kakaoBubble,
     chevronSignal,
     chevronGraph,
     chevronSeeAll,
@@ -72,6 +113,8 @@ abstract final class AppAssets {
     radioCircleAfter,
     logo,
     logoMark,
+    mascotLemur,
+    ...emotionImages,
     pretendardBold,
   ];
 }
