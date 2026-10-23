@@ -151,6 +151,14 @@ abstract final class SplashLayout {
   /// Figma는 이미지를 박스 안에서 left −0.4%, top −0.85% 옮겨 놓았다(200 기준 −0.8, −1.7px).
   static const logoOffset = Offset(-0.8, -1.7);
 
-  /// 로고를 보여 주는 시간. Figma에 지정이 없어 정한 임시값(팀 확인 필요).
-  static const duration = Duration(milliseconds: 1200);
+  // 아래 시간은 모두 Figma에 지정이 없어 정한 임시값(팀 확인 필요).
+
+  /// 로고를 최소한 이만큼은 보여 준다(로딩이 빨라도 번쩍 사라지지 않게).
+  static const minDuration = Duration(milliseconds: 800);
+
+  /// 로딩이 끝나지 않아도 이 시간이 지나면 홈으로 넘어간다.
+  static const maxDuration = Duration(seconds: 3);
+
+  /// 홈이 로고 화면 위로 서서히 나타나는 시간(크로스페이드).
+  static const fadeDuration = Duration(milliseconds: 400);
 }
