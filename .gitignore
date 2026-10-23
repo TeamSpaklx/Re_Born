@@ -52,3 +52,4 @@ app.*.map.json
 /docs/design/references/**/*.jpeg
 /docs/design/references/**/*.webp
 /docs/design/references/fragment-*.md
+.env

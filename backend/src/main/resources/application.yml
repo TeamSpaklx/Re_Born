@@ -12,6 +12,12 @@ spring:
 server:
   port: ${PORT:8080}
 
+<<<<<<< Updated upstream
+supabase:
+  jwks-url: ${SUPABASE_JWKS_URL:https://cblolxoebahefwbyhoqe.supabase.co/auth/v1/.well-known/jwks.json}
+
+=======
+>>>>>>> Stashed changes
 reborn:
   ai:
     enabled: ${AI_ANALYSIS_ENABLED:false}
