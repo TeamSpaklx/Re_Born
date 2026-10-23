@@ -18,9 +18,6 @@ class WeeklyEmotionCard extends StatelessWidget {
   final WeeklyEmotionFlow flow;
 
   static const _weekdays = ['월', '화', '수', '목', '금', '토', '일'];
-  static const _emojiLeft = 212.0;
-  static const _emojiTop = 26.0;
-  static const _emojiHeight = 22.0;
   static const _barCount = 6;
 
   /// 막대 색: 값이 낮을수록 진하고 높을수록 연하다(구간은 [GraphLayout.barStrongMax]·[GraphLayout.barMidMax]).
@@ -72,14 +69,14 @@ class WeeklyEmotionCard extends StatelessWidget {
                   ),
                 ),
               ),
-              for (final y in GraphLayout.gridLineYs)
-                Positioned(
-                  left: GraphLayout.gridLeft * s,
-                  top: y,
-                  width: GraphLayout.gridWidth * s,
-                  height: 1,
-                  child: ColoredBox(color: colors.gridLine),
-                ),
+              // 수정안은 막대가 서는 바닥선 하나만 보인다(위쪽 격자선 3개는 Figma에서 숨김).
+              Positioned(
+                left: GraphLayout.gridLeft * s,
+                top: GraphLayout.baselineY,
+                width: GraphLayout.gridWidth * s,
+                height: 1,
+                child: ColoredBox(color: colors.gridLine),
+              ),
               for (var i = 0; i < _barCount; i++)
                 if (flow.days[i] != null)
                   Positioned(
@@ -107,20 +104,6 @@ class WeeklyEmotionCard extends StatelessWidget {
                       _weekdays[i],
                       style: AppTextStyles.weekday.copyWith(
                         color: colors.textStrong,
-                      ),
-                    ),
-                  ),
-                ),
-              if (flow.peakEmoji != null)
-                Positioned(
-                  left: _emojiLeft * s,
-                  top: _emojiTop,
-                  child: CenteredLine(
-                    height: _emojiHeight,
-                    child: Text(
-                      flow.peakEmoji!,
-                      style: AppTextStyles.graphEmoji.copyWith(
-                        color: colors.emoji,
                       ),
                     ),
                   ),

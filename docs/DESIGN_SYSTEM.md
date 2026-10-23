@@ -43,7 +43,7 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 | 글자 보조 | `textSecondary` | `rgba(76,83,95,0.8)` | Figma |
 | 날짜 글자 | `textDate` | `rgba(68,68,68,0.6)` | Figma |
 | 그래프 설명 글자 | `textGraphCaption` | `#70757F` | Figma |
-| 그래프 이모지 | `emoji` | `#A0A7B4` | Figma |
+| 그래프 이모지 | `emoji` | `#A0A7B4` | Figma (최신 안에서 이모지가 숨겨져 지금은 화면에 그리지 않음) |
 | 칩 배경 | `chip` | `#F0F2F3` | Figma |
 | 기록 카드(Before) 부제 | `recordCardSubtitle` | `#7D8492` | Figma 수정안 |
 | 연한 핑크 버튼 / 그 위 글자 | `ctaSoft` / `onCtaSoft` | `#FFAFC7` / `#000000` | Figma 수정안 |
@@ -95,7 +95,7 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 | `navLabel` | 10 Bold | −0.1 | 12 | 탭 라벨 | 기본 textStrong, 선택 brand |
 | `attendanceNumber` | 40 Bold | −0.45 | 24 | 출석 숫자 "6" | brand |
 | `attendanceUnit` | 20 Bold | −0.45 | 24 | "일" | textBlack |
-| `graphEmoji` | 22 Regular | −0.22 | 기본 | 그래프 위 😁 | emoji |
+| `graphEmoji` | 22 Regular | −0.22 | 기본 | (그래프 위 😁, 최신 안에서 숨겨져 지금은 안 씀) | emoji |
 
 참고: Figma에서 "✦ 9월"에는 `CTGR`, `wdth` 가변 폰트 설정이 있지만 Flutter에서는 무시될 수 있습니다(추정, 확인 필요). 이모지는 플랫폼 기본 폰트(Apple Color Emoji / Noto)라 Figma와 모양이 다를 수 있습니다.
 
@@ -176,8 +176,8 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 
 ### 5.5 감정 그래프 카드 ("이번 주 감정 흐름")
 - 354×180, 배경 `cardWhite`, 모서리 24(수정안은 테두리 없음, 투명 2px 자리 유지). 좌표는 카드 안쪽 기준.
-- 제목 `graphTitle` @(18,12) + `chevron_graph.svg`(17) 간격 2. "✦ 9월" `graphMonth` @(18,48). 오른쪽 위에 이모지(😁 `graphEmoji`, 가장 높은 막대 위, x 212·y 37 중심).
-- 격자선 4개: y 61 / 82 / 103 / 124, x 18, 폭 314, 두께 1, `gridLine`.
+- 제목 `graphTitle` @(18,12) + `chevron_graph.svg`(17) 간격 2. "✦ 9월" `graphMonth` @(18,48). **이모지는 최신 안(`736:267`)에서 숨겨져 있어 그리지 않습니다**(이전 안: 😁 `graphEmoji`, 가장 높은 막대 위). 데이터의 `peakEmoji`는 남아 있지만 화면에 쓰지 않습니다.
+- **격자선은 바닥선 하나만** 보입니다: y 124(바깥 기준 126), x 18, 폭 314, 두께 1, `gridLine`(`GraphLayout.baselineY`). 이전 안의 위쪽 선 3개(y 61 / 82 / 103)는 최신 안에서 숨겨져 있습니다.
 - **좌표 기준 주의:** 제목·격자선·설명·월 라벨·이모지는 테두리(2px) **안쪽** 기준이고, 막대와 요일 라벨은 테두리 **바깥(카드 모서리)** 기준입니다. 구현은 막대·요일 라벨에서 2px를 빼 맞춥니다(`WeeklyEmotionCard._borderInset`).
 - 막대 6개(월~토) 폭 27.437, 왼쪽 x 20 / 67.76 / 115.52 / 163.28 / 211.04 / 258.8, 바닥 y 126, 위쪽 모서리 5. **색은 값에 따라 3단계(수정안):** 값 ≤ 0.5(월·화·목)는 `barStrong` `#D94F79`, ≤ 0.9(수·토)는 `barMid` `#FF80A6`, 그 위(금)는 `barLight` `#FFB3CA`. 값 구간(`GraphLayout.barStrongMax`·`barMidMax`)은 Figma에 규칙이 없어 샘플 막대에서 정한 **추정**입니다(`WeeklyEmotionCard.barColor`). 샘플 높이: 월 9 / 화 21 / 수 48 / 목 36 / 금 75.8 / 토 66. **일요일은 막대가 없습니다**(값 없음). 가장 높은 막대 = 75.806px.
 - 요일 라벨(월~일 7개) 14 Medium `weekday`, 중심 y 135, 막대 가운데 아래. 글자 상자(폭 13.21)의 왼쪽 x는 월 27.1 / 화 74.9 / 수 122.6 / 목 170.4 / 금 219.2 / 토 266.9 / 일 314.7.

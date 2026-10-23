@@ -186,7 +186,22 @@ void main() {
       reason: '첫 3일은 평균이 내려가는 흐름',
     );
     expect(find.textContaining('조금씩 줄고', findRichText: true), findsOneWidget);
-    expect(find.text('🙂'), findsOneWidget, reason: '가장 높은 화요일(0.4167)');
+    // 최신 안에는 그래프 위 이모지가 없다(데이터의 peakEmoji는 있지만 화면에 그리지 않는다).
+    expect(find.text('🙂'), findsNothing);
+    expect(find.text('😁'), findsNothing);
+    // 격자선은 막대가 서는 바닥선 하나만 보인다(위쪽 3개는 Figma에서 숨김).
+    final lines = find.descendant(
+      of: find.byType(WeeklyEmotionCard),
+      matching: find.byWidgetPredicate(
+        (w) => w is ColoredBox && w.color == AppColors.light.gridLine,
+      ),
+    );
+    expect(lines, findsOneWidget);
+    final card = tester.getTopLeft(find.byType(WeeklyEmotionCard));
+    expect(
+      tester.getTopLeft(lines).dy - card.dy,
+      closeTo(GraphLayout.baselineY + 2, 0.5), // 투명 테두리 2px 안쪽 기준 → 바깥 기준 126
+    );
   });
 
   test('막대 색은 값이 낮을수록 진하고 높을수록 연하다 (Figma 수정안 샘플 막대 기준)', () {

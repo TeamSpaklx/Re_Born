@@ -94,8 +94,8 @@ abstract final class GraphLayout {
   /// 막대 x 좌표(월~일). 간격은 47.76.
   static const barLefts = [20.0, 67.76, 115.52, 163.28, 211.04, 258.8];
 
-  /// 가로 격자선 y (카드 안쪽) 4개, 선 x=18, 폭 314.
-  static const gridLineYs = [61.0, 82.0, 103.0, 124.0];
+  /// 막대가 서는 바닥선 y (카드 안쪽), 선 x=18, 폭 314. 위쪽 격자선 3개(y 61/82/103)는 최신 안에서 숨겨져 있다.
+  static const baselineY = 124.0;
   static const gridLeft = 18.0;
   static const gridWidth = 314.0;
 
