@@ -4,6 +4,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Size;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,6 +30,15 @@ public class DiaryController {
         return service.create(request);
     }
 
+    @PostMapping("/analyze")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "일기 AI 분석 및 저장", description = "본문을 OpenAI로 전송해 감정을 분석한 뒤 public.diary에 저장합니다.")
+    public DiaryService.AnalyzedDiaryResponse analyzeAndCreate(
+            @Valid @RequestBody AnalyzeDiaryRequest request) {
+        return service.analyzeAndCreate(
+                new DiaryService.AnalyzeDiaryRequest(request.person_id(), request.body()));
+    }
+
     @GetMapping
     @Operation(summary = "일기 목록 조회", description = "from, to 날짜 범위로 일기를 조회합니다.")
     public List<DiaryResponse> list(@RequestParam(required = false) String from,
@@ -36,11 +47,17 @@ public class DiaryController {
     }
 
     public record CreateDiaryRequest(
-            @NotBlank @Size(max = 2000) String body,
-            @Min(-3) @Max(3) Integer score,
-            OffsetDateTime createdAt) {}
+        String person_id,
+        @NotBlank @Size(max = 2000) String body,
+        String emotion,
+        @Min(-3) @Max(3) Integer score
+        ) {}
 
-    public record DiaryResponse(String id, String body, Integer score,
-                                String emotion, OffsetDateTime createdAt,
-                                String analysisStatus) {}
+    public record AnalyzeDiaryRequest(
+            String person_id,
+            @NotBlank @Size(max = 2000) String body,
+            @NotNull @AssertTrue Boolean consentToExternalAnalysis) {}
+
+    public record DiaryResponse(String id, String user_id, String person_id, String body,
+                                String emotion, Integer score) {}
 }

@@ -39,7 +39,7 @@ PR을 올리기 전에 `flutter analyze`와 `flutter test`가 통과해야 합�
 ## 하지 말 것
 
 - **Firebase / Firestore를 쓰지 않습니다.** SPEC의 `users/{uid}/entries/...` 같은 경로는 PostgreSQL 테이블로 읽습니다.
-- **외부 AI API를 쓰지 않고**, 기록 본문을 외부로 보내지 않습니다.
+- 기록 AI 분석은 Spring Boot 백엔드에서 OpenAI Responses API를 사용합니다. 기록 본문은 분석 요청 때 OpenAI로 전송되며, 사용자의 동의를 받은 뒤 호출합니다. API 키는 서버 환경변수로만 보관합니다.
 - **Supabase `service_role` / secret 키를 코드나 커밋에 넣지 않습니다.** 앱에는 publishable key만 둡니다.
 - **RLS 없는 테이블을 만들지 않습니다.** 모든 사용자 데이터 테이블은 본인 `user_id`의 행만 접근하게 합니다.
 - **TECH_STACK.md에 없는 패키지를 마음대로 추가하지 않습니다.** 필요하면 PR에서 이유를 적고 TECH_STACK.md도 함께 고칩니다.

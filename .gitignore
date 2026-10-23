@@ -3,6 +3,7 @@
 *.log
 *.pyc
 *.swp
+.env
 .DS_Store
 .atom/
 .build/
@@ -33,6 +34,7 @@ migrate_working_dir/
 /build/
 /coverage/
 /backend/target/
+/backend/src/main/resources/application-local.yml
 
 # Symbolication related
 app.*.symbols

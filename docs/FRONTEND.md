@@ -62,7 +62,7 @@ class RecordStreak {
 
 ```dart
 class RelationSignal {
-  String personId;
+  String person_id;
   String personName;          // "지민"
   RelationType relationType;  // friend / family / teacher / coworker / other → 칩 글자 "친구"
   String message;             // "최근 대화가 조금 줄었어요"
@@ -95,7 +95,7 @@ class WeeklyEmotionFlow {
 ```dart
 class ActionSuggestion {
   String id;
-  String personId;
+  String person_id;
   String title;     // "지민님에게 가볍게 안부 묻기"
   String reason;    // "최근 대화가 조금 줄었어요"
   bool done;        // 오른쪽 원 체크 여부 (F-04 체크리스트와 연결)
