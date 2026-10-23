@@ -57,6 +57,9 @@ abstract final class HomeLayout {
   static const headerLogoHeight = 42.0;
   static const bellButtonSize = 44.0;
 
+  /// 로고를 누르면 맨 위로 올라가는 시간. Figma에 지정이 없어 정한 임시값(팀 확인 필요).
+  static const scrollToTopDuration = Duration(milliseconds: 500);
+
   // 카드 높이
   static const recordCardHeightBefore = 172.0;
   static const recordCardHeightAfter = 399.0;

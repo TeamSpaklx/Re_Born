@@ -234,6 +234,42 @@ void main() {
     );
   });
 
+  testWidgets('로고를 누르면 맨 위로 부드럽게 올라간다', (tester) async {
+    useDesignScreen(tester);
+    await pumpHome(tester);
+
+    final scrollable = tester.state<ScrollableState>(find.byType(Scrollable));
+    await tester.drag(
+      find.byType(SingleChildScrollView),
+      const Offset(0, -300),
+    );
+    await tester.pumpAndSettle();
+    expect(scrollable.position.pixels, closeTo(300, 1));
+
+    await tester.tap(find.bySemanticsLabel('맨 위로 이동'));
+    await tester.pump(); // 애니메이션 시작 프레임
+    // 애니메이션 도중에는 아직 위로 올라가는 중이다.
+    await tester.pump(HomeLayout.scrollToTopDuration ~/ 2);
+    expect(scrollable.position.pixels, inExclusiveRange(0, 300));
+
+    await tester.pumpAndSettle();
+    expect(scrollable.position.pixels, 0);
+  });
+
+  testWidgets('이미 맨 위일 때 로고를 눌러도 오류가 없다', (tester) async {
+    useDesignScreen(tester);
+    await pumpHome(tester);
+
+    await tester.tap(find.bySemanticsLabel('맨 위로 이동'));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(
+      tester.state<ScrollableState>(find.byType(Scrollable)).position.pixels,
+      0,
+    );
+  });
+
   testWidgets('불러오는 동안은 배경만 보인다', (tester) async {
     useDesignScreen(tester);
     await tester.pumpWidget(

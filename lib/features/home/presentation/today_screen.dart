@@ -46,10 +46,35 @@ class TodayScreen extends ConsumerWidget {
   }
 }
 
-class _HomeContent extends ConsumerWidget {
+class _HomeContent extends ConsumerStatefulWidget {
   const _HomeContent({required this.summary});
 
   final HomeSummary summary;
+
+  @override
+  ConsumerState<_HomeContent> createState() => _HomeContentState();
+}
+
+class _HomeContentState extends ConsumerState<_HomeContent> {
+  final _scrollController = ScrollController();
+
+  HomeSummary get summary => widget.summary;
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  /// 상단 바의 로고를 누르면 맨 위로 부드럽게 올라간다.
+  void _scrollToTop() {
+    if (!_scrollController.hasClients || _scrollController.offset <= 0) return;
+    _scrollController.animateTo(
+      0,
+      duration: HomeLayout.scrollToTopDuration,
+      curve: Curves.easeInOutCubic,
+    );
+  }
 
   /// 제안을 체크리스트에 담는다(이미 담았으면 아무 일도 하지 않는다).
   Future<void> _add(
@@ -71,7 +96,7 @@ class _HomeContent extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final colors = context.colors;
     const margin = EdgeInsets.symmetric(horizontal: AppSpacing.pageMargin);
 
@@ -80,6 +105,7 @@ class _HomeContent extends ConsumerWidget {
     return Stack(
       children: [
         SingleChildScrollView(
+          controller: _scrollController,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -159,7 +185,12 @@ class _HomeContent extends ConsumerWidget {
             ],
           ),
         ),
-        const Positioned(left: 0, right: 0, top: 0, child: HomeTopBar()),
+        Positioned(
+          left: 0,
+          right: 0,
+          top: 0,
+          child: HomeTopBar(onLogoTap: _scrollToTop),
+        ),
       ],
     );
   }

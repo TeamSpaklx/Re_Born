@@ -10,7 +10,10 @@ import 'home_header.dart';
 /// 스크롤되는 내용이 이 뒤로 지나가면 블러와 핑크 틴트로 흐려진다.
 /// 스크롤 0에서는 Figma의 "흰 배경 위 핑크 그라디언트" 모습과 같다.
 class HomeTopBar extends StatelessWidget {
-  const HomeTopBar({super.key});
+  const HomeTopBar({super.key, this.onLogoTap});
+
+  /// 로고를 눌렀을 때(화면 맨 위로 이동).
+  final VoidCallback? onLogoTap;
 
   /// 상단 바 높이: 상태바 영역 + 헤더 행.
   static double heightOf(BuildContext context) =>
@@ -48,7 +51,7 @@ class HomeTopBar extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(height: safeTop),
-                const HomeHeader(),
+                HomeHeader(onLogoTap: onLogoTap),
               ],
             ),
           ),
