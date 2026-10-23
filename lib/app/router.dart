@@ -11,11 +11,14 @@ import '../features/record/presentation/record_screen.dart';
 import '../features/relations/presentation/person_detail_screen.dart';
 import '../features/relations/presentation/person_form_screen.dart';
 import '../features/relations/presentation/relations_screen.dart';
+import '../features/splash/presentation/splash_screen.dart';
 import 'main_shell.dart';
 
 /// 화면 경로. 화면 이동은 문자열 대신 이 상수를 사용한다.
 /// 순서는 하단 탭 순서(투데이 / 관계 / 기록 / 전체)와 같다.
 abstract final class AppRoutes {
+  static const splash = '/splash';
+
   static const today = '/today';
   static const relations = '/relations';
   static const record = '/record';
@@ -31,11 +34,19 @@ abstract final class AppRoutes {
   static String relationsEdit(String id) => '/relations/$id/edit';
 }
 
-/// 앱 라우터. 로그인 화면은 디자인이 나올 때까지 없고, 앱은 투데이(홈)로 바로 시작한다.
+/// 앱이 처음 여는 경로. 실제 앱은 `main.dart`에서 스플래시로 바꾸고,
+/// 테스트는 기본값(투데이)으로 바로 화면을 확인한다.
+final initialLocationProvider = Provider<String>((ref) => AppRoutes.today);
+
+/// 앱 라우터. 앱은 스플래시로 시작해 투데이(홈)로 넘어간다. 로그인 화면은 디자인이 나올 때까지 없다.
 final routerProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
-    initialLocation: AppRoutes.today,
+    initialLocation: ref.read(initialLocationProvider),
     routes: [
+      GoRoute(
+        path: AppRoutes.splash,
+        builder: (context, state) => const SplashScreen(),
+      ),
       GoRoute(
         path: AppRoutes.recordNew,
         builder: (context, state) => const RecordFormScreen(),

@@ -52,7 +52,8 @@ docs/                명세서, 디자인 시스템, 프론트 문서 (design/ �
 
 - **하단 탭 4개:** 투데이(홈) / 관계 / 기록 / 전체. 디자인이 있는 화면은 홈뿐이고, 나머지 탭은 흰 배경의 빈 화면으로 둡니다.
 - **고정 규칙:** 글자 크기 배율 1.0(시스템 글자 크기 설정 무시), 라이트 모드만, 세로 방향만. **다크 모드는 나중에 추가할 예정**이라 색은 `AppColors` 팔레트로만 씁니다.
-- 로그인·회원가입은 디자인이 나올 때까지 제외하고 앱은 홈으로 바로 시작합니다.
+- 앱은 스플래시 화면(로고만, 약 1.2초)으로 시작해 홈으로 넘어갑니다. 로그인·회원가입은 디자인이 나올 때까지 제외합니다(로그인이 들어오면 스플래시가 로그인 여부로 로그인/홈을 나눕니다). 시작 경로는 `initialLocationProvider`이고 `main.dart`에서만 스플래시로 바꿉니다(테스트는 기본값 투데이).
+- 앱이 켜지는 동안의 네이티브 시작 화면(iOS `LaunchScreen.storyboard`, Android `launch_background.xml`)도 같은 로고(200)로 맞춰 두었습니다. Android 12 이상은 시스템 스플래시(앱 아이콘 기반)가 먼저 나와 완전히 같지는 않습니다.
 - 하단 탭 바는 플랫폼별로 다릅니다: **iOS 26 이상 = 네이티브 `UITabBar`(Liquid Glass)**, iOS 26 미만·Android = Flutter가 그린 탭 바(블러). 분기는 `lib/shared/widgets/app_bottom_nav_bar.dart` 한 곳이고, 네이티브 쪽은 `ios/Runner/NativeTabBarView.swift`(플랫폼 뷰)와 `lib/shared/widgets/native_tab_bar.dart`입니다. 새 패키지는 쓰지 않습니다.
 - iOS 네이티브 탭 바(Liquid Glass)는 **Xcode 26 이상(iOS 26 SDK)으로 빌드**해야 유리 모양이 나옵니다. iOS 시뮬레이터 런타임 26.5와 27.0에서 확인했습니다.
 - 세로 고정은 세 곳에서 합니다: `main.dart`(SystemChrome), iOS `Info.plist`, Android `AndroidManifest.xml`.
