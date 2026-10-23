@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/errors/app_error_log.dart';
 import '../core/platform/image_picker_service.dart';
+import '../core/platform/notification_service.dart';
 import '../core/providers/clock_provider.dart';
 import '../features/analysis/analysis_service.dart';
 import '../features/analysis/data/sample_data.dart';
@@ -76,4 +77,9 @@ final analysisServiceProvider = Provider<AnalysisService>(
 /// 프로필 사진을 가져오는 서비스(갤러리·카메라). 테스트에서 가짜로 바꾼다.
 final imagePickerServiceProvider = Provider<ImagePickerService>(
   (ref) => DeviceImagePickerService(),
+);
+
+/// OS 알림 권한과 기록 리마인드 예약. 테스트에서 가짜로 바꾼다.
+final notificationServiceProvider = Provider<NotificationService>(
+  (ref) => LocalNotificationService(),
 );

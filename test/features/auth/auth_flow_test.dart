@@ -13,7 +13,13 @@ import 'package:reborn_app/features/home/presentation/today_screen.dart';
 import 'package:reborn_app/features/people/presentation/people_providers.dart';
 import 'package:reborn_app/features/settings/presentation/settings_providers.dart';
 
+import '../../helpers/fakes.dart';
+
 void main() {
+  late FakeNotificationService notifications;
+
+  setUp(() => notifications = FakeNotificationService());
+
   Future<ProviderContainer> pumpAt(
     WidgetTester tester,
     String location, {
@@ -26,6 +32,7 @@ void main() {
       ProviderScope(
         overrides: [
           initialLocationProvider.overrideWithValue(location),
+          notificationServiceProvider.overrideWithValue(notifications),
           authRepositoryProvider.overrideWithValue(
             InMemoryAuthRepository(
               signedInEmail: signedIn ? InMemoryAuthRepository.demoEmail : null,
@@ -287,5 +294,26 @@ void main() {
       expect(find.text('계정을 삭제했어요'), findsOneWidget);
       expect(c.read(sessionProvider), isNull);
     });
+  });
+
+  testWidgets('알림 권한이 거부되면 리마인드는 꺼진 채 안내하고 홈으로 간다', (tester) async {
+    notifications.allowed = false;
+    final c = await pumpAt(
+      tester,
+      AppRoutes.onboardingPermission,
+      signedIn: true,
+    );
+    await tester.tap(find.text('알림 켜기'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.textContaining('알림 권한이 꺼져 있어요'), findsOneWidget);
+    final prefs = (await c.read(settingsProvider.future)).notifications;
+    expect(prefs.reminder, isFalse);
+    expect(prefs.insight, isTrue);
+    expect(notifications.scheduled, isEmpty);
+    await tester.pump(const Duration(seconds: 4));
+    await tester.pumpAndSettle();
+    expect(find.byType(TodayScreen), findsOneWidget);
   });
 }

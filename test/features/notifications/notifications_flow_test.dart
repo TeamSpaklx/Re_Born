@@ -11,9 +11,15 @@ import 'package:reborn_app/features/notifications/models/app_notification.dart';
 import 'package:reborn_app/features/notifications/presentation/notifications_providers.dart';
 import 'package:reborn_app/features/settings/presentation/settings_providers.dart';
 
+import '../../helpers/fakes.dart';
+
 final fixedNow = DateTime(2026, 10, 22, 12);
 
 void main() {
+  late FakeNotificationService service;
+
+  setUp(() => service = FakeNotificationService());
+
   Future<ProviderContainer> pumpAt(
     WidgetTester tester,
     String location, {
@@ -26,6 +32,7 @@ void main() {
       ProviderScope(
         overrides: [
           clockProvider.overrideWithValue(() => fixedNow),
+          notificationServiceProvider.overrideWithValue(service),
           initialLocationProvider.overrideWithValue(location),
           if (noInsights)
             insightsRepositoryProvider.overrideWithValue(
@@ -113,6 +120,8 @@ void main() {
     await tester.pumpAndSettle();
     final prefs = (await c.read(settingsProvider.future)).notifications;
     expect(prefs.reminder, isTrue);
+    expect(service.permissionRequests, 1);
+    expect(service.scheduled, [(21, 0)]);
     expect(find.byKey(const Key('notify-time')), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('notify-time')));
@@ -123,6 +132,7 @@ void main() {
       (await c.read(settingsProvider.future)).notifications.reminderTime,
       '20:00',
     );
+    expect(service.scheduled.last, (20, 0), reason: '시간을 바꾸면 다시 예약');
 
     await c
         .read(settingsActionsProvider)
@@ -132,5 +142,28 @@ void main() {
           )).notifications.copyWith(insight: false),
         );
     expect(await c.read(notificationsProvider.future), isEmpty);
+  });
+
+  testWidgets('OS 권한이 거부되면 리마인드를 켜지 못하고 안내한다', (tester) async {
+    service.allowed = false;
+    final c = await pumpAt(tester, AppRoutes.notificationSettings);
+    await tester.tap(
+      find
+          .descendant(
+            of: find.byKey(const Key('notify-reminder')),
+            matching: find.byType(GestureDetector),
+          )
+          .first,
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.textContaining('알림 권한이 꺼져 있어요'), findsOneWidget);
+    expect(
+      (await c.read(settingsProvider.future)).notifications.reminder,
+      isFalse,
+    );
+    expect(service.scheduled, isEmpty);
+    await tester.pump(const Duration(seconds: 4));
   });
 }

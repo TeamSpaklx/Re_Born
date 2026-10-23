@@ -7,12 +7,12 @@ import '../../../app/theme/app_assets.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../app/theme/app_text_styles.dart';
+import '../../../shared/widgets/app_dialogs.dart';
 import '../../../shared/widgets/app_text_button.dart';
 import '../../../shared/widgets/bottom_cta_bar.dart';
 import '../../../shared/widgets/page_scaffold.dart';
 import '../../../shared/widgets/permission_row.dart';
 import '../../../shared/widgets/step_progress_bar.dart';
-import '../../settings/models/app_settings.dart';
 import '../../settings/presentation/settings_providers.dart';
 
 /// 가입 4/4: 알림 안내. 켜면 인사이트 알림과 기록 리마인드를 쓰고, 나중에 설정에서 바꿀 수 있다.
@@ -21,11 +21,12 @@ class PermissionScreen extends ConsumerWidget {
 
   Future<void> _enable(BuildContext context, WidgetRef ref) async {
     final router = GoRouter.of(context);
-    await ref
+    final allowed = await ref
         .read(settingsActionsProvider)
-        .saveNotifications(
-          const NotificationPrefs(insight: true, reminder: true),
-        );
+        .enableNotifications();
+    if (!allowed && context.mounted) {
+      showAppToast(context, '알림 권한이 꺼져 있어요. 기기 설정에서 켤 수 있어요.');
+    }
     router.go(AppRoutes.today);
   }
 
