@@ -35,6 +35,7 @@ abstract final class AppTextStyles {
 
   /// "규리님, 오늘도 즐거운 하루 보내세요!"
   static final greeting = _style(26, _extraBold, -0.65, lineHeight: 32);
+  static final homeGreeting = _style(26, _semiBold, -0.65, lineHeight: 32);
 
   /// 섹션 제목("최근 관계 신호"), 인물 이름("지민").
   static final sectionTitle = _style(20, _semiBold, -0.5, lineHeight: 32);

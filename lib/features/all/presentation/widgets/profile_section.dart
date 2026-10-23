@@ -32,15 +32,26 @@ class ProfileSection extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     String current,
+    String? currentPhoto,
   ) async {
-    final saved = await showAppBottomSheet<String>(
+    final result = await showAppBottomSheet<_ProfileEditResult>(
       context,
       title: '프로필 편집',
-      builder: (context) => _ProfileEditSheet(initialNickname: current),
+      builder: (context) => _ProfileEditSheet(
+        initialNickname: current,
+        initialPhoto: currentPhoto,
+      ),
     );
-    if (saved == null || !context.mounted) return;
-    await ref.read(settingsActionsProvider).saveNickname(saved);
-    if (context.mounted) showAppToast(context, '닉네임을 바꿨어요');
+    if (result == null || !context.mounted) return;
+    if (result.nicknameChanged) {
+      await ref.read(settingsActionsProvider).saveNickname(result.nickname);
+    }
+    if (!context.mounted) return;
+    if (result.profileChanged) {
+      showAppToast(context, '프로필이 변경되었어요');
+    } else if (result.nicknameChanged) {
+      showAppToast(context, '닉네임을 바꿨어요');
+    }
   }
 
   @override
@@ -62,7 +73,7 @@ class ProfileSection extends ConsumerWidget {
             title: nickname.isEmpty ? '닉네임을 정해 주세요' : nickname,
             subtitle: email,
             avatar: UserAvatar(photoPath: photo, size: 56),
-            onTap: () => _editNickname(context, ref, nickname),
+            onTap: () => _editNickname(context, ref, nickname, photo),
           ),
         ),
         const SizedBox(height: AppSpacing.space12),
@@ -81,9 +92,13 @@ class ProfileSection extends ConsumerWidget {
 /// 프로필 편집 시트: 아바타(사진 또는 캐릭터) + 사진 찍기·앨범에서 선택·기본으로 되돌리기 + 닉네임.
 /// 사진은 고르는 즉시 저장되고, 닉네임은 "저장"을 눌러야 시트가 닫히며 저장된다.
 class _ProfileEditSheet extends ConsumerStatefulWidget {
-  const _ProfileEditSheet({required this.initialNickname});
+  const _ProfileEditSheet({
+    required this.initialNickname,
+    required this.initialPhoto,
+  });
 
   final String initialNickname;
+  final String? initialPhoto;
 
   @override
   ConsumerState<_ProfileEditSheet> createState() => _ProfileEditSheetState();
@@ -127,7 +142,16 @@ class _ProfileEditSheetState extends ConsumerState<_ProfileEditSheet> {
   void _submit() {
     final error = AuthValidator.validateNickname(_controller.text);
     setState(() => _error = error);
-    if (error == null) Navigator.of(context).pop(_controller.text.trim());
+    if (error == null) {
+      final photo = ref.read(settingsProvider).value?.profileImagePath;
+      Navigator.of(context).pop(
+        _ProfileEditResult(
+          nickname: _controller.text.trim(),
+          nicknameChanged: _controller.text.trim() != widget.initialNickname,
+          profileChanged: photo != widget.initialPhoto,
+        ),
+      );
+    }
   }
 
   @override
@@ -208,6 +232,18 @@ class _ProfileEditSheetState extends ConsumerState<_ProfileEditSheet> {
       ],
     );
   }
+}
+
+class _ProfileEditResult {
+  const _ProfileEditResult({
+    required this.nickname,
+    required this.nicknameChanged,
+    required this.profileChanged,
+  });
+
+  final String nickname;
+  final bool nicknameChanged;
+  final bool profileChanged;
 }
 
 class _PhotoActionRow extends StatelessWidget {
