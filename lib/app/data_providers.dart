@@ -4,6 +4,8 @@ import '../core/errors/app_error_log.dart';
 import '../core/providers/clock_provider.dart';
 import '../features/analysis/analysis_service.dart';
 import '../features/analysis/data/sample_data.dart';
+import '../features/auth/data/auth_repository.dart';
+import '../features/auth/data/in_memory_auth_repository.dart';
 import '../features/entries/data/entries_repository.dart';
 import '../features/entries/data/in_memory_entries_repository.dart';
 import '../features/insights/data/in_memory_insights_repository.dart';
@@ -15,11 +17,15 @@ import '../features/settings/data/settings_repository.dart';
 import '../features/todos/data/in_memory_todos_repository.dart';
 import '../features/todos/data/todos_repository.dart';
 
-/// **저장소 교체 지점.** 백엔드가 Supabase 구현을 만들면 아래 provider 6개의 한 줄씩만 바꾼다
+/// **저장소 교체 지점.** 백엔드가 Supabase 구현을 만들면 아래 provider 7개의 한 줄씩만 바꾼다
 /// (예: `InMemoryPeopleRepository(...)` → `SupabasePeopleRepository(...)`). 화면과 분석 코드는 그대로다.
 /// 지금은 메모리 저장소 + 샘플 데이터이고, 앱을 다시 켜면 샘플로 돌아간다.
 final sampleDataProvider = Provider<SampleData>(
   (ref) => buildSampleData(ref.watch(clockProvider)()),
+);
+
+final authRepositoryProvider = Provider<AuthRepository>(
+  (ref) => InMemoryAuthRepository(),
 );
 
 final peopleRepositoryProvider = Provider<PeopleRepository>(

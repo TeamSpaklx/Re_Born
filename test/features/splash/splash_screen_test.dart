@@ -8,6 +8,8 @@ import 'package:reborn_app/app/router.dart';
 import 'package:reborn_app/app/theme/app_assets.dart';
 import 'package:reborn_app/app/theme/app_spacing.dart';
 import 'package:reborn_app/app/theme/app_theme.dart';
+import 'package:reborn_app/features/auth/data/in_memory_auth_repository.dart';
+import 'package:reborn_app/features/auth/presentation/login_screen.dart';
 import 'package:reborn_app/features/entries/data/in_memory_entries_repository.dart';
 import 'package:reborn_app/features/entries/models/entry.dart';
 import 'package:reborn_app/features/home/presentation/today_screen.dart';
@@ -37,6 +39,7 @@ void main() {
   Future<void> pumpSplash(
     WidgetTester tester, {
     List<Override> overrides = const [],
+    bool signedIn = true,
   }) async {
     tester.view.physicalSize = const Size(402, 874);
     tester.view.devicePixelRatio = 1;
@@ -45,6 +48,11 @@ void main() {
       ProviderScope(
         overrides: [
           initialLocationProvider.overrideWithValue(AppRoutes.splash),
+          authRepositoryProvider.overrideWithValue(
+            InMemoryAuthRepository(
+              signedInEmail: signedIn ? InMemoryAuthRepository.demoEmail : null,
+            ),
+          ),
           ...overrides,
         ],
         child: const RebornApp(),
@@ -211,5 +219,16 @@ void main() {
     await tester.pump(SplashLayout.maxDuration * 2);
 
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('로그인하지 않았으면 최소 시간 뒤 로그인 화면으로 간다', (tester) async {
+    await pumpSplash(tester, signedIn: false);
+    expect(find.byType(LoginScreen), findsNothing);
+
+    await tester.pump(SplashLayout.minDuration);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(LoginScreen), findsOneWidget);
+    expect(find.byType(TodayScreen), findsNothing);
   });
 }

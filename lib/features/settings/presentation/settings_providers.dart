@@ -23,6 +23,20 @@ class SettingsActions {
     _ref.read(dataRevisionProvider.notifier).bump();
   }
 
+  Future<void> saveNickname(String nickname) async {
+    final repo = _ref.read(settingsRepositoryProvider);
+    final current = await repo.get();
+    await repo.save(current.copyWith(nickname: nickname.trim()));
+    _ref.read(dataRevisionProvider.notifier).bump();
+  }
+
+  Future<void> saveNotifications(NotificationPrefs prefs) async {
+    final repo = _ref.read(settingsRepositoryProvider);
+    final current = await repo.get();
+    await repo.save(current.copyWith(notifications: prefs));
+    _ref.read(dataRevisionProvider.notifier).bump();
+  }
+
   /// 기록 전체 삭제: 기록과 거기서 만들어진 지수 이력·인사이트를 지운다. 인물·체크리스트는 남긴다.
   Future<void> deleteAllRecords() async {
     await _ref.read(entriesRepositoryProvider).deleteAll();
