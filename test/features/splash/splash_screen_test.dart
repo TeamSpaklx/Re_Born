@@ -78,6 +78,12 @@ void main() {
   testWidgets('로고는 투명도·색 보정 없이 원본 그대로 그려진다', (tester) async {
     await pumpSplash(tester);
 
+    expect(
+      tester.widget<Scaffold>(find.byType(Scaffold)).backgroundColor,
+      const Color(0xFFFFFFFF),
+      reason: '스플래시는 흰 배경(Figma), 홈 배경 #FFF8F8과 다름',
+    );
+
     final image = tester.widget<Image>(logo());
     expect(image.opacity, isNull);
     expect(image.color, isNull);

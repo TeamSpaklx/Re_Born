@@ -44,6 +44,7 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.toastFill,
     required this.scrim,
     required this.topBarTint,
+    required this.splashBackground,
   });
 
   /// 브랜드 핑크: 그래프 막대, 활성 탭, 강조 숫자, 출석 알약.
@@ -115,6 +116,9 @@ class AppColors extends ThemeExtension<AppColors> {
   /// 홈 상단 바 위에 덮는 흰색 10% (수정안 `rgba(255,255,255,0.1)`).
   final Color topBarTint;
 
+  /// 스플래시 화면 배경: 흰색(Figma `289:1723`). 화면 배경(`#FFF8F8`)과 다르다. iOS·Android 시작 화면도 흰색이라 이어서 보인다.
+  final Color splashBackground;
+
   /// Figma 홈 화면에서 읽은 라이트 팔레트.
   static const light = AppColors(
     brand: Color(0xFFFF6090),
@@ -153,6 +157,7 @@ class AppColors extends ThemeExtension<AppColors> {
     toastFill: Color(0xE61A1A1A),
     scrim: Color(0x80000000),
     topBarTint: Color(0x1AFFFFFF),
+    splashBackground: Color(0xFFFFFFFF),
   );
 
   @override
@@ -193,6 +198,7 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? toastFill,
     Color? scrim,
     Color? topBarTint,
+    Color? splashBackground,
   }) {
     return AppColors(
       brand: brand ?? this.brand,
@@ -231,6 +237,7 @@ class AppColors extends ThemeExtension<AppColors> {
       toastFill: toastFill ?? this.toastFill,
       scrim: scrim ?? this.scrim,
       topBarTint: topBarTint ?? this.topBarTint,
+      splashBackground: splashBackground ?? this.splashBackground,
     );
   }
 
@@ -275,6 +282,7 @@ class AppColors extends ThemeExtension<AppColors> {
       toastFill: mix(toastFill, other.toastFill),
       scrim: mix(scrim, other.scrim),
       topBarTint: mix(topBarTint, other.topBarTint),
+      splashBackground: mix(splashBackground, other.splashBackground),
     );
   }
 }
