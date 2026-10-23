@@ -67,6 +67,7 @@ flutter:
   assets:
     - assets/icons/ui/
     - assets/images/
+    - assets/images/emotions/
 
   # 디자인 기준 폰트: Pretendard (SIL OFL 1.1, assets/fonts/OFL-LICENSE.txt)
   fonts:

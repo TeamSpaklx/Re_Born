@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/character_avatar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../app/theme/app_assets.dart';
@@ -56,21 +57,10 @@ class RecordCardAfter extends StatelessWidget {
                 for (var i = 0; i < peopleCount.clamp(0, 3); i++)
                   Positioned(
                     left: i * _avatarStep,
-                    child: Container(
-                      width: _avatarSize,
-                      height: _avatarSize,
-                      decoration: BoxDecoration(
-                        color: colors.avatar,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: colors.cardWhite, width: 2),
-                      ),
-                      child: Center(
-                        child: SvgPicture.asset(
-                          AppAssets.person,
-                          width: 28,
-                          height: 28,
-                        ),
-                      ),
+                    child: CharacterAvatar(
+                      seed: 'today-$i',
+                      size: _avatarSize,
+                      borderColor: colors.cardWhite,
                     ),
                   ),
                 Positioned(

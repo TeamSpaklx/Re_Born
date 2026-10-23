@@ -55,7 +55,7 @@ void main() {
   }
 
   Future<void> pickEmotionAndIntensity(WidgetTester tester) async {
-    await tester.tap(find.byKey(const Key('emotion-hurt')));
+    await tester.tap(find.byKey(const Key('emotion-sadness')));
     await tester.pump();
     await tester.tap(find.byKey(const Key('intensity-2')));
     await tester.pump();
@@ -149,7 +149,7 @@ void main() {
     expect(find.text('지금 마음은\n어떤가요?'), findsOneWidget, reason: '작성 화면에 남아 있다');
   });
 
-  testWidgets('T-10: 본문·서운함·강도 2로 저장하면 목록에 생기고 점수는 −2', (tester) async {
+  testWidgets('T-10: 본문·슬픔·강도 2로 저장하면 목록에 생기고 점수는 −2', (tester) async {
     final container = await pumpApp(tester);
     await openRecordForm(tester);
 
@@ -163,7 +163,7 @@ void main() {
     final saved =
         (await container.read(entriesRepositoryProvider).list()).first;
     expect(saved.body, contains('하은이가'));
-    expect(saved.emotion, Emotion.hurt);
+    expect(saved.emotion, Emotion.sadness);
     expect(saved.score, -2);
     expect(find.textContaining('하은이가 노트를'), findsOneWidget);
   });

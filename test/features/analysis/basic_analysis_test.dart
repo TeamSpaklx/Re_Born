@@ -9,23 +9,23 @@ import 'package:reborn_app/features/insights/models/insight.dart';
 
 void main() {
   group('감정 점수·분석 (T-10, T-18)', () {
-    test('점수 = 극성 × 강도, 서운함 강도 2 → −2', () {
-      expect(Emotion.hurt.scoreFor(2), -2);
+    test('점수 = 극성 × 강도, 슬픔 강도 2 → −2', () {
+      expect(Emotion.sadness.scoreFor(2), -2);
       expect(Emotion.joy.scoreFor(3), 3);
-      expect(Emotion.calm.scoreFor(3), 0);
+      expect(Emotion.neutral.scoreFor(3), 0);
     });
 
     test('같은 입력으로 두 번 분석해도 같은 점수·키워드', () {
       final now = DateTime(2026, 10, 22);
       final a = EmotionAnalyzer.analyze(
         body: '친구가 답장을 안 해서 서운했고 불안했다',
-        emotion: Emotion.hurt,
+        emotion: Emotion.sadness,
         intensity: 2,
         now: now,
       );
       final b = EmotionAnalyzer.analyze(
         body: '친구가 답장을 안 해서 서운했고 불안했다',
-        emotion: Emotion.hurt,
+        emotion: Emotion.sadness,
         intensity: 2,
         now: now,
       );

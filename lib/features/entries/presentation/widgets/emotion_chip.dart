@@ -6,19 +6,18 @@ import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../models/emotion.dart';
 
-/// 감정의 대표색 (docs/DESIGN_SYSTEM.md 1장 감정 8색). 캐릭터 에셋이 오기 전까지는 이 색 원이 감정을 나타낸다.
+/// 감정의 대표색 (docs/DESIGN_SYSTEM.md 1장 감정 7색, 캐릭터 이름표 색). 카드 배경·비율 막대·범례에 쓴다.
 Color emotionColor(Emotion emotion, AppColors colors) => switch (emotion) {
   Emotion.joy => colors.emotionJoy,
-  Emotion.gratitude => colors.emotionGratitude,
-  Emotion.excitement => colors.emotionExcitement,
-  Emotion.calm => colors.emotionCalm,
-  Emotion.hurt => colors.emotionHurt,
-  Emotion.anxiety => colors.emotionAnxiety,
-  Emotion.anger => colors.emotionAnger,
   Emotion.sadness => colors.emotionSadness,
+  Emotion.neutral => colors.emotionNeutral,
+  Emotion.anger => colors.emotionAnger,
+  Emotion.anxiety => colors.emotionAnxiety,
+  Emotion.love => colors.emotionLove,
+  Emotion.excited => colors.emotionExcited,
 };
 
-/// 감정 색 원 (달력·목록·선택 격자에서 감정 캐릭터가 들어갈 자리).
+/// 감정 색 점 (비율 막대 범례·칩).
 class EmotionDot extends StatelessWidget {
   const EmotionDot({super.key, required this.emotion, this.size = 12});
 

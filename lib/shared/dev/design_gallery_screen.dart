@@ -395,7 +395,7 @@ class _DesignGalleryScreenState extends State<DesignGalleryScreen> {
             ),
             gap(AppSpacing.space16),
             const EmotionRatioBar(
-              counts: {Emotion.joy: 4, Emotion.calm: 3, Emotion.hurt: 2},
+              counts: {Emotion.joy: 4, Emotion.neutral: 3, Emotion.sadness: 2},
             ),
             gap(AppSpacing.space16),
             AppCard.white(

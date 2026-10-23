@@ -595,15 +595,15 @@ void main() {
     });
 
     testWidgets('감정 칩은 감정 이름과 색 점을 가진다', (tester) async {
-      await pump(tester, const EmotionChip(emotion: Emotion.hurt));
-      expect(find.text('서운함'), findsOneWidget);
+      await pump(tester, const EmotionChip(emotion: Emotion.sadness));
+      expect(find.text('슬픔'), findsOneWidget);
       final dot = tester.widget<Container>(
         find.descendant(
           of: find.byType(EmotionDot),
           matching: find.byType(Container),
         ),
       );
-      expect((dot.decoration! as BoxDecoration).color, colors.emotionHurt);
+      expect((dot.decoration! as BoxDecoration).color, colors.emotionSadness);
     });
   });
 

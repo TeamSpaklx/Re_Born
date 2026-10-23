@@ -46,6 +46,25 @@ abstract final class AppAssets {
   /// 기록 카드(Before)의 여우원숭이 일러스트 (604×604, 배경 투명, 원본 1254×1254를 줄임).
   static const mascotLemur = 'assets/images/mascot_lemur.png';
 
+  /// 감정 캐릭터 7종 (RebornMood 시안에서 캐릭터별로 잘라 번짐을 정리한 PNG, 320×320 투명 배경).
+  static const _emotions = 'assets/images/emotions';
+  static const emotionJoy = '$_emotions/joy.png';
+  static const emotionSadness = '$_emotions/sadness.png';
+  static const emotionNeutral = '$_emotions/neutral.png';
+  static const emotionAnger = '$_emotions/anger.png';
+  static const emotionAnxiety = '$_emotions/anxiety.png';
+  static const emotionLove = '$_emotions/love.png';
+  static const emotionExcited = '$_emotions/excited.png';
+  static const emotionImages = [
+    emotionJoy,
+    emotionSadness,
+    emotionNeutral,
+    emotionAnger,
+    emotionAnxiety,
+    emotionLove,
+    emotionExcited,
+  ];
+
   /// iOS 네이티브 탭 바 라벨용 글꼴 파일(UIKit에 직접 등록한다). Flutter 글자는 pubspec의 Pretendard를 쓴다.
   static const pretendardBold = 'assets/fonts/Pretendard-Bold.otf';
 

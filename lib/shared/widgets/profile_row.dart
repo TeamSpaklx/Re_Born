@@ -5,6 +5,7 @@ import '../../app/theme/app_assets.dart';
 import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_text_styles.dart';
+import 'character_avatar.dart';
 import 'pressable.dart';
 
 /// 프로필 행: 둥근 아바타 + 이름 + 보조 문구 + 화살표 (전체 탭 맨 위, 인물 목록).
@@ -36,11 +37,9 @@ class ProfileRow extends StatelessWidget {
               height: ComponentLayout.profileAvatarSize,
               child:
                   avatar ??
-                  ColoredBox(
-                    color: colors.avatar,
-                    child: Center(
-                      child: SvgPicture.asset(AppAssets.person, width: 40),
-                    ),
+                  const CharacterAvatar(
+                    seed: 'me',
+                    size: ComponentLayout.profileAvatarSize,
                   ),
             ),
           ),

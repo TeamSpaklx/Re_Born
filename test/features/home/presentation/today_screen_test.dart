@@ -170,7 +170,7 @@ void main() {
           d.color == AppColors.light.barStrong &&
           d.borderRadius == AppRadii.graphBarBorderRadius;
     });
-    // 월(평온 0과 서운함 −2의 평균 −1 → 0.3333), 화(−2와 +1의 평균 → 0.4167), 수(−2 → 0.1667)
+    // 월(무표정 0과 슬픔 −2의 평균 −1 → 0.3333), 화(−2와 +1의 평균 → 0.4167), 수(−2 → 0.1667)
     expect(bars, findsNWidgets(3));
     const expected = [0.33333, 0.41667, 0.16667];
     for (var i = 0; i < 3; i++) {

@@ -6,7 +6,7 @@ import 'package:reborn_app/features/entries/models/entry.dart';
 Entry entry(DateTime day, int score) => Entry(
   id: '$day$score',
   body: '본문',
-  emotion: score < 0 ? Emotion.hurt : Emotion.joy,
+  emotion: score < 0 ? Emotion.sadness : Emotion.joy,
   intensity: score.abs().clamp(1, 3),
   score: score,
   createdAt: day,

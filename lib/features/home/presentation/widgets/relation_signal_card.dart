@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/character_avatar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../app/theme/app_assets.dart';
@@ -40,18 +41,9 @@ class RelationSignalCard extends StatelessWidget {
               top: 26,
               width: HomeLayout.avatarSize,
               height: HomeLayout.avatarSize,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: colors.avatar,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: SvgPicture.asset(
-                    AppAssets.person,
-                    width: HomeLayout.personIconSize,
-                    height: HomeLayout.personIconSize,
-                  ),
-                ),
+              child: CharacterAvatar(
+                seed: signal.personId,
+                size: HomeLayout.avatarSize,
               ),
             ),
             Positioned(

@@ -39,7 +39,7 @@ void main() {
     );
   }
 
-  testWidgets('감정 얼굴 8종이 모두 그려진다', (tester) async {
+  testWidgets('감정 캐릭터 7종이 모두 그려진다', (tester) async {
     await pump(
       tester,
       Wrap(
@@ -48,7 +48,7 @@ void main() {
         ],
       ),
     );
-    expect(find.byType(EmotionFace), findsNWidgets(8));
+    expect(find.byType(EmotionFace), findsNWidgets(7));
     expect(tester.takeException(), isNull);
   });
 
@@ -72,7 +72,7 @@ void main() {
     final semantics = tester.getSemantics(
       find.byKey(const Key('emotion-anxiety')),
     );
-    expect(semantics.label, '불안');
+    expect(semantics.label, '불안함');
   });
 
   group('MonthCalendar', () {

@@ -10,7 +10,7 @@ void main() {
   Entry entry(DateTime at, int score, {String? personId}) => Entry(
     id: '$at$score',
     body: '본문',
-    emotion: score < 0 ? Emotion.hurt : Emotion.joy,
+    emotion: score < 0 ? Emotion.sadness : Emotion.joy,
     intensity: score.abs().clamp(1, 3),
     score: score,
     createdAt: at,
