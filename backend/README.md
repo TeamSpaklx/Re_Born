@@ -22,6 +22,8 @@ API:
 - `POST /api/diaries` (Supabase access token 필요)
 - `POST /api/diaries/analyze` (Supabase access token 필요, 본문을 OpenAI로 보내 분석하고 감정·점수를 DB에 저장)
 - `GET /api/diaries?from=2026-10-01T00:00:00Z&to=2026-11-01T00:00:00Z` (Supabase access token 필요)
+- `GET /api/me`, `PUT /api/me` (프로필·동의 설정)
+- `GET /api/people`, `POST /api/people`, `PATCH /api/people/{id}`, `DELETE /api/people/{id}` (인물 CRUD)
 
 보호된 API는 다음 헤더로 Flutter가 받은 Supabase access token을 전달합니다.
 
