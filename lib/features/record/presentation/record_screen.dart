@@ -27,7 +27,7 @@ import '../../people/presentation/people_providers.dart';
 
 /// 기록 탭 (F-03): 달력으로 날짜를 골라 그날의 기록을 보거나, 날짜별 목록으로 훑는다.
 /// 달력의 날짜 아래에는 그날 마지막 기록의 감정 캐릭터가 붙고, 위에는 이번 달 감정 비율이 있다.
-/// 카드는 밀어서 지울 수 있다(확인 팝업). 오른쪽 아래 "기록하기"가 작성 화면을 연다.
+/// 카드는 밀어서 지울 수 있다(확인 팝업). 기록이 있을 때 오른쪽 아래 "기록하기"가 작성 화면을 연다.
 class RecordScreen extends ConsumerStatefulWidget {
   const RecordScreen({super.key});
 
@@ -75,10 +75,12 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
 
     return TabPageScaffold(
       title: '기록',
-      floating: AppFab(
-        label: '기록하기',
-        onTap: () => context.push(AppRoutes.recordNew),
-      ),
+      floating: entries.value?.isEmpty == true
+          ? null
+          : AppFab(
+              label: '기록하기',
+              onTap: () => context.push(AppRoutes.recordNew),
+            ),
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(

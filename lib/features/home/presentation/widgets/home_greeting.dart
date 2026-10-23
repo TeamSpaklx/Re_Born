@@ -37,7 +37,9 @@ class HomeGreeting extends ConsumerWidget {
             // 문구는 앱을 켤 때 한 번 뽑은 것(GreetingPool). 두 줄로 나뉘게 줄바꿈이 들어 있다.
             Text(
               GreetingPool.format(ref.watch(greetingIndexProvider), nickname),
-              style: AppTextStyles.greeting.copyWith(color: colors.textBlack),
+              style: AppTextStyles.homeGreeting.copyWith(
+                color: colors.textBlack,
+              ),
             ),
           ],
         ),
