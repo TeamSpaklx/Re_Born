@@ -33,6 +33,7 @@ migrate_working_dir/
 /build/
 /coverage/
 /backend/target/
+/.tools/
 
 # Symbolication related
 app.*.symbols
