@@ -12,6 +12,8 @@ import '../features/auth/presentation/permission_screen.dart';
 import '../features/auth/presentation/signup_screen.dart';
 import '../features/home/presentation/today_screen.dart';
 import '../features/insights/presentation/insight_detail_screen.dart';
+import '../features/notifications/presentation/notification_settings_screen.dart';
+import '../features/notifications/presentation/notifications_screen.dart';
 import '../features/record/presentation/record_detail_screen.dart';
 import '../features/record/presentation/record_form_screen.dart';
 import '../features/record/presentation/record_screen.dart';
@@ -38,6 +40,8 @@ abstract final class AppRoutes {
   static const onboarding = '/onboarding';
   static const onboardingPermission = '/onboarding/permission';
   static const accountDelete = '/account/delete';
+  static const notifications = '/notifications';
+  static const notificationSettings = '/notifications/settings';
 
   static const today = '/today';
   static const relations = '/relations';
@@ -91,6 +95,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.onboardingPermission,
         builder: (context, state) => const PermissionScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.notifications,
+        builder: (context, state) => const NotificationsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.notificationSettings,
+        builder: (context, state) => const NotificationSettingsScreen(),
       ),
       GoRoute(
         path: AppRoutes.accountDelete,

@@ -15,9 +15,9 @@ class SummaryItem {
 
 /// 요약 카드: 연한 핑크 카드 안에 큰 수치와 이름을 2~3칸으로 나눠 보여 준다(전체 탭 상단, 인물 상세).
 class SummaryCard extends StatelessWidget {
-  const SummaryCard({super.key, required this.items})
-    : assert(items.length >= 2 && items.length <= 3);
+  const SummaryCard({super.key, required this.items});
 
+  /// 2~3칸.
   final List<SummaryItem> items;
 
   @override

@@ -5,14 +5,17 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/router.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_dialogs.dart';
 import '../../../../shared/widgets/settings_group.dart';
+import '../../../auth/presentation/auth_providers.dart';
+import '../../../notifications/presentation/notifications_providers.dart';
 import '../../../settings/models/app_settings.dart';
 import '../../../settings/presentation/settings_providers.dart';
 
-/// 전체 탭의 설정 (F-11). **임시 디자인**.
-/// 동의 on/off, 기록 전체 삭제(확인 팝업), 계정 삭제(로그인 연결 뒤 사용), 의료 서비스 아님 안내.
+/// 전체 탭의 설정 (F-10·F-11): 알림, 동의 on/off, 기록 전체 삭제(확인 팝업), 로그아웃, 계정 삭제(재인증 화면),
+/// 의료 서비스 아님 안내.
 class SettingsSection extends ConsumerWidget {
   const SettingsSection({super.key});
 
@@ -29,14 +32,16 @@ class SettingsSection extends ConsumerWidget {
     if (context.mounted) showAppToast(context, '기록을 모두 삭제했어요');
   }
 
-  Future<void> _deleteAccount(BuildContext context) {
-    return showAppConfirmDialog(
+  Future<void> _logout(BuildContext context, WidgetRef ref) async {
+    final ok = await showAppConfirmDialog(
       context,
-      title: '계정 삭제',
-      message: '계정 삭제는 로그인 기능이 연결된 뒤에 사용할 수 있어요. 삭제하면 복구할 수 없고, 재인증이 필요해요.',
-      confirmLabel: '확인',
-      cancelLabel: null,
+      title: '로그아웃할까요?',
+      message: '언제든 다시 로그인할 수 있어요.',
+      confirmLabel: '로그아웃',
     );
+    if (!ok) return;
+    await ref.read(authActionsProvider).signOut();
+    if (context.mounted) context.go(AppRoutes.login);
   }
 
   @override
@@ -46,6 +51,7 @@ class SettingsSection extends ConsumerWidget {
         ref.watch(settingsProvider).value ?? const AppSettings(nickname: '');
     final consents = settings.consents;
     final actions = ref.read(settingsActionsProvider);
+    final unread = ref.watch(unreadNotificationCountProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -54,8 +60,25 @@ class SettingsSection extends ConsumerWidget {
           '설정',
           style: AppTextStyles.sectionTitle.copyWith(color: colors.textBlack),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.space12),
         SettingsGroup(
+          children: [
+            SettingsRow.link(
+              key: const Key('open-notifications'),
+              title: '알림',
+              trailingText: unread > 0 ? '$unread개 안 읽음' : null,
+              onTap: () => context.push(AppRoutes.notifications),
+            ),
+            SettingsRow.link(
+              key: const Key('open-notification-settings'),
+              title: '알림 설정',
+              onTap: () => context.push(AppRoutes.notificationSettings),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.space12),
+        SettingsGroup(
+          title: '동의 관리',
           children: [
             SettingsRow.toggle(
               key: const Key('consent-privacy'),
@@ -80,24 +103,29 @@ class SettingsSection extends ConsumerWidget {
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.space12),
         SettingsGroup(
-          title: '데이터 관리',
+          title: '데이터·계정',
           children: [
             SettingsRow.destructive(
               key: const Key('delete-records'),
               title: '기록 전체 삭제',
               onTap: () => _deleteRecords(context, ref),
             ),
+            SettingsRow.link(
+              key: const Key('logout'),
+              title: '로그아웃',
+              onTap: () => _logout(context, ref),
+            ),
             SettingsRow.destructive(
               key: const Key('delete-account'),
               title: '계정 삭제',
-              onTap: () => _deleteAccount(context),
+              onTap: () => context.push(AppRoutes.accountDelete),
             ),
           ],
         ),
         if (kDebugMode) ...[
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.space12),
           SettingsGroup(
             children: [
               SettingsRow.link(
@@ -108,7 +136,7 @@ class SettingsSection extends ConsumerWidget {
             ],
           ),
         ],
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.space16),
         Text(
           '리본은 의료·상담 서비스가 아니에요. 힘든 마음이 계속되면 가까운 사람이나 전문 기관의 도움을 받아 보세요.',
           style: AppTextStyles.caption.copyWith(color: colors.textSecondary),

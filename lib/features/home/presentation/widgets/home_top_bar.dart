@@ -1,14 +1,18 @@
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../app/router.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
+import '../../../notifications/presentation/notifications_providers.dart';
 import 'home_header.dart';
 
 /// 화면 위에 고정되는 상단 바: 상태바 영역 + 로고/알림 행.
 /// 스크롤되는 내용이 이 뒤로 지나가면 블러로 흐려진다. 핑크 그라디언트는 없고 흰색 10%만 덮는다(수정안).
-class HomeTopBar extends StatelessWidget {
+class HomeTopBar extends ConsumerWidget {
   const HomeTopBar({super.key, this.onLogoTap});
 
   /// 로고를 눌렀을 때(화면 맨 위로 이동).
@@ -19,7 +23,7 @@ class HomeTopBar extends StatelessWidget {
       MediaQuery.paddingOf(context).top + HomeLayout.headerHeight;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final safeTop = MediaQuery.paddingOf(context).top;
 
     return SizedBox(
@@ -35,7 +39,11 @@ class HomeTopBar extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(height: safeTop),
-                HomeHeader(onLogoTap: onLogoTap),
+                HomeHeader(
+                  onLogoTap: onLogoTap,
+                  onBellTap: () => context.push(AppRoutes.notifications),
+                  unreadCount: ref.watch(unreadNotificationCountProvider),
+                ),
               ],
             ),
           ),
