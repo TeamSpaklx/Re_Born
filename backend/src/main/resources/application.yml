@@ -2,16 +2,16 @@ spring:
   application:
     name: reborn-backend
   datasource:
-    url: ${SUPABASE_DB_URL:jdbc:postgresql://localhost:5432/postgres}
-    username: ${SUPABASE_DB_USERNAME:postgres}
-    password: ${SUPABASE_DB_PASSWORD:}
+    url: https://cblolxoebahefwbyhoqe.supabase.co
+    username: postgres
+    password: rlarbfl20100311..
     driver-class-name: org.postgresql.Driver
   sql:
     init:
       mode: never
 server:
-  port: ${PORT:8080}
+  port: 8000
 
 reborn:
   ai:
-    enabled: ${AI_ANALYSIS_ENABLED:false}
+    enabled: true

@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/diaries")
+@Tag(name = "Diary", description = "일기 작성 및 조회 API")
 public class DiaryController {
     private final DiaryService service;
 
@@ -20,11 +23,13 @@ public class DiaryController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "일기 작성", description = "새 일기를 pending 상태로 저장합니다.")
     public DiaryResponse create(@Valid @RequestBody CreateDiaryRequest request) {
         return service.create(request);
     }
 
     @GetMapping
+    @Operation(summary = "일기 목록 조회", description = "from, to 날짜 범위로 일기를 조회합니다.")
     public List<DiaryResponse> list(@RequestParam(required = false) String from,
                                     @RequestParam(required = false) String to) {
         return service.list(from, to);
