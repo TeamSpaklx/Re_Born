@@ -43,6 +43,9 @@ abstract final class AppAssets {
   /// 스플래시 화면 로고 마크 (2000×2000, 배경 투명).
   static const logoMark = 'assets/images/logo_mark.png';
 
+  /// 기록 카드(Before)의 여우원숭이 일러스트 (604×604, 배경 투명, 원본 1254×1254를 줄임).
+  static const mascotLemur = 'assets/images/mascot_lemur.png';
+
   /// iOS 네이티브 탭 바 라벨용 글꼴 파일(UIKit에 직접 등록한다). Flutter 글자는 pubspec의 Pretendard를 쓴다.
   static const pretendardBold = 'assets/fonts/Pretendard-Bold.otf';
 
@@ -72,6 +75,7 @@ abstract final class AppAssets {
     radioCircleAfter,
     logo,
     logoMark,
+    mascotLemur,
     pretendardBold,
   ];
 }

@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:reborn_app/app/app.dart';
 import 'package:reborn_app/app/data_providers.dart';
 import 'package:reborn_app/app/main_shell.dart';
+import 'package:reborn_app/app/theme/app_assets.dart';
 import 'package:reborn_app/app/theme/app_colors.dart';
 import 'package:reborn_app/app/theme/app_radii.dart';
 import 'package:reborn_app/app/theme/app_spacing.dart';
@@ -243,15 +244,15 @@ void main() {
       Border.all(color: AppColors.light.cardBorder, width: 1),
     );
 
-    // 제목·부제는 카드 안쪽 왼쪽(20)에서 시작한다.
+    // 제목·부제는 테두리 1px 안쪽 왼쪽(20) → 바깥 기준 21에서 시작한다.
     final cardLeft = tester.getTopLeft(find.byType(RecordCardBefore)).dx;
     expect(
       tester.getTopLeft(find.text('아직 오늘의 마음을 기록하지 않았어요')).dx - cardLeft,
-      closeTo(20, 0.5),
+      closeTo(21, 0.5),
     );
     expect(
       tester.getTopLeft(find.text('1분만 천천히 돌아볼까요?')).dx - cardLeft,
-      closeTo(20, 0.5),
+      closeTo(21, 0.5),
     );
 
     final button = find.ancestor(
@@ -264,6 +265,42 @@ void main() {
     final label = tester.widget<Text>(find.text('감정 기록하기'));
     expect(label.style!.color, AppColors.light.onCtaSoft);
     expect(label.style!.fontSize, 16);
+  });
+
+  testWidgets('기록 카드(Before)에는 버튼 뒤로 얼굴만 내민 여우원숭이가 있다 (151×98, 위쪽만 보임)', (
+    tester,
+  ) async {
+    useDesignScreen(tester);
+    await pumpHome(tester);
+
+    final card = tester.getRect(find.byType(RecordCardBefore));
+    final mascot = find.byWidgetPredicate(
+      (w) =>
+          w is Image &&
+          w.image is AssetImage &&
+          (w.image as AssetImage).assetName == AppAssets.mascotLemur,
+    );
+    expect(mascot, findsOneWidget);
+    // 보이는 영역은 151×98, 이미지 자체는 정사각(높이 ≈151)이라 아래가 잘린다.
+    final visible = tester.getRect(
+      find.ancestor(of: mascot, matching: find.byType(ClipRect)).first,
+    );
+    expect(visible.size, const Size(151, 98));
+    expect(
+      tester.getSize(mascot),
+      const Size(HomeLayout.mascotWidth, HomeLayout.mascotImageHeight),
+    );
+    // 카드 위에서 96, 가로 가운데, 버튼은 그 바로 아래(194)에서 시작한다.
+    expect(visible.top - card.top, closeTo(96, 0.5));
+    expect(visible.center.dx, closeTo(card.center.dx, 0.5));
+    final button = tester.getRect(
+      find
+          .ancestor(of: find.text('감정 기록하기'), matching: find.byType(Container))
+          .first,
+    );
+    expect(button.top - card.top, closeTo(194, 0.5));
+    expect(button.height, 52);
+    expect(button.left - card.left, closeTo(21, 0.5));
   });
 
   testWidgets('폭 360에서도 오버플로 없이 카드가 폭을 채운다', (tester) async {
@@ -280,8 +317,8 @@ void main() {
     await pumpHome(tester);
 
     final scrollable = tester.state<ScrollableState>(find.byType(Scrollable));
-    // 내용 높이 1205(Figma 프레임) − 화면 874
-    expect(scrollable.position.maxScrollExtent, closeTo(1205 - 874, 1));
+    // 내용 높이 1288(Figma 최신 프레임) − 화면 874
+    expect(scrollable.position.maxScrollExtent, closeTo(1288 - 874, 1));
   });
 
   testWidgets('상단 바는 스크롤해도 화면 위에 고정되고 블러 배경을 가진다', (tester) async {
@@ -298,10 +335,8 @@ void main() {
     final headerY = tester.getTopLeft(find.byType(HomeHeader)).dy;
     final recordCardY = tester.getTopLeft(find.byType(RecordCardBefore)).dy;
 
-    await tester.drag(
-      find.byType(SingleChildScrollView),
-      const Offset(0, -200),
-    );
+    // 글자 위(눌리는 위젯이 없는 곳)에서 끈다. 버튼 위에서 끌면 탭 인식기 때문에 시작 거리가 달라진다.
+    await tester.dragFrom(const Offset(300, 180), const Offset(0, -200));
     await tester.pumpAndSettle();
 
     expect(tester.getTopLeft(find.byType(HomeHeader)).dy, headerY);
@@ -317,10 +352,7 @@ void main() {
     await pumpHome(tester);
 
     final scrollable = tester.state<ScrollableState>(find.byType(Scrollable));
-    await tester.drag(
-      find.byType(SingleChildScrollView),
-      const Offset(0, -300),
-    );
+    await tester.dragFrom(const Offset(300, 180), const Offset(0, -300));
     await tester.pumpAndSettle();
     expect(scrollable.position.pixels, closeTo(300, 1));
 

@@ -42,7 +42,7 @@ abstract final class HomeLayout {
   static const scrollToTopDuration = Duration(milliseconds: 500);
 
   // 카드 높이
-  static const recordCardHeightBefore = 172.0;
+  static const recordCardHeightBefore = 268.0;
   static const recordCardHeightAfter = 399.0;
   static const ctaButtonHeightBefore = 52.0;
   static const ctaButtonHeightAfter = 48.0;
@@ -56,7 +56,7 @@ abstract final class HomeLayout {
   static const dateHeight = 17.0;
   static const dateToGreeting = 4.0;
   static const greetingToRecordCard = 24.0;
-  static const recordCardToSignalTitle = 35.0;
+  static const recordCardToSignalTitle = 22.0;
   static const sectionTitleHeight = 32.0;
   static const sectionTitleToCard = 12.0;
   static const signalCardToGraph = 22.0;
@@ -66,12 +66,18 @@ abstract final class HomeLayout {
   static const dateY = 128.0;
   static const greetingY = 149.0;
   static const recordCardY = 237.0;
-  static const signalTitleY = 444.0;
-  static const signalCardY = 488.0;
-  static const graphCardY = 614.0;
-  static const actionTitleY = 821.0;
-  static const actionCardY1 = 865.0;
-  static const actionCardY2 = 967.0;
+  static const signalTitleY = 527.0;
+  static const signalCardY = 571.0;
+  static const graphCardY = 697.0;
+  static const actionTitleY = 904.0;
+  static const actionCardY1 = 948.0;
+  static const actionCardY2 = 1050.0;
+
+  // 기록 카드(Before) 안쪽: 여우원숭이 일러스트(Figma `736:309`). 박스 151×98 안에 이미지 높이 ≈151(153.85%)을
+  // 위쪽 정렬로 놓아 아래가 잘리고, 버튼 뒤에서 머리·귀·꼬리만 보인다.
+  static const mascotWidth = 151.0;
+  static const mascotHeight = 98.0;
+  static const mascotImageHeight = 150.77;
 
   // 아이콘·아바타
   static const avatarSize = 48.0;
