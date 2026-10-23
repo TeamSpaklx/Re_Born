@@ -35,6 +35,7 @@ migrate_working_dir/
 /coverage/
 /backend/target/
 /backend/src/main/resources/application-local.yml
+/.tools/
 
 # Symbolication related
 app.*.symbols
