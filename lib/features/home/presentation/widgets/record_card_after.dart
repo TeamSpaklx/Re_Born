@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../shared/widgets/character_avatar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../app/theme/app_assets.dart';
@@ -12,8 +11,8 @@ import '../../../../shared/widgets/centered_line.dart';
 import '../../../../shared/widgets/cta_button.dart';
 import '../../models/record_streak.dart';
 
-/// 오늘 기록을 마쳤을 때의 핑크 카드 (Figma `UnWrite` After, 높이 399, docs/DESIGN_HOME.md 5.3).
-/// 아바타(오늘 기록에 나온 인물) · 완료 문구 · "오늘 기록 보기" · (출석 체크 패널은 [HomeLayout.showAttendance]가 켜졌을 때만).
+/// 오늘 기록을 마쳤을 때의 핑크 카드 (Figma `UnWrite` After, 높이 399, docs/DESIGN_SYSTEM.md 5.3).
+/// 아바타(오늘 기록에 나온 인물) · 완료 문구 · "오늘 기록 보기" · 출석 체크 패널.
 class RecordCardAfter extends StatelessWidget {
   const RecordCardAfter({
     super.key,
@@ -57,10 +56,21 @@ class RecordCardAfter extends StatelessWidget {
                 for (var i = 0; i < peopleCount.clamp(0, 3); i++)
                   Positioned(
                     left: i * _avatarStep,
-                    child: CharacterAvatar(
-                      seed: 'today-$i',
-                      size: _avatarSize,
-                      borderColor: colors.cardWhite,
+                    child: Container(
+                      width: _avatarSize,
+                      height: _avatarSize,
+                      decoration: BoxDecoration(
+                        color: colors.avatar,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: colors.cardWhite, width: 2),
+                      ),
+                      child: Center(
+                        child: SvgPicture.asset(
+                          AppAssets.person,
+                          width: 28,
+                          height: 28,
+                        ),
+                      ),
                     ),
                   ),
                 Positioned(
@@ -96,26 +106,24 @@ class RecordCardAfter extends StatelessWidget {
             height: HomeLayout.ctaButtonHeightAfter,
             onPressed: onViewToday,
           ),
-          if (HomeLayout.showAttendance) ...[
-            // Figma의 "출석 체크" 글자 위치에 맞추려고 제목 위 간격을 4 늘리고 아래를 4 줄였다(전체 높이 그대로).
-            const SizedBox(height: _gap + 4),
-            CenteredLine(
-              height: 20,
-              child: Row(
-                children: [
-                  Text(
-                    '출석 체크',
-                    style: AppTextStyles.attendanceTitle.copyWith(
-                      color: colors.textBlack,
-                    ),
+          // Figma의 "출석 체크" 글자 위치에 맞추려고 제목 위 간격을 4 늘리고 아래를 4 줄였다(전체 높이 그대로).
+          const SizedBox(height: _gap + 4),
+          CenteredLine(
+            height: 20,
+            child: Row(
+              children: [
+                Text(
+                  '출석 체크',
+                  style: AppTextStyles.attendanceTitle.copyWith(
+                    color: colors.textBlack,
                   ),
-                  SvgPicture.asset(AppAssets.chevronAttendance),
-                ],
-              ),
+                ),
+                SvgPicture.asset(AppAssets.chevronAttendance),
+              ],
             ),
-            const SizedBox(height: _gap - 4),
-            _AttendancePanel(streak: streak, longest: longest),
-          ],
+          ),
+          const SizedBox(height: _gap - 4),
+          _AttendancePanel(streak: streak, longest: longest),
         ],
       ),
     );

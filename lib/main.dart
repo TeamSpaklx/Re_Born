@@ -1,6 +1,3 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,8 +8,6 @@ import 'app/router.dart';
 import 'core/config/supabase_config.dart';
 import 'core/errors/app_error_log.dart';
 import 'core/errors/error_handlers.dart';
-
-const _initialRoute = String.fromEnvironment('INITIAL_ROUTE');
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,33 +31,18 @@ Future<void> main() async {
     ),
   );
 
+  await Supabase.initialize(
+    url: SupabaseConfig.url,
+    publishableKey: SupabaseConfig.publishableKey,
+  );
+
   runApp(
     ProviderScope(
       overrides: [
         appErrorLogProvider.overrideWithValue(errorLog),
-        // 개발 중 특정 화면에서 바로 시작하려면: flutter run --dart-define=INITIAL_ROUTE=/dev/gallery
-        initialLocationProvider.overrideWithValue(
-          kDebugMode && _initialRoute.isNotEmpty
-              ? _initialRoute
-              : AppRoutes.splash,
-        ),
+        initialLocationProvider.overrideWithValue(AppRoutes.splash),
       ],
       child: const RebornApp(),
     ),
   );
-
-  // 아직 화면이 Supabase를 쓰지 않으므로, 첫 화면(스플래시 로고)이 뜨는 것을 막지 않게 앱을 켠 뒤에 준비한다.
-  // Supabase를 처음 쓰는 코드가 생기면 이 준비가 끝난 뒤에 쓰도록 바꾼다.
-  unawaited(_initSupabase(errorLog));
-}
-
-Future<void> _initSupabase(AppErrorLog errorLog) async {
-  try {
-    await Supabase.initialize(
-      url: SupabaseConfig.url,
-      publishableKey: SupabaseConfig.publishableKey,
-    );
-  } catch (error, stack) {
-    errorLog.record(error, stack, where: 'supabase');
-  }
 }

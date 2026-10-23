@@ -1,18 +1,16 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reborn_app/features/analysis/data/sample_data.dart';
 import 'package:reborn_app/features/analysis/home_summary_builder.dart';
-import 'package:reborn_app/features/analysis/suggestion_pool.dart';
 import 'package:reborn_app/features/analysis/weekly_emotion_builder.dart';
 import 'package:reborn_app/features/entries/models/emotion.dart';
 import 'package:reborn_app/features/entries/models/entry.dart';
-import 'package:reborn_app/features/todos/models/todo.dart';
 
 void main() {
   final now = DateTime(2026, 10, 22, 12); // 목요일
   Entry entry(DateTime at, int score, {String? personId}) => Entry(
     id: '$at$score',
     body: '본문',
-    emotion: score < 0 ? Emotion.sadness : Emotion.joy,
+    emotion: score < 0 ? Emotion.hurt : Emotion.joy,
     intensity: score.abs().clamp(1, 3),
     score: score,
     createdAt: at,
@@ -75,41 +73,10 @@ void main() {
       expect(s.streak.longest, 20);
       expect(s.relationSignals.single.personName, '지민');
       expect(s.relationSignals.single.daysSinceLastRecord, 1);
-      // 샘플 체크리스트에는 첫 제안이 이미 담겨 있어, 담은 것은 빼고 다음 두 제안이 나온다.
       expect(s.suggestions, hasLength(2));
-      expect(s.suggestions.map((e) => e.title), [
-        '오늘은 거리를 두고, 내일 가벼운 간식과 함께 말을 건네 보세요.',
-        '지민님과의 일을 잠시 적어 보며 마음을 정리해 보세요.',
-      ]);
-      expect(s.suggestions.every((e) => !e.added), isTrue);
-      expect(s.suggestionsDone, isFalse);
-    });
-
-    test('제안을 모두 담으면(완료한 것 포함) 제안은 비고 suggestionsDone이 켜진다', () {
-      final insight = data.insights.first;
-      final person = data.people.firstWhere((p) => p.id == insight.personId);
-      final titles = SuggestionPool.forInsight(insight.type, person.name);
-      final todos = [
-        for (var i = 0; i < titles.length; i++)
-          Todo(
-            id: 't$i',
-            title: titles[i],
-            createdAt: now,
-            insightId: insight.id,
-            source: TodoSource.suggestion,
-            done: i.isEven,
-          ),
-      ];
-      final s = buildHomeSummary(
-        nickname: '규리',
-        now: now,
-        entries: data.entries,
-        people: data.people,
-        insights: data.insights,
-        todos: todos,
-      );
-      expect(s.suggestions, isEmpty);
-      expect(s.suggestionsDone, isTrue);
+      // 샘플 체크리스트에는 첫 제안이 이미 담겨 있다.
+      expect(s.suggestions[0].added, isTrue);
+      expect(s.suggestions[1].added, isFalse);
     });
 
     test('오늘 기록이 생기면 After, 연속 6일, 오늘 기록 id와 인물 수가 채워진다', () {
@@ -139,7 +106,6 @@ void main() {
       );
       expect(s.relationSignals, isEmpty);
       expect(s.suggestions, isEmpty);
-      expect(s.suggestionsDone, isFalse);
       expect(s.streak.current, 0);
     });
   });

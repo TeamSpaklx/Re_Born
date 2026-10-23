@@ -12,9 +12,7 @@
 | 폰트 | Pretendard (400·500·600·700·800) | `assets/fonts/`, 라이선스 SIL OFL 1.1 (`OFL-LICENSE.txt`) |
 | 아이콘 | `flutter_svg` ^2.3.0 + Figma에서 내려받은 SVG | `assets/icons/ui/`, 경로는 `lib/app/theme/app_assets.dart`. 원본 라이브러리: 탭 바 투데이·관계·기록 = Phosphor Icons, 전체 = Iconsax, 임시 디자인 화면의 새 아이콘(check, trash)도 Phosphor(MIT)에서 SVG로 받음 (아이콘 패키지는 쓰지 않음) |
 | 디자인 기준 | Figma 홈 화면 (100% 일치 목표) | [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md), 값은 `lib/app/theme/` 상수만 사용 |
-| 인증 | Supabase Auth, 이메일 + 비밀번호 | 구글·카카오 소셜 로그인 화면은 구현(메모리 동작), 실제 Supabase OAuth 연결은 백엔드 작업 (SPEC 11장 7번) |
-| 프로필 사진 | `image_picker` ^1.2.4 | 갤러리·카메라에서 사진 한 장(긴 변 1024로 축소). iOS `Info.plist`에 사진·카메라 사용 문구. 사진은 지금 메모리에만 저장 |
-| 알림 권한·리마인드 | `flutter_local_notifications` ^22.3.2, `timezone` ^0.11.2, `flutter_timezone` ^5.1.1 | iOS·Android 13+ OS 알림 권한 요청과 매일 정시 로컬 알림(기록 리마인드). 기기 시간대는 `flutter_timezone`, 예약은 `timezone`. 서버·FCM 푸시는 아님. Android는 desugaring·`POST_NOTIFICATIONS`·부팅 receiver 설정(`android/app`), iOS는 `AppDelegate`에서 알림 델리게이트 설정 |
+| 인증 | Supabase Auth, 이메일 + 비밀번호 | 구글 로그인은 미정 (SPEC 11장 7번) |
 | 상태 관리 | `flutter_riverpod` ^3.4.3 | 앱 최상단 `ProviderScope`, 데이터는 Repository를 Provider로 주입 ([FRONTEND.md](./FRONTEND.md)) |
 | 라우팅 | `go_router` ^18.1.1 | `lib/app/router.dart`, 하단 탭은 `StatefulShellRoute.indexedStack`(탭마다 상태 유지) |
 | DB | Supabase PostgreSQL | 사용자별 접근은 RLS로 제한 |
@@ -52,10 +50,10 @@ docs/                명세서, 디자인 시스템, 프론트 문서 (design/ �
 
 ## 화면 규칙
 
-- **하단 탭 4개:** 투데이(홈) / 관계 / 기록 / 전체. Figma가 있는 화면은 홈뿐이고(2026-10-23 수정안 반영, 배경 `#FFF8F8`), 관계·기록·전체 탭과 로그인·가입·알림 등은 레퍼런스를 해석해 만들었습니다(FRONTEND.md 2장). 토글·모달·토스트·설정 목록은 Figma에 없어 Reborn 공통 컴포넌트로 만들어 쓰고 머티리얼 위젯은 쓰지 않습니다(DESIGN_SYSTEM.md 7장).
+- **하단 탭 4개:** 투데이(홈) / 관계 / 기록 / 전체. 디자인이 있는 화면은 홈뿐이고, 나머지 탭은 흰 배경의 빈 화면으로 둡니다.
 - **고정 규칙:** 글자 크기 배율 1.0(시스템 글자 크기 설정 무시), 라이트 모드만, 세로 방향만. **다크 모드는 나중에 추가할 예정**이라 색은 `AppColors` 팔레트로만 씁니다.
-- 앱은 스플래시 화면(로고만)으로 시작해, 홈 데이터가 준비되면(최소 0.8초, 최대 3초) 홈이 로고 화면 위로 서서히 나타납니다(크로스페이드 0.4초, 시간은 임시값). 로고에는 투명도·크기 애니메이션이 없습니다. 로그인 여부에 따라 로그인 화면 또는 홈으로 갑니다(인증은 메모리 구현, FRONTEND.md 2장). 시작 경로는 `initialLocationProvider`이고 `main.dart`에서만 스플래시로 바꿉니다(테스트는 기본값 투데이). Supabase 초기화는 첫 화면을 막지 않도록 `runApp` 뒤에 합니다(화면이 Supabase를 쓰기 시작하면 그 전에 끝나도록 바꿀 것).
-- 앱이 켜지는 동안의 네이티브 시작 화면(iOS `LaunchScreen.storyboard`, Android `launch_background.xml`)도 같은 로고(200)로 맞춰 두었습니다. **알려진 한계(iOS 시뮬레이터 iOS 27·26.5에서 확인):** 시스템이 그리는 시작 화면의 로고가 앱 안에서 그린 로고(RGB 230,106,141)보다 진하게(248,96,141) 보이는 구간이 앱을 켠 직후 잠깐 있습니다. sRGB 태그, 템플릿 tint, 화면 색공간별 이미지, `UILaunchScreen`, 번들 PNG를 시도했지만 해결되지 않았고 실제 기기에서는 확인하지 못했습니다. 앱 시작을 빠르게 해(Supabase 초기화 지연) 이 구간을 줄입니다. Android 12 이상은 시스템 스플래시(앱 아이콘 기반)가 먼저 나와 완전히 같지는 않습니다.
+- 앱은 스플래시 화면(로고만, 약 1.2초)으로 시작해 홈으로 넘어갑니다. 로그인·회원가입은 디자인이 나올 때까지 제외합니다(로그인이 들어오면 스플래시가 로그인 여부로 로그인/홈을 나눕니다). 시작 경로는 `initialLocationProvider`이고 `main.dart`에서만 스플래시로 바꿉니다(테스트는 기본값 투데이).
+- 앱이 켜지는 동안의 네이티브 시작 화면(iOS `LaunchScreen.storyboard`, Android `launch_background.xml`)도 같은 로고(200)로 맞춰 두었습니다. Android 12 이상은 시스템 스플래시(앱 아이콘 기반)가 먼저 나와 완전히 같지는 않습니다.
 - 하단 탭 바는 플랫폼별로 다릅니다: **iOS 26 이상 = 네이티브 `UITabBar`(Liquid Glass)**, iOS 26 미만·Android = Flutter가 그린 탭 바(블러). 분기는 `lib/shared/widgets/app_bottom_nav_bar.dart` 한 곳이고, 네이티브 쪽은 `ios/Runner/NativeTabBarView.swift`(플랫폼 뷰)와 `lib/shared/widgets/native_tab_bar.dart`입니다. 새 패키지는 쓰지 않습니다.
 - iOS 네이티브 탭 바(Liquid Glass)는 **Xcode 26 이상(iOS 26 SDK)으로 빌드**해야 유리 모양이 나옵니다. iOS 시뮬레이터 런타임 26.5와 27.0에서 확인했습니다.
 - 세로 고정은 세 곳에서 합니다: `main.dart`(SystemChrome), iOS `Info.plist`, Android `AndroidManifest.xml`.

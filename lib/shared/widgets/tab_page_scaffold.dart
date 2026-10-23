@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
@@ -16,7 +15,6 @@ class TabPageScaffold extends StatelessWidget {
     required this.title,
     required this.children,
     this.trailing,
-    this.floating,
   });
 
   final String title;
@@ -24,9 +22,6 @@ class TabPageScaffold extends StatelessWidget {
 
   /// 제목 오른쪽 끝에 놓을 것(예: 추가 버튼).
   final Widget? trailing;
-
-  /// 탭 바 위 오른쪽에 떠 있는 버튼(예: [AppFab]).
-  final Widget? floating;
 
   @override
   Widget build(BuildContext context) {
@@ -85,18 +80,6 @@ class TabPageScaffold extends StatelessWidget {
               ),
             ),
           ),
-          if (floating != null)
-            Positioned(
-              right: AppSpacing.pageMargin,
-              bottom:
-                  math.max(
-                    MediaQuery.paddingOf(context).bottom,
-                    BottomNavTokens.bottomOffset,
-                  ) +
-                  BottomNavTokens.height +
-                  AppSpacing.space16,
-              child: floating!,
-            ),
         ],
       ),
     );

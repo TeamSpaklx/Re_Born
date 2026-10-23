@@ -8,19 +8,15 @@ import '../../../app/theme/app_radii.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../app/theme/app_text_styles.dart';
 import '../../../core/utils/korean_date.dart';
-import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/app_dialogs.dart';
 import '../../../shared/widgets/cta_button.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/page_scaffold.dart';
 import '../../entries/models/entry.dart';
 import '../../entries/presentation/entries_providers.dart';
-import '../../entries/presentation/widgets/emotion_chip.dart';
-import '../../entries/presentation/widgets/emotion_face.dart';
-import '../../entries/presentation/widgets/entry_card.dart';
 import '../../people/presentation/people_providers.dart';
 
-/// 기록 상세 (F-03): 감정 캐릭터와 강도, 본문, 분석 결과. 수정·삭제(삭제하면 그 인물의 지수를 다시 계산한다).
+/// 기록 상세 (F-03). **임시 디자인**. 수정·삭제(삭제하면 그 인물의 지수를 다시 계산한다).
 class RecordDetailScreen extends ConsumerWidget {
   const RecordDetailScreen({super.key, required this.entryId});
 
@@ -32,7 +28,6 @@ class RecordDetailScreen extends ConsumerWidget {
       title: '기록을 삭제할까요?',
       message: '삭제하면 되돌릴 수 없어요.',
       confirmLabel: '삭제',
-      destructive: true,
     );
     if (!ok || !context.mounted) return;
     final router = GoRouter.of(context);
@@ -57,7 +52,8 @@ class RecordDetailScreen extends ConsumerWidget {
         .where((p) => p.id == entry.personId)
         .map((p) => p.name)
         .firstOrNull;
-    final tint = emotionColor(entry.emotion, colors);
+    final time =
+        '${entry.createdAt.hour.toString().padLeft(2, '0')}:${entry.createdAt.minute.toString().padLeft(2, '0')}';
 
     return PageScaffold(
       title: '기록',
@@ -71,73 +67,41 @@ class RecordDetailScreen extends ConsumerWidget {
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(
           AppSpacing.pageMargin,
-          AppSpacing.space8,
+          8,
           AppSpacing.pageMargin,
-          AppSpacing.space40,
+          40,
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.space20),
-              decoration: BoxDecoration(
-                color: Color.alphaBlend(
-                  tint.withValues(alpha: 0.16),
-                  colors.cardWhite,
-                ),
-                borderRadius: AppRadii.cardBorderRadius,
-              ),
-              child: Row(
-                children: [
-                  EmotionFace(emotion: entry.emotion, size: 64),
-                  const SizedBox(width: AppSpacing.space16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              entry.emotion.label,
-                              style: AppTextStyles.sectionTitle.copyWith(
-                                color: colors.textBlack,
-                                height: 1.3,
-                              ),
-                            ),
-                            const SizedBox(width: AppSpacing.space8),
-                            IntensityDots(level: entry.intensity),
-                          ],
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '${formatKoreanDate(entry.createdAt)} · ${formatKoreanTime(entry.createdAt)}',
-                          style: AppTextStyles.body.copyWith(
-                            color: colors.textSecondary,
-                          ),
-                        ),
-                        if (personName != null) ...[
-                          const SizedBox(height: AppSpacing.space8),
-                          _Chip(
-                            personName,
-                            colors.cardWhite,
-                            colors.textStrong,
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+            Text(
+              '${formatKoreanDate(entry.createdAt)} $time',
+              style: AppTextStyles.date.copyWith(color: colors.textDate),
             ),
-            const SizedBox(height: AppSpacing.space24),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                _Chip(
+                  '${entry.emotion.label} ${entry.intensity}',
+                  colors.brand,
+                  colors.onCta,
+                ),
+                if (personName != null)
+                  _Chip(personName, colors.chip, colors.textSecondary),
+              ],
+            ),
+            const SizedBox(height: 20),
             Text(
               entry.body,
-              style: AppTextStyles.recordCardSubtitle.copyWith(
+              style: AppTextStyles.recordCardTitleBefore.copyWith(
                 color: colors.textBlack,
-                height: 1.7,
+                fontWeight: FontWeight.w500,
+                height: 1.6,
               ),
             ),
-            const SizedBox(height: AppSpacing.space32),
+            const SizedBox(height: 24),
             _AnalysisSection(entry: entry),
           ],
         ),
@@ -161,68 +125,39 @@ class _AnalysisSection extends ConsumerWidget {
       case AnalysisStatus.pending:
         status = '분석 중이에요';
       case AnalysisStatus.done:
-        status = '분석을 마쳤어요';
+        status = '분석을 마쳤어요 · 점수 ${entry.score}';
       case AnalysisStatus.failed:
         status = '분석하지 못했어요';
     }
 
-    return AppCard.white(
-      padding: const EdgeInsets.all(AppSpacing.space20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '분석 결과',
-            style: AppTextStyles.groupTitle.copyWith(color: colors.textBlack),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          status,
+          style: AppTextStyles.body.copyWith(color: colors.textSecondary),
+        ),
+        if (keywords.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              for (final k in keywords)
+                _Chip(k, colors.chip, colors.textSecondary),
+            ],
           ),
-          const SizedBox(height: AppSpacing.space8),
-          Text(
-            status,
-            style: AppTextStyles.body.copyWith(color: colors.textSecondary),
-          ),
-          if (entry.analysisStatus == AnalysisStatus.done) ...[
-            const SizedBox(height: AppSpacing.space16),
-            Row(
-              children: [
-                Text(
-                  '감정 점수',
-                  style: AppTextStyles.body.copyWith(
-                    color: colors.textSecondary,
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  '${entry.score > 0 ? '+' : ''}${entry.score}',
-                  key: const Key('entry-score'),
-                  style: AppTextStyles.sectionTitle.copyWith(
-                    color: entry.score < 0 ? colors.danger : colors.brand,
-                  ),
-                ),
-              ],
-            ),
-          ],
-          if (keywords.isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.space16),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: [
-                for (final k in keywords)
-                  _Chip(k, colors.chip, colors.textSecondary),
-              ],
-            ),
-          ],
-          if (entry.analysisStatus == AnalysisStatus.failed) ...[
-            const SizedBox(height: AppSpacing.space16),
-            CtaButton(
-              label: '다시 분석',
-              height: 48,
-              onPressed: () =>
-                  ref.read(recordActionsProvider).retryAnalysis(entry.id),
-            ),
-          ],
         ],
-      ),
+        if (entry.analysisStatus == AnalysisStatus.failed) ...[
+          const SizedBox(height: 16),
+          CtaButton(
+            label: '다시 분석',
+            height: 48,
+            onPressed: () =>
+                ref.read(recordActionsProvider).retryAnalysis(entry.id),
+          ),
+        ],
+      ],
     );
   }
 }
