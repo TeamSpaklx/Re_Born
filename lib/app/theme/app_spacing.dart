@@ -131,6 +131,11 @@ abstract final class GraphLayout {
   static const captionY = 159.0;
 }
 
+abstract final class AuthLayout {
+  static const maxWidth = 440.0;
+  static const logoSize = 76.0;
+}
+
 /// 출석 체크 패널 치수 (After 기록 카드 안).
 abstract final class AttendanceLayout {
   static const panelWidth = 313.0;

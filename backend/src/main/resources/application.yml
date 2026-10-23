@@ -12,12 +12,17 @@ spring:
 server:
   port: ${PORT:8080}
 
-<<<<<<< Updated upstream
+springdoc:
+  swagger-ui:
+    path: /swagger
+
 supabase:
   jwks-url: ${SUPABASE_JWKS_URL:https://cblolxoebahefwbyhoqe.supabase.co/auth/v1/.well-known/jwks.json}
 
-=======
->>>>>>> Stashed changes
 reborn:
   ai:
     enabled: ${AI_ANALYSIS_ENABLED:false}
+    openai:
+      api-key: ${OPENAI_API_KEY:}
+      model: ${OPENAI_MODEL:gpt-6-luna}
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}

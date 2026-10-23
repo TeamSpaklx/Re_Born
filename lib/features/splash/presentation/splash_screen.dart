@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../app/router.dart';
 import '../../../app/theme/app_assets.dart';
@@ -24,7 +25,9 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     _timer = Timer(SplashLayout.duration, () {
-      if (mounted) context.go(AppRoutes.today);
+      if (!mounted) return;
+      final hasSession = Supabase.instance.client.auth.currentSession != null;
+      context.go(hasSession ? AppRoutes.today : AppRoutes.auth);
     });
   }
 

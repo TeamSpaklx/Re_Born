@@ -32,8 +32,8 @@ class BackendApiClient {
     _configuredBaseUrl.isNotEmpty
         ? _configuredBaseUrl
         : Platform.isAndroid
-        ? 'http://10.0.2.2:8000'
-        : 'http://127.0.0.1:8000',
+        ? 'http://10.0.2.2:8080'
+        : 'http://127.0.0.1:8080',
   );
 
   final Uri _baseUri;

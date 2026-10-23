@@ -8,20 +8,20 @@ class BackendSettingsRepository implements SettingsRepository {
 
   @override
   Future<AppSettings> get() async {
-    final row = _object(await _api.get('/api/me'));
+    final row = _object(await _api.get('/api/profile'));
     return AppSettings(
       nickname: row['nickname'] as String? ?? '',
       consents: Consents(
-        privacy: row['consent_privacy'] as bool,
-        aiAnalysis: row['consent_ai_analysis'] as bool,
-        analytics: row['consent_analytics'] as bool,
+        privacy: row['consentPrivacy'] as bool? ?? true,
+        aiAnalysis: row['consentAiAnalysis'] as bool? ?? true,
+        analytics: row['consentAnalytics'] as bool? ?? false,
       ),
     );
   }
 
   @override
   Future<void> save(AppSettings settings) async {
-    await _api.put('/api/me', {
+    await _api.put('/api/profile', {
       'nickname': settings.nickname,
       'consentPrivacy': settings.consents.privacy,
       'consentAiAnalysis': settings.consents.aiAnalysis,

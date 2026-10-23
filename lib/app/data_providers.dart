@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/errors/app_error_log.dart';
 import '../core/network/backend_api_client.dart';
 import '../core/providers/clock_provider.dart';
+import '../features/auth/data/auth_service.dart';
 import '../features/analysis/analysis_service.dart';
 import '../features/analysis/data/sample_data.dart';
 import '../features/entries/data/entries_repository.dart';
@@ -28,9 +30,14 @@ final backendApiClientProvider = Provider<BackendApiClient>((ref) {
   return client;
 });
 
-/// **저장소 교체 지점.** 백엔드가 Supabase 구현을 만들면 아래 provider 6개의 한 줄씩만 바꾼다
-/// (예: `InMemoryPeopleRepository(...)` → `SupabasePeopleRepository(...)`). 화면과 분석 코드는 그대로다.
-/// 지금은 메모리 저장소 + 샘플 데이터이고, 앱을 다시 켜면 샘플로 돌아간다.
+final authServiceProvider = Provider<AuthService>(
+  (ref) => AuthService(
+    supabase: Supabase.instance.client,
+    api: ref.watch(backendApiClientProvider),
+  ),
+);
+
+/// USE_BACKEND_API=true이면 서버 저장소를 사용하고, 기본값에서는 샘플 메모리 저장소를 사용한다.
 final sampleDataProvider = Provider<SampleData>(
   (ref) => buildSampleData(ref.watch(clockProvider)()),
 );

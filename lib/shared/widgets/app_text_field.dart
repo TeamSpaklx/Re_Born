@@ -15,6 +15,8 @@ class AppTextField extends StatelessWidget {
     this.maxLength,
     this.maxLines = 1,
     this.minLines,
+    this.obscureText = false,
+    this.keyboardType,
     this.onChanged,
     this.fieldKey,
   });
@@ -25,6 +27,8 @@ class AppTextField extends StatelessWidget {
   final int? maxLength;
   final int? maxLines;
   final int? minLines;
+  final bool obscureText;
+  final TextInputType? keyboardType;
   final ValueChanged<String>? onChanged;
   final Key? fieldKey;
 
@@ -42,6 +46,8 @@ class AppTextField extends StatelessWidget {
       maxLength: maxLength,
       maxLines: maxLines,
       minLines: minLines,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
       onChanged: onChanged,
       cursorColor: colors.brand,
       style: AppTextStyles.body.copyWith(color: colors.textBlack),

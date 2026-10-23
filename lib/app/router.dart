@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/all/presentation/all_screen.dart';
+import '../features/auth/presentation/auth_screen.dart';
 import '../features/home/presentation/today_screen.dart';
 import '../features/insights/presentation/insight_detail_screen.dart';
 import '../features/record/presentation/record_detail_screen.dart';
@@ -18,6 +19,7 @@ import 'main_shell.dart';
 /// 순서는 하단 탭 순서(투데이 / 관계 / 기록 / 전체)와 같다.
 abstract final class AppRoutes {
   static const splash = '/splash';
+  static const auth = '/auth';
 
   static const today = '/today';
   static const relations = '/relations';
@@ -38,7 +40,7 @@ abstract final class AppRoutes {
 /// 테스트는 기본값(투데이)으로 바로 화면을 확인한다.
 final initialLocationProvider = Provider<String>((ref) => AppRoutes.today);
 
-/// 앱 라우터. 앱은 스플래시로 시작해 투데이(홈)로 넘어간다. 로그인 화면은 디자인이 나올 때까지 없다.
+/// 앱 라우터. 시작 세션에 따라 로그인 화면 또는 홈으로 이동한다.
 final routerProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
     initialLocation: ref.read(initialLocationProvider),
@@ -46,6 +48,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.splash,
         builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.auth,
+        builder: (context, state) => const AuthScreen(),
       ),
       GoRoute(
         path: AppRoutes.recordNew,

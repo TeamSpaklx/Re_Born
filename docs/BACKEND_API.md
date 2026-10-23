@@ -7,7 +7,7 @@ API는 Supabase access token을 `Authorization: Bearer <token>` 헤더로 받습
 | 저장소 | 경로 | 지원 작업 |
 |---|---|---|
 | 상태 | `/health` | `GET` |
-| 프로필 | `/api/me` | `GET`, `PUT` |
+| 프로필 | `/api/profile` | `GET`, `PUT` |
 | 인물 | `/api/people` | 목록·생성 `GET`/`POST`, 전체 삭제 `DELETE` |
 | 인물 | `/api/people/{id}` | 수정·삭제 `PATCH`/`DELETE` |
 | 기록 | `/api/entries` | 목록(선택 `personId` 필터)·생성·전체 삭제 `GET`/`POST`/`DELETE` |
@@ -36,10 +36,10 @@ Android 에뮬레이터 예시:
 ```sh
 flutter run \
   --dart-define=USE_BACKEND_API=true \
-  --dart-define=BACKEND_BASE_URL=http://10.0.2.2:8000 \
+  --dart-define=BACKEND_BASE_URL=http://10.0.2.2:8080 \
   --dart-define=BACKEND_ACCESS_TOKEN=<test-access-token>
 ```
 
-iOS 시뮬레이터에서는 `BACKEND_BASE_URL=http://127.0.0.1:8000`을 사용합니다. 실제 기기에서는 컴퓨터의 같은 네트워크 주소 또는 HTTPS로 접근 가능한 서버 주소를 지정합니다. `BACKEND_ACCESS_TOKEN`은 debug 전용이며 저장소에 넣거나 배포 빌드에 전달하지 마세요. 앱에 실제 Supabase 로그인이 구현되면 client는 현재 세션 token을 자동으로 사용합니다.
+iOS 시뮬레이터에서는 `BACKEND_BASE_URL=http://127.0.0.1:8080`을 사용합니다. 실제 기기에서는 컴퓨터의 같은 네트워크 주소 또는 HTTPS로 접근 가능한 서버 주소를 지정합니다. 가입·로그인 후 앱은 Supabase 세션 token으로 백엔드에 요청합니다. `BACKEND_ACCESS_TOKEN`은 debug 전용이며 저장소에 넣거나 배포 빌드에 전달하지 마세요.
 
 `BackendApiClient`는 응답 오류를 `BackendApiException`으로 전달합니다. Repository는 오류를 삼키지 않으며 기존 화면의 오류/재시도 흐름이 처리합니다.
