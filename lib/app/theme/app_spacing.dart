@@ -56,9 +56,17 @@ abstract final class HomeLayout {
   /// 로고를 누르면 맨 위로 올라가는 시간. Figma에 지정이 없어 정한 임시값(팀 확인 필요).
   static const scrollToTopDuration = Duration(milliseconds: 500);
 
+  /// 제안을 담은 뒤 채워진 원을 보여 주는 시간(그 뒤 다음 제안이 온다). 임시값.
+  static const suggestionSwapDelay = Duration(milliseconds: 700);
+
   // 카드 높이
   static const recordCardHeightBefore = 268.0;
-  static const recordCardHeightAfter = 399.0;
+
+  /// 출석 체크 패널을 보일지. 지금은 숨긴다(2026-10-24). 켜면 After 카드가 Figma 높이(399)로 돌아온다.
+  static const showAttendance = false;
+
+  /// After 카드 높이. 출석 패널을 숨기면 안쪽 내용 높이에 맞춰 줄어들도록 null.
+  static const double? recordCardHeightAfter = showAttendance ? 399.0 : null;
   static const ctaButtonHeightBefore = 52.0;
   static const ctaButtonHeightAfter = 48.0;
   static const signalCardHeight = 104.0;

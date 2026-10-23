@@ -8,7 +8,10 @@ import '../../../app/theme/app_spacing.dart';
 import '../../../app/theme/bottom_nav_tokens.dart';
 import '../../../app/theme/app_text_styles.dart';
 import '../../../core/providers/clock_provider.dart';
+import '../../../app/theme/app_motion.dart';
+import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/app_dialogs.dart';
+import '../../../shared/widgets/cta_button.dart';
 import '../../todos/models/todo.dart';
 import '../../todos/presentation/todos_providers.dart';
 import '../models/action_suggestion.dart';
@@ -58,6 +61,9 @@ class _HomeContent extends ConsumerStatefulWidget {
 class _HomeContentState extends ConsumerState<_HomeContent> {
   final _scrollController = ScrollController();
 
+  /// 방금 담은 제안: 채워진 원을 잠깐 보여 준 뒤 목록에서 뺀다(자리 번호와 함께 보관).
+  final _justAdded = <String, ({ActionSuggestion suggestion, int slot})>{};
+
   HomeSummary get summary => widget.summary;
 
   @override
@@ -76,13 +82,23 @@ class _HomeContentState extends ConsumerState<_HomeContent> {
     );
   }
 
-  /// 제안을 체크리스트에 담는다(이미 담았으면 아무 일도 하지 않는다).
+  /// 제안을 체크리스트에 담는다. 담으면 원이 채워지고 잠시 뒤 다음 제안이 그 자리로 온다.
   Future<void> _add(
     BuildContext context,
     WidgetRef ref,
     ActionSuggestion suggestion,
+    int slot,
   ) async {
-    if (suggestion.added) return;
+    if (suggestion.added || _justAdded.containsKey(suggestion.id)) return;
+    setState(() {
+      _justAdded[suggestion.id] = (
+        suggestion: suggestion.asAdded(),
+        slot: slot,
+      );
+    });
+    Future<void>.delayed(HomeLayout.suggestionSwapDelay, () {
+      if (mounted) setState(() => _justAdded.remove(suggestion.id));
+    });
     await ref
         .read(todoActionsProvider)
         .add(
@@ -93,6 +109,17 @@ class _HomeContentState extends ConsumerState<_HomeContent> {
           now: ref.read(clockProvider)(),
         );
     if (context.mounted) showAppToast(context, '체크리스트에 담았어요');
+  }
+
+  /// 화면에 보일 제안: 새로 계산된 제안 앞에 방금 담은 카드를 제자리에 끼워 넣고 두 장으로 자른다.
+  List<ActionSuggestion> _visibleSuggestions() {
+    final shown = [...summary.suggestions];
+    final kept = _justAdded.values.toList()
+      ..sort((a, b) => a.slot.compareTo(b.slot));
+    for (final k in kept) {
+      shown.insert(k.slot.clamp(0, shown.length), k.suggestion);
+    }
+    return shown.take(2).toList();
   }
 
   @override
@@ -156,28 +183,45 @@ class _HomeContentState extends ConsumerState<_HomeContent> {
                     ),
                   ),
               const SizedBox(height: HomeLayout.signalCardToGraph),
-              card(WeeklyEmotionCard(flow: summary.weeklyEmotion)),
-              const SizedBox(height: HomeLayout.graphToActionTitle),
-              const SectionTitleRow(title: '오늘 해볼까요?', trailingChevron: true),
-              const SizedBox(height: HomeLayout.sectionTitleToCard),
-              if (summary.suggestions.isEmpty)
-                card(
-                  Text(
-                    '관계 변화가 감지되면 해 볼 만한 일을 제안해 드려요.',
-                    style: AppTextStyles.body.copyWith(
-                      color: colors.textSecondary,
-                    ),
-                  ),
+              card(
+                WeeklyEmotionCard(
+                  flow: summary.weeklyEmotion,
+                  onTitleTap: () => context.go(AppRoutes.record),
                 ),
-              for (var i = 0; i < summary.suggestions.length; i++) ...[
+              ),
+              const SizedBox(height: HomeLayout.graphToActionTitle),
+              SectionTitleRow(
+                title: '오늘 해볼까요?',
+                trailingChevron: true,
+                onTitleTap: () => context.go(AppRoutes.all),
+              ),
+              const SizedBox(height: HomeLayout.sectionTitleToCard),
+              if (_visibleSuggestions().isEmpty)
+                card(
+                  summary.suggestionsDone
+                      ? _SuggestionsDone(
+                          onOpenChecklist: () => context.go(AppRoutes.all),
+                        )
+                      : Text(
+                          '관계 변화가 감지되면 해 볼 만한 일을 제안해 드려요.',
+                          style: AppTextStyles.body.copyWith(
+                            color: colors.textSecondary,
+                          ),
+                        ),
+                ),
+              for (final (i, s) in _visibleSuggestions().indexed) ...[
                 if (i > 0) const SizedBox(height: AppSpacing.actionCardGap),
                 card(
-                  ActionSuggestionCard(
-                    suggestion: summary.suggestions[i],
-                    onTap: () => context.push(
-                      AppRoutes.insightDetail(summary.suggestions[i].insightId),
+                  AnimatedSwitcher(
+                    duration: AppMotion.normal,
+                    switchInCurve: AppMotion.enter,
+                    child: ActionSuggestionCard(
+                      key: ValueKey(s.id),
+                      suggestion: s,
+                      onTap: () =>
+                          context.push(AppRoutes.insightDetail(s.insightId)),
+                      onAdd: () => _add(context, ref, s, i),
                     ),
-                    onAdd: () => _add(context, ref, summary.suggestions[i]),
                   ),
                 ),
               ],
@@ -192,6 +236,42 @@ class _HomeContentState extends ConsumerState<_HomeContent> {
           child: HomeTopBar(onLogoTap: _scrollToTop),
         ),
       ],
+    );
+  }
+}
+
+/// 제안을 모두 담았을 때의 한 줄 안내와 체크리스트로 가는 버튼.
+class _SuggestionsDone extends StatelessWidget {
+  const _SuggestionsDone({required this.onOpenChecklist});
+
+  final VoidCallback onOpenChecklist;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return AppCard.white(
+      padding: const EdgeInsets.all(AppSpacing.space20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '오늘 제안을 모두 담았어요',
+            style: AppTextStyles.groupTitle.copyWith(color: colors.textBlack),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '체크리스트에서 하나씩 해 보세요.',
+            style: AppTextStyles.body.copyWith(color: colors.textSecondary),
+          ),
+          const SizedBox(height: AppSpacing.space12),
+          CtaButton(
+            label: '체크리스트 보기',
+            height: 44,
+            variant: CtaVariant.soft,
+            onPressed: onOpenChecklist,
+          ),
+        ],
+      ),
     );
   }
 }
