@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: reborn-backend
+  datasource:
+    url: https://cblolxoebahefwbyhoqe.supabase.co
+    username: postgres
+    password: rlarbfl20100311..
+    driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: never
+server:
+  port: 8000
+
+reborn:
+  ai:
+    enabled: true

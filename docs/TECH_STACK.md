@@ -17,7 +17,8 @@
 | 라우팅 | `go_router` ^18.1.1 | `lib/app/router.dart`, 하단 탭은 `StatefulShellRoute.indexedStack`(탭마다 상태 유지) |
 | DB | Supabase PostgreSQL | 사용자별 접근은 RLS로 제한 |
 | 클라이언트 SDK | `supabase_flutter` 2.17.2 | 초기화: `lib/main.dart`, 설정: `lib/core/config/supabase_config.dart` |
-| 감정 분석·관계 지수 | Flutter 앱 내부 규칙 기반 계산 | 외부 AI·분석 API 없음 |
+| 일기 감정 분석 | Spring Boot 백엔드 → OpenAI Responses API | 키는 `OPENAI_API_KEY`로 설정, 본문 전송 전 사용자 동의 필요 |
+| 관계 지수·패턴 감지 | Flutter 앱 내부 규칙 기반 계산 | 순수 Dart 함수와 단위 테스트 |
 | DB 스키마 관리 | Supabase CLI 마이그레이션 | `supabase/migrations/` |
 | 린트 | `flutter_lints` 6 | `analysis_options.yaml` |
 | CI | GitHub Actions | `main` 대상 PR마다 `flutter analyze` + `flutter test` (`.github/workflows/flutter-ci.yml`) |
@@ -25,8 +26,8 @@
 ## 쓰지 않는 것
 
 - **Firebase / Firestore**: SPEC의 `users/{uid}/entries/{entryId}` 같은 경로는 Firestore 시절 표기입니다. PostgreSQL 테이블 + `user_id` 컬럼 + RLS로 읽어 주세요.
-- **외부 AI API**: 기록 본문을 외부로 보내지 않습니다 (SPEC 6.7).
-- **별도 서버**: 계산은 앱에서, 저장은 Supabase에서 합니다.
+- **AI 분석**: 사용자가 동의하고 분석을 요청한 일기 본문만 Spring Boot에서 OpenAI로 전송합니다. 그 외 본문은 분석 요청에 포함하지 않습니다.
+- 별도 백엔드 서버는 `backend/` Spring Boot 프로젝트입니다. 데이터는 Supabase PostgreSQL에 저장합니다.
 - **SwiftUI, WidgetKit, ActivityKit**: SPEC 6장 스택에 적혀 있지만 MVP 범위가 아닙니다.
 
 ## 폴더 구조
