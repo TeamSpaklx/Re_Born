@@ -1,6 +1,6 @@
-# 디자인 시스템
+# 홈 화면 디자인 명세 (Figma 값)
 
-Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만들 때 Figma에 접속하지 말고 이 문서와 `docs/design/`의 스크린샷을 기준으로 합니다.**
+홈 화면을 Figma에서 읽은 값(좌표·크기·에셋)을 정리한 문서입니다. **리본 전체의 규칙(색 역할·글자·간격·모션·컴포넌트·화면 패턴)은 [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)에 있고**, 이 문서는 그 규칙을 홈에 적용한 결과의 정확한 수치입니다.
 코드로 옮긴 값은 `lib/app/theme/`에 있으며, 화면 코드는 그 상수만 사용합니다 ([AGENTS.md](../AGENTS.md) UI 규칙).
 
 - 출처 표시: **Figma** = Figma 노드에서 읽은 값, **추정** = Figma에 없어서 정한 값(확인 필요)
@@ -216,20 +216,9 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 - 네이티브 탭 바는 탭을 누르면 Dart로 index를 알리고(`onTap`), Dart에서 탭이 바뀌면(화면 안 버튼 등) 선택 표시를 맞춥니다(`setSelectedIndex`). 같은 탭을 다시 누르면 그 탭의 첫 화면으로 돌아갑니다.
 - **스크롤 가장자리 효과(Figma `Scroll Edge Effect - Soft`)는 쓰지 않습니다.** 탭 바 뒤에서 내용이 흐려지는 구간(블러·배경색 베일)을 요청으로 제거했습니다(2026-10-23). 내용은 탭 바 뒤로 그대로 지나갑니다.
 
-### 5.9 공통 컴포넌트 (`lib/shared/widgets/`)
+### 5.9 공통 컴포넌트
 
-**Figma에 없는 컴포넌트입니다. 토스 설정·로그아웃 화면의 구조(둥근 모달 + 두 버튼, 둥근 카드로 묶은 설정 목록)를 참고하고 Reborn 색·모서리로 정한 추정 디자인입니다(확인 필요).** 머티리얼(구글) 위젯은 쓰지 않습니다. 치수는 `ComponentLayout`(`app_spacing.dart`), 색은 `AppColors`, 모서리는 `AppRadii`에 있습니다.
-
-| 컴포넌트 | 위젯 | 모양과 동작 |
-|---|---|---|
-| 토글 | `AppToggle` | iOS식 알약 51×31, 흰 동그라미 27(그림자 약하게), 켜짐 `brand` / 꺼짐 `toggleOff`, 200ms 이동, 누르면 햅틱, 누르는 영역 최소 44, 접근성 `toggled` |
-| 모달 | `showAppDialog` / `showAppConfirmDialog` | 흰 둥근 창(모서리 28, 안쪽 24, 좌우 여백 24), 왼쪽 정렬 제목(`sectionTitle`)·설명(`body` `textSecondary`), 가림막 `scrim`, 페이드+0.96→1 확대 200ms. 버튼 높이 52·모서리 12: 취소 = `chip` 배경 + `textStrong`, 확인 = `brand` + 흰 글자, 위험(`destructive`) = `dangerTile` + `danger` 글자. 버튼 2개 이하는 가로, 3개 이상은 세로 |
-| 토스트 | `showAppToast` | 어두운 둥근 상자(`toastFill`, 모서리 16, 가로 20·세로 14) + 흰 `body` 글자, 탭 바 위 16(화면 아래에서 `max(시스템 여백, 34) + 64 + 16`), 아래에서 12 올라오며 나타남(250ms) → 총 3초 → 사라짐. 새 토스트는 이전 것을 바로 대체, 터치는 아래로 통과 |
-| 설정 목록 | `SettingsGroup` / `SettingsRow` | 흰 카드(모서리 24)에 행을 묶음, 좌우 20, 선택적 제목(`groupTitle` Bold 16, 높이 52). 행 높이 56, 제목 `rowTitle`(Medium 16): 토글 행(오른쪽 `AppToggle`) / 링크 행(값 글자 `brand` + `chevron_signal`) / 위험 행(`danger` 글자) |
-| 글자 버튼 | `AppTextButton` | 글자만 있는 버튼(최소 44), 눌리면 흐려짐 |
-| 눌림 효과 | `Pressable` | 머티리얼 번짐(리플) 대신 눌린 동안 불투명도 0.7 |
-
-전체 탭 설정(`SettingsSection`)이 이 컴포넌트로 만들어져 있습니다(동의 3개 = 토글 행, 기록 전체 삭제·계정 삭제 = 위험 행). 기록 입력 화면의 인물 고르기 바텀시트는 아직 머티리얼 `ListTile`입니다(후속 작업).
+토글·모달·토스트·설정 목록 등 공통 컴포넌트는 [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md) 7장(컴포넌트 카탈로그)으로 옮겼습니다.
 
 ## 6. 에셋 목록
 
@@ -286,4 +275,4 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 - 화면 코드에 색(`Color(0x…)`), 글자 크기·굵기·자간, 모서리, 에셋 경로를 직접 쓰지 않습니다. 없는 값이 필요하면 `lib/app/theme/`에 상수를 추가하고 이 문서에도 적습니다.
 - 값을 바꾸면 이 문서, `lib/app/theme/`, `test/app/theme/app_theme_test.dart`를 같이 고칩니다.
 - 구현한 화면은 iOS 시뮬레이터와 Android 에뮬레이터에서 실행해 `docs/design/`의 스크린샷과 나란히 비교합니다.
-- **머티리얼(구글) 위젯을 화면에서 직접 쓰지 않습니다**: `Switch`, `SnackBar`, `AlertDialog`/`Dialog`+`TextButton`, `InkWell` 번짐 효과 대신 `lib/shared/widgets/`의 `AppToggle`, `showAppToast`, `showAppConfirmDialog`/`showAppDialog`, `SettingsGroup`/`SettingsRow`, `AppTextButton`, `Pressable`을 씁니다(5.9).
+- (DESIGN_SYSTEM.md 9장으로 이동) **머티리얼(구글) 위젯을 화면에서 직접 쓰지 않습니다**: `Switch`, `SnackBar`, `AlertDialog`/`Dialog`+`TextButton`, `InkWell` 번짐 효과 대신 `lib/shared/widgets/`의 `AppToggle`, `showAppToast`, `showAppConfirmDialog`/`showAppDialog`, `SettingsGroup`/`SettingsRow`, `AppTextButton`, `Pressable`을 씁니다(5.9).

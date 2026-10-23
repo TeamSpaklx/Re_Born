@@ -10,7 +10,7 @@ import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/centered_line.dart';
 import '../../models/weekly_emotion_flow.dart';
 
-/// "이번 주 감정 흐름" 그래프 카드 (높이 180). 좌표는 테두리 안쪽 기준(docs/DESIGN_SYSTEM.md 5.5).
+/// "이번 주 감정 흐름" 그래프 카드 (높이 180). 좌표는 테두리 안쪽 기준(docs/DESIGN_HOME.md 5.5).
 /// 폭이 디자인(안쪽 350)과 다르면 가로 좌표만 같은 비율로 늘리고 줄인다.
 class WeeklyEmotionCard extends StatelessWidget {
   const WeeklyEmotionCard({super.key, required this.flow});

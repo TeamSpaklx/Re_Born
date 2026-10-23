@@ -1,12 +1,14 @@
 import 'package:flutter/widgets.dart';
 
+import '../../app/theme/app_motion.dart';
+
 /// 눌린 동안 살짝 흐려지는 탭 영역. 머티리얼 `InkWell`의 번짐(리플) 효과 대신 쓴다.
 class Pressable extends StatefulWidget {
   const Pressable({
     super.key,
     required this.onTap,
     required this.child,
-    this.pressedOpacity = 0.7,
+    this.pressedOpacity = AppMotion.pressedOpacity,
     this.behavior = HitTestBehavior.opaque,
   });
 
@@ -37,7 +39,7 @@ class _PressableState extends State<Pressable> {
       onTapCancel: enabled ? () => _set(false) : null,
       child: AnimatedOpacity(
         opacity: _pressed ? widget.pressedOpacity : 1,
-        duration: const Duration(milliseconds: 80),
+        duration: AppMotion.press,
         child: widget.child,
       ),
     );

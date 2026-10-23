@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,6 +13,7 @@ import '../features/relations/presentation/person_detail_screen.dart';
 import '../features/relations/presentation/person_form_screen.dart';
 import '../features/relations/presentation/relations_screen.dart';
 import '../features/splash/presentation/splash_screen.dart';
+import '../shared/dev/design_gallery_screen.dart';
 import 'main_shell.dart';
 import 'theme/app_spacing.dart';
 
@@ -19,6 +21,9 @@ import 'theme/app_spacing.dart';
 /// 순서는 하단 탭 순서(투데이 / 관계 / 기록 / 전체)와 같다.
 abstract final class AppRoutes {
   static const splash = '/splash';
+
+  /// 디자인 갤러리(개발용). 디버그 빌드에서만 등록된다.
+  static const devGallery = '/dev/gallery';
 
   static const today = '/today';
   static const relations = '/relations';
@@ -48,6 +53,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.splash,
         builder: (context, state) => const SplashScreen(),
       ),
+      if (kDebugMode)
+        GoRoute(
+          path: AppRoutes.devGallery,
+          builder: (context, state) => const DesignGalleryScreen(),
+        ),
       GoRoute(
         path: AppRoutes.recordNew,
         builder: (context, state) => const RecordFormScreen(),

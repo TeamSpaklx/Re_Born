@@ -9,7 +9,7 @@ import '../../../../shared/widgets/centered_line.dart';
 import '../../../../shared/widgets/cta_button.dart';
 
 /// 오늘 아직 기록하지 않았을 때의 카드 (Figma `UnWrite` Before 최신 안: 흰색 + 테두리 1px, 높이 268,
-/// 버튼 뒤에서 여우원숭이가 얼굴을 내민다, docs/DESIGN_SYSTEM.md 5.2).
+/// 버튼 뒤에서 여우원숭이가 얼굴을 내민다, docs/DESIGN_HOME.md 5.2).
 class RecordCardBefore extends StatelessWidget {
   const RecordCardBefore({super.key, required this.onRecord});
 
@@ -80,7 +80,7 @@ class RecordCardBefore extends StatelessWidget {
           CtaButton(
             label: '감정 기록하기',
             height: HomeLayout.ctaButtonHeightBefore,
-            soft: true,
+            variant: CtaVariant.soft,
             onPressed: onRecord,
           ),
         ],

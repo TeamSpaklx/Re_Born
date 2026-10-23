@@ -45,6 +45,15 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.scrim,
     required this.topBarTint,
     required this.splashBackground,
+    required this.skeleton,
+    required this.emotionJoy,
+    required this.emotionGratitude,
+    required this.emotionExcitement,
+    required this.emotionCalm,
+    required this.emotionHurt,
+    required this.emotionAnxiety,
+    required this.emotionAnger,
+    required this.emotionSadness,
   });
 
   /// 브랜드 핑크: 그래프 막대, 활성 탭, 강조 숫자, 출석 알약.
@@ -119,6 +128,33 @@ class AppColors extends ThemeExtension<AppColors> {
   /// 스플래시 화면 배경: 흰색(Figma `289:1723`). 화면 배경(`#FFF8F8`)과 다르다. iOS·Android 시작 화면도 흰색이라 이어서 보인다.
   final Color splashBackground;
 
+  /// 로딩 스켈레톤 블록 (흰 카드·#FFF8F8 배경 둘 다에서 보이는 연한 핑크 회색, 추정).
+  final Color skeleton;
+
+  /// 감정 8색(캐릭터 에셋이 오면 에셋의 대표색으로 교체, 지금은 임시 파스텔·추정): 기쁨
+  final Color emotionJoy;
+
+  /// 감사
+  final Color emotionGratitude;
+
+  /// 설렘
+  final Color emotionExcitement;
+
+  /// 평온
+  final Color emotionCalm;
+
+  /// 서운함
+  final Color emotionHurt;
+
+  /// 불안
+  final Color emotionAnxiety;
+
+  /// 분노
+  final Color emotionAnger;
+
+  /// 슬픔
+  final Color emotionSadness;
+
   /// Figma 홈 화면에서 읽은 라이트 팔레트.
   static const light = AppColors(
     brand: Color(0xFFFF6090),
@@ -158,6 +194,15 @@ class AppColors extends ThemeExtension<AppColors> {
     scrim: Color(0x80000000),
     topBarTint: Color(0x1AFFFFFF),
     splashBackground: Color(0xFFFFFFFF),
+    skeleton: Color(0xFFF1EAED),
+    emotionJoy: Color(0xFFFFD66B),
+    emotionGratitude: Color(0xFFFFB38A),
+    emotionExcitement: Color(0xFFFF9CC2),
+    emotionCalm: Color(0xFF9FD8C0),
+    emotionHurt: Color(0xFF9DB4F2),
+    emotionAnxiety: Color(0xFFC5A8EE),
+    emotionAnger: Color(0xFFF27B72),
+    emotionSadness: Color(0xFF9FB7C9),
   );
 
   @override
@@ -199,6 +244,15 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? scrim,
     Color? topBarTint,
     Color? splashBackground,
+    Color? skeleton,
+    Color? emotionJoy,
+    Color? emotionGratitude,
+    Color? emotionExcitement,
+    Color? emotionCalm,
+    Color? emotionHurt,
+    Color? emotionAnxiety,
+    Color? emotionAnger,
+    Color? emotionSadness,
   }) {
     return AppColors(
       brand: brand ?? this.brand,
@@ -238,6 +292,15 @@ class AppColors extends ThemeExtension<AppColors> {
       scrim: scrim ?? this.scrim,
       topBarTint: topBarTint ?? this.topBarTint,
       splashBackground: splashBackground ?? this.splashBackground,
+      skeleton: skeleton ?? this.skeleton,
+      emotionJoy: emotionJoy ?? this.emotionJoy,
+      emotionGratitude: emotionGratitude ?? this.emotionGratitude,
+      emotionExcitement: emotionExcitement ?? this.emotionExcitement,
+      emotionCalm: emotionCalm ?? this.emotionCalm,
+      emotionHurt: emotionHurt ?? this.emotionHurt,
+      emotionAnxiety: emotionAnxiety ?? this.emotionAnxiety,
+      emotionAnger: emotionAnger ?? this.emotionAnger,
+      emotionSadness: emotionSadness ?? this.emotionSadness,
     );
   }
 
@@ -283,6 +346,15 @@ class AppColors extends ThemeExtension<AppColors> {
       scrim: mix(scrim, other.scrim),
       topBarTint: mix(topBarTint, other.topBarTint),
       splashBackground: mix(splashBackground, other.splashBackground),
+      skeleton: mix(skeleton, other.skeleton),
+      emotionJoy: mix(emotionJoy, other.emotionJoy),
+      emotionGratitude: mix(emotionGratitude, other.emotionGratitude),
+      emotionExcitement: mix(emotionExcitement, other.emotionExcitement),
+      emotionCalm: mix(emotionCalm, other.emotionCalm),
+      emotionHurt: mix(emotionHurt, other.emotionHurt),
+      emotionAnxiety: mix(emotionAnxiety, other.emotionAnxiety),
+      emotionAnger: mix(emotionAnger, other.emotionAnger),
+      emotionSadness: mix(emotionSadness, other.emotionSadness),
     );
   }
 }

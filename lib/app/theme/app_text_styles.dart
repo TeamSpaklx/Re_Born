@@ -67,6 +67,10 @@ abstract final class AppTextStyles {
   static final rowTitle = _style(16, _medium, -0.4);
   static final groupTitle = _style(16, _bold, -0.4);
 
+  /// 목록 구획 머리글("오늘", "지난 알림") 14 SemiBold, 뱃지 숫자 11 Bold.
+  static final sectionLabel = _style(14, _semiBold, -0.35);
+  static final badge = _style(11, _bold, -0.2);
+
   /// 감정 그래프 카드 제목.
   static final graphTitle = _style(14, _semiBold, -0.35);
 

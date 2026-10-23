@@ -17,6 +17,7 @@ import 'home_providers.dart';
 import 'widgets/action_suggestion_card.dart';
 import 'widgets/home_error_view.dart';
 import 'widgets/home_greeting.dart';
+import 'widgets/home_skeleton.dart';
 import 'widgets/home_top_bar.dart';
 import 'widgets/record_card_after.dart';
 import 'widgets/record_card_before.dart';
@@ -37,8 +38,7 @@ class TodayScreen extends ConsumerWidget {
       backgroundColor: background,
       body: summary.when(
         data: (data) => _HomeContent(summary: data),
-        // 로딩 화면(스켈레톤)은 디자인이 나오면 만든다. 그때까지는 배경만 보인다.
-        loading: () => const SizedBox.expand(),
+        loading: () => const HomeSkeleton(),
         error: (error, stack) =>
             HomeErrorView(onRetry: () => ref.invalidate(homeSummaryProvider)),
       ),

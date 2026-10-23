@@ -1,5 +1,5 @@
 /// 에셋 경로 상수. 문자열 경로를 화면에서 직접 쓰지 않는다.
-/// 파일과 Figma 노드의 대응은 docs/DESIGN_SYSTEM.md의 에셋 목록 참고.
+/// 파일과 Figma 노드의 대응은 docs/DESIGN_HOME.md의 에셋 목록 참고.
 abstract final class AppAssets {
   static const _icons = 'assets/icons/ui';
 

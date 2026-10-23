@@ -10,7 +10,7 @@ import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/centered_line.dart';
 import '../../models/relation_signal.dart';
 
-/// "최근 관계 신호" 카드 하나 (높이 104). 좌표는 테두리 안쪽 기준(docs/DESIGN_SYSTEM.md 5.4).
+/// "최근 관계 신호" 카드 하나 (높이 104). 좌표는 테두리 안쪽 기준(docs/DESIGN_HOME.md 5.4).
 class RelationSignalCard extends StatelessWidget {
   const RelationSignalCard({
     super.key,

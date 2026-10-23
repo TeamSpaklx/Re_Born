@@ -1,6 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../app/router.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_dialogs.dart';
@@ -93,6 +96,18 @@ class SettingsSection extends ConsumerWidget {
             ),
           ],
         ),
+        if (kDebugMode) ...[
+          const SizedBox(height: 12),
+          SettingsGroup(
+            children: [
+              SettingsRow.link(
+                key: const Key('open-design-gallery'),
+                title: '디자인 갤러리 (개발용)',
+                onTap: () => context.push(AppRoutes.devGallery),
+              ),
+            ],
+          ),
+        ],
         const SizedBox(height: 16),
         Text(
           '리본은 의료·상담 서비스가 아니에요. 힘든 마음이 계속되면 가까운 사람이나 전문 기관의 도움을 받아 보세요.',

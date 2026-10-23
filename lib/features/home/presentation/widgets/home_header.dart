@@ -12,7 +12,7 @@ class HomeHeader extends StatelessWidget {
   /// 로고를 눌렀을 때(화면 맨 위로 이동).
   final VoidCallback? onLogoTap;
 
-  // 로고 PNG는 안쪽 여백이 있어 Figma가 영역 안에서 이만큼 옮겨 그린다(DESIGN_SYSTEM.md 5.1).
+  // 로고 PNG는 안쪽 여백이 있어 Figma가 영역 안에서 이만큼 옮겨 그린다(DESIGN_HOME.md 5.1).
   static const _logoLeftFraction = -0.1132;
   static const _logoTopFraction = -0.0064;
   static const _bellInsetFraction = 0.1818;

@@ -1,5 +1,5 @@
 /// 하단 탭 바 치수. Figma `ButtonNavigator[Liquid Glass]`(289:1158)에서 읽은 값이며
-/// 출처는 docs/DESIGN_SYSTEM.md.
+/// 출처는 docs/DESIGN_HOME.md.
 ///
 /// iOS는 Figma 값 그대로(반투명 흰색 + 테두리 + 그림자), Android는 같은 치수에
 /// 배경 블러를 더한다. Android 값은 Figma에 없어 추정이다.

@@ -1,6 +1,6 @@
 import 'dart:ui' show Offset;
 
-/// 간격과 크기. Figma 홈 화면(402×874 기준)에서 읽은 값이며 출처는 docs/DESIGN_SYSTEM.md.
+/// 간격과 크기. Figma 홈 화면(402×874 기준)에서 읽은 값이며 출처는 docs/DESIGN_HOME.md.
 ///
 /// 화면 폭은 좌우 여백 [pageMargin]을 고정하고 카드가 남는 폭을 채운다(402일 때 354).
 abstract final class AppSpacing {
@@ -10,6 +10,21 @@ abstract final class AppSpacing {
 
   /// 좌우 여백.
   static const pageMargin = 24.0;
+
+  /// 간격 스케일(4pt 체계). 새 화면의 여백·간격은 이 값 중에서 고른다.
+  /// 홈 화면의 Figma 좌표값(22, 27, 35 등)은 아래 `HomeLayout`에 따로 둔다.
+  static const space4 = 4.0;
+  static const space8 = 8.0;
+  static const space12 = 12.0;
+  static const space16 = 16.0;
+  static const space20 = 20.0;
+  static const space24 = 24.0;
+  static const space32 = 32.0;
+  static const space40 = 40.0;
+  static const space48 = 48.0;
+
+  /// 터치할 수 있는 요소의 최소 크기(접근성).
+  static const minTouchTarget = 44.0;
 
   /// 카드 폭 (디자인 기준, 실제로는 화면 폭 − 좌우 여백 × 2).
   static const designCardWidth = 354.0;
@@ -180,6 +195,38 @@ abstract final class ComponentLayout {
   static const toastPaddingH = 20.0;
   static const toastPaddingV = 14.0;
   static const toastRiseOffset = 12.0;
+
+  // 입력창
+  static const inputBorderWidth = 1.5;
+  static const inputPadding = 16.0;
+
+  // 세그먼트 컨트롤
+  static const segmentedHeight = 44.0;
+  static const segmentedPadding = 4.0;
+
+  // 바텀시트
+  static const sheetHandleWidth = 40.0;
+  static const sheetHandleHeight = 4.0;
+  static const sheetMaxHeightFraction = 0.9;
+  static const sheetOptionHeight = 56.0;
+
+  // 하단 고정 CTA 바
+  static const ctaBarTop = 12.0;
+  static const ctaBarBottom = 16.0;
+  static const ctaButtonHeight = 52.0;
+
+  // 체크 행 · 프로필 행 · 뱃지
+  static const checkSize = 24.0;
+  static const profileAvatarSize = 56.0;
+  static const badgeDot = 8.0;
+  static const badgeCountHeight = 18.0;
+
+  // 빈·오류 상태
+  static const stateMascotSize = 120.0;
+  static const stateButtonWidth = 200.0;
+
+  // 스켈레톤
+  static const skeletonPulseMin = 0.55;
 
   // 설정 목록
   static const settingsRowHeight = 56.0;

@@ -9,18 +9,24 @@ import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_text_styles.dart';
 import 'app_text_button.dart';
 
-/// 탭 위로 쌓이는 전체 화면(작성·상세 등)의 공통 틀: 뒤로 가기 + 제목 + 오른쪽 동작. 임시 디자인.
+/// 탭 위로 쌓이는 전체 화면(작성·상세 등)의 공통 틀: 뒤로 가기 + 제목 + 오른쪽 동작.
+/// - [largeTitle]: 제목을 위 바 가운데 대신 바 아래에 크고 굵게(26) 놓는다(토스식 큰 제목 화면).
+/// - [bottom]: 화면 맨 아래에 고정되는 영역(보통 [BottomCtaBar]).
 class PageScaffold extends StatelessWidget {
   const PageScaffold({
     super.key,
     required this.title,
     required this.body,
     this.actions = const [],
+    this.largeTitle = false,
+    this.bottom,
   });
 
   final String title;
   final Widget body;
   final List<Widget> actions;
+  final bool largeTitle;
+  final Widget? bottom;
 
   @override
   Widget build(BuildContext context) {
@@ -59,19 +65,43 @@ class PageScaffold extends StatelessWidget {
                       ),
                     ),
                     Expanded(
-                      child: Text(
-                        title,
-                        style: AppTextStyles.sectionTitle.copyWith(
-                          color: colors.textBlack,
-                        ),
-                      ),
+                      child: largeTitle
+                          ? const SizedBox.shrink()
+                          : Text(
+                              title,
+                              style: AppTextStyles.sectionTitle.copyWith(
+                                color: colors.textBlack,
+                              ),
+                            ),
                     ),
                     ...actions,
                   ],
                 ),
               ),
             ),
+            if (largeTitle)
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.pageMargin,
+                    AppSpacing.space8,
+                    AppSpacing.pageMargin,
+                    AppSpacing.space16,
+                  ),
+                  child: Semantics(
+                    header: true,
+                    child: Text(
+                      title,
+                      style: AppTextStyles.greeting.copyWith(
+                        color: colors.textBlack,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             Expanded(child: body),
+            ?bottom,
           ],
         ),
       ),

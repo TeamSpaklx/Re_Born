@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +11,8 @@ import 'app/router.dart';
 import 'core/config/supabase_config.dart';
 import 'core/errors/app_error_log.dart';
 import 'core/errors/error_handlers.dart';
+
+const _initialRoute = String.fromEnvironment('INITIAL_ROUTE');
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,7 +40,12 @@ Future<void> main() async {
     ProviderScope(
       overrides: [
         appErrorLogProvider.overrideWithValue(errorLog),
-        initialLocationProvider.overrideWithValue(AppRoutes.splash),
+        // 개발 중 특정 화면에서 바로 시작하려면: flutter run --dart-define=INITIAL_ROUTE=/dev/gallery
+        initialLocationProvider.overrideWithValue(
+          kDebugMode && _initialRoute.isNotEmpty
+              ? _initialRoute
+              : AppRoutes.splash,
+        ),
       ],
       child: const RebornApp(),
     ),
