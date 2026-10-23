@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app/app.dart';
+import 'app/router.dart';
 import 'core/config/supabase_config.dart';
 import 'core/errors/app_error_log.dart';
 import 'core/errors/error_handlers.dart';
@@ -37,7 +38,10 @@ Future<void> main() async {
 
   runApp(
     ProviderScope(
-      overrides: [appErrorLogProvider.overrideWithValue(errorLog)],
+      overrides: [
+        appErrorLogProvider.overrideWithValue(errorLog),
+        initialLocationProvider.overrideWithValue(AppRoutes.splash),
+      ],
       child: const RebornApp(),
     ),
   );
