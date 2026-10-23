@@ -223,6 +223,7 @@ class _PersonDetailScreenState extends ConsumerState<PersonDetailScreen> {
                               child: ColoredBox(color: colors.cardWhite),
                             ),
                             FractionallySizedBox(
+                              heightFactor: 1,
                               widthFactor: (index.index / 100)
                                   .clamp(0, 1)
                                   .toDouble(),

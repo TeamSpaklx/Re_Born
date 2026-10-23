@@ -128,6 +128,7 @@ class PersonCard extends StatelessWidget {
                                 child: ColoredBox(color: colors.chip),
                               ),
                               FractionallySizedBox(
+                                heightFactor: 1,
                                 widthFactor: (index / 100)
                                     .clamp(0, 1)
                                     .toDouble(),

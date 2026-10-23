@@ -158,6 +158,7 @@ class _ChecklistSectionState extends ConsumerState<ChecklistSection> {
                   duration: AppMotion.normal,
                   curve: AppMotion.move,
                   alignment: Alignment.centerLeft,
+                  heightFactor: 1,
                   widthFactor: rate / 100,
                   child: ColoredBox(color: colors.brand),
                 ),

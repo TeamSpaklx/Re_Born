@@ -233,8 +233,26 @@
 | 빈 상태 `EmptyState` | `empty_state.dart` | (마스코트 120) + 제목(18) + 설명(14) + (소프트 버튼 48). 한 줄 문구는 8장 | ✅ |
 | 오류 상태 `ErrorState` | `empty_state.dart` | "불러오지 못했어요" + "잠시 뒤에 다시 시도해 주세요." + "다시 시도". 오류 원인(기술 문구)은 보이지 않음 | ✅ |
 
-### 7.6 아직 없는 컴포넌트 (화면 롤아웃 때 만들 것)
-레퍼런스는 [references/INDEX.md](./design/references/INDEX.md)에 있습니다. 감정 선택 격자(3열 + 큰 질문 제목), 월 달력(날짜 원 + 감정 표시 + 선택일 상세), 선 그래프(곡선 + 점 + 영역, 기간 세그먼트), 도넛 차트 + 범례, 진행 막대(온보딩 단계), 선택 카드 쌓기(온보딩·관계 유형), 전체 동의 체크 행(약관), 권한 안내 행, 요약 카드(2열 수치), 탭 밑줄 인디케이터, 스와이프 삭제.
+### 7.6 화면 흐름용 컴포넌트 (구현됨, 디버그 갤러리 "감정·기록" 이하에서 확인)
+| 컴포넌트 | 파일 | 쓰는 곳 |
+|---|---|---|
+| `EmotionFace` | `features/entries/.../emotion_face.dart` | 감정 캐릭터 자리 표시(색 원 + 표정 8종). 정식 에셋이 오면 이 위젯 안쪽만 이미지로 교체 |
+| `EmotionPicker`, `EmotionRatioBar` | `emotion_picker.dart` | 기록 작성의 감정 선택(4열×2행), 감정 비율 막대 |
+| `MonthCalendar` | `shared/widgets/month_calendar.dart` | 기록 탭 달력(날짜 아래 마커, 미래 날짜 비활성) |
+| `DonutChart` | `donut_chart.dart` | 인물 상세 감정 분포 |
+| `IndexLineChart` | `features/relations/.../index_line_chart.dart` | 관계 지수 곡선 + 영역 + 오늘 점 |
+| `StepProgressBar` | `step_progress_bar.dart` | 가입 4단계 |
+| `SelectCard` | `select_card.dart` | 온보딩 관계 유형 |
+| `ConsentRow` | `consent_row.dart` | 약관 동의(전체 동의 강조형 포함) |
+| `PermissionRow` | `permission_row.dart` | 알림 안내 |
+| `SummaryCard` | `summary_card.dart` | 전체 탭·관계 탭·인사이트 상세의 수치 2~3칸 |
+| `AppTabBar` | `app_tab_bar.dart` | 알림 "전체/안 읽음" 밑줄 탭 |
+| `NotificationRow` | `notification_row.dart` | 알림 목록(읽지 않음 강조) |
+| `SwipeToDelete` | `swipe_to_delete.dart` | 기록·체크리스트 밀어서 삭제(확인 팝업 선택) |
+| `AppFab` | `app_fab.dart` | 기록 탭 "기록하기"(`TabPageScaffold.floating`) |
+| `IntensitySelector` | `features/record/.../intensity_selector.dart` | 감정 강도 1~3 |
+
+아직 없는 것: 날짜 휠 시트.
 
 ## 8. 화면 패턴
 
@@ -282,7 +300,7 @@
 2. 위험·오류 색(`danger`/`dangerTile`), 토스트·가림막 색, 스켈레톤 색, 토글 꺼짐 색, 모달 확인 버튼 색.
 3. 모션 값(지속시간·곡선)과 "움직임 줄이기" 전체 대응.
 4. 핑크 on 흰색의 대비(AA 미달 가능), 접근성 검사.
-5. 월 달력·감정 선택 격자·선 그래프·도넛·온보딩·약관·알림 화면의 정확한 치수(Figma 프레임이 `W8guq…` 파일에 있으나 MCP 호출 한도로 읽지 못함 → 읽으면 Figma 기준으로 교정).
+5. 월 달력·감정 선택 격자·곡선 그래프·도넛·가입·온보딩·약관·알림 화면은 레퍼런스(INDEX.md)를 해석해 만든 것이라 치수가 추정이다(Figma 프레임이 `W8guq…` 파일에 있으나 MCP 호출 한도로 읽지 못함 → 읽으면 Figma 기준으로 교정). 위기 안내의 상담 전화번호(109·1577-0199·1388)도 출시 전에 공식 안내로 확인한다.
 6. 홈 외 화면의 Figma 프레임과 이 문서의 컴포넌트 규칙이 어긋나는 부분.
 7. Home After(`466:2704`)의 최신 안.
 8. 아직 레퍼런스가 없는 화면: 체크리스트, 기록 작성 폼, 인물 목록·추가·상세(밝은 화면), 약관 동의, 이메일 가입(한국어), 인사이트 상세, 위기 안내, 한국어 오류·빈 상태, 계정 삭제 흐름([INDEX.md](./design/references/INDEX.md) C).

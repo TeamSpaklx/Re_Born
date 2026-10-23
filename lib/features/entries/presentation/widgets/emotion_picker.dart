@@ -117,6 +117,7 @@ class EmotionRatioBar extends StatelessWidget {
           child: SizedBox(
             height: 12,
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 for (final e in sorted)
                   Expanded(

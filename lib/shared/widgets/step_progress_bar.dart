@@ -28,6 +28,7 @@ class StepProgressBar extends StatelessWidget {
               AnimatedFractionallySizedBox(
                 duration: AppMotion.normal,
                 curve: AppMotion.move,
+                heightFactor: 1,
                 widthFactor: (current / total).clamp(0, 1).toDouble(),
                 alignment: Alignment.centerLeft,
                 child: ColoredBox(color: colors.brand),
