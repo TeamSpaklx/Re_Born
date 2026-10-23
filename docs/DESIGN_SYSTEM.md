@@ -4,11 +4,13 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 코드로 옮긴 값은 `lib/app/theme/`에 있으며, 화면 코드는 그 상수만 사용합니다 ([AGENTS.md](../AGENTS.md) UI 규칙).
 
 - 출처 표시: **Figma** = Figma 노드에서 읽은 값, **추정** = Figma에 없어서 정한 값(확인 필요)
+- **2026-10-23에 홈 수정안(`8632:1470`)이 나와 아래 값이 바뀌었습니다.** 화면 배경 `#FFF8F8`, 상단 핑크 그라디언트 없음, 기록 카드(Before)가 흰색 카드로, 카드 테두리 없음, 막대 색 3단계. After(`466:2704`)는 수정안이 없어 핑크 카드 그대로입니다(확인 필요).
 - Figma: [홈 화면 섹션](https://www.figma.com/design/W8guqOac0W71P3l7e23ZsN/%E1%84%85%E1%85%B5%E1%84%87%E1%85%A9%E1%86%ABRe_born-%E1%84%83%E1%85%B5%E1%84%8C%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%AB?node-id=654-827) (파일 `W8guqOac0W71P3l7e23ZsN`, 섹션 `654:827`). 2026-10-21에 디자인이 새 Figma 파일로 옮겨지면서 색과 탭 바 "전체" 아이콘이 바뀌었습니다(노드 ID는 그대로, 이전 파일 `PJNOc5b1S7pmmtoObtP9mw`).
 
 | 노드 | ID | 스크린샷 |
 |---|---|---|
-| 홈 Home[Before] (402×1205) | `282:160` | [design/home_before.png](./design/home_before.png) |
+| 홈 Home[Before] **수정안** (402×1205) | `8632:1470` (2026-10-23, 페이지 `02_DesignSystemScreen`) | [design/home_before.png](./design/home_before.png) |
+| 홈 Home[Before] 이전 안 | `282:160` | [design/home_before_v1.png](./design/home_before_v1.png) |
 | 홈 Home[After] (402×1407) | `466:2704` | [design/home_after.png](./design/home_after.png) |
 | ButtonNavigator[Liquid Glass] (4개 상태) | `289:1158` | [design/bottom_nav.png](./design/bottom_nav.png) |
 
@@ -31,9 +33,8 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 | 브랜드 핑크 (막대·활성 탭·강조 숫자·출석 알약) | `brand` | `#FF6090` | Figma |
 | 주요 버튼 배경 | `cta` | `#FF6090` (지금은 `brand`와 같은 값, 나중에 달라질 수 있어 이름을 나눠 둠) | Figma |
 | 버튼 글자 | `onCta` | `#FFFFFF` | Figma |
-| 화면 배경 | `background` | `#FFFFFF` | Figma |
-| 상단 그라디언트 시작 | `backgroundGradientTop` | `rgba(217,79,121,0.8)` → 흰색 | Figma |
-| 기록 카드(핑크) | `cardPink` | `#FEDAE5` | Figma |
+| 화면 배경 | `background` | `#FFF8F8` (수정안, 이전 `#FFFFFF`) | Figma |
+| 기록 카드(핑크, After·상세 화면) | `cardPink` | `#FEDAE5` | Figma |
 | 흰 카드 / 테두리 | `cardWhite` / `cardBorder` | `#FFFFFF` / `#EEE6E9` | Figma |
 | 글자 검정 | `textBlack` | `#000000` | Figma |
 | 글자 진한 회색 | `textStrong` | `#1A1A1A` | Figma |
@@ -42,6 +43,14 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 | 그래프 설명 글자 | `textGraphCaption` | `#70757F` | Figma |
 | 그래프 이모지 | `emoji` | `#A0A7B4` | Figma |
 | 칩 배경 | `chip` | `#F0F2F3` | Figma |
+| 기록 카드(Before) 부제 | `recordCardSubtitle` | `#7D8492` | Figma 수정안 |
+| 연한 핑크 버튼 / 그 위 글자 | `ctaSoft` / `onCtaSoft` | `#FFAFC7` / `#000000` | Figma 수정안 |
+| 그래프 막대 3단계 | `barStrong` / `barMid` / `barLight` | `#D94F79`(Figma 변수 `브랜드 컬러`) / `#FF80A6` / `#FFB3CA` | Figma 수정안 |
+| 홈 상단 바 덮개 | `topBarTint` | `rgba(255,255,255,0.1)` | Figma 수정안 |
+| 토글 꺼짐 | `toggleOff` | `#E8D5DA` (팔레트 색) | **추정** |
+| 위험 글자 / 위험 버튼 배경 | `danger` / `dangerTile` | `#E5484D` / `#FDECEE` | **추정** |
+| 토스트 배경 | `toastFill` | `#1A1A1A` 불투명도 90% | **추정** |
+| 모달 뒤 가림막 | `scrim` | 검정 50% | **추정** |
 | 아바타 배경 | `avatar` | `#D9D9D9` | Figma |
 | 아이콘 타일 배경 | `iconTile` | `rgba(217,217,217,0.5)` | Figma |
 | 그래프 격자선 | `gridLine` | `rgba(160,167,180,0.5)` | Figma |
@@ -53,7 +62,9 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 | 탭 바 그림자 | `navShadow` | `rgba(0,0,0,0.1)` | Figma |
 | 탭 바 선택 알약 | `navSelection` | `#EDEDED` (Figma 변수 `Fills - Vibrant/Tertiary`, SVG에도 같은 색) | Figma |
 
-**배경 그라디언트:** Figma 코드값(`rgba(217,79,121,0.8)` → 흰색, 프레임 높이의 4.327%)은 실제 화면과 달랐습니다. 스크린샷(`docs/design/home_before.png`)의 색을 10px 간격으로 재 보니 맨 위 핑크 불투명도가 약 **0.40**이고 아래로 부드럽게 줄어 약 120px에서 흰색이 됩니다. 그래서 `AppSpacing.backgroundGradientHeight`(120)와 `backgroundGradientAlphas`(10px 간격 불투명도)로 구현했고(`backgroundGradientTop`의 RGB 사용), 스크린샷과 맨 위·30·62·100px에서 색이 ±1 이내로 일치합니다. 상단 바(고정)의 배경으로 그려지며, 바 높이가 상태바 영역에 따라 달라지면(Android는 더 낮음) 그 높이 안에서 끝나게 늘이고 줄입니다. **현재는 상단 바에 이 그라디언트를 그리지 않습니다**(요청으로 제거, 2026-10-23). 토큰은 다시 쓸 수 있게 남겨 둡니다.
+**배경:** 수정안에서 화면 배경은 `#FFF8F8`이고 상단 핑크 그라디언트는 없습니다(이전 안의 그라디언트는 2026-10-23에 제거, `backgroundGradient*` 상수도 삭제). 상단 바는 흰색 10% 덮개(`topBarTint`)와 블러(`topBarBlurSigma` 10)만 씁니다.
+
+**Figma 팔레트 프레임(수정안, 8색):** `FFB2CA`(`attendancePanel`) / `FF6090`(`brand`) / `FFF5F8` / `E8D5DA`(`toggleOff`로 사용) / `A46273` / `FFF8F8`(`background`) / `FFFF5B`, `FFFFA0`(노랑, 쓰이는 곳을 모름 → 코드에 없음, 확인 필요). `FFF5F8`, `A46273`도 아직 쓰이는 곳이 없어 코드에 넣지 않았습니다.
 
 ## 2. 글자 (Pretendard)
 
@@ -133,15 +144,16 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 ## 5. 컴포넌트
 
 ### 5.1 헤더
-- **상단 바(`HomeTopBar`)는 화면 위에 고정**됩니다(사용자 요청 2026-10-22). 상태바 영역 + 헤더 행(62)이 스크롤하지 않고, 그 뒤로 지나가는 내용은 블러(`topBarBlurSigma` 10)와 핑크 틴트(배경 그라디언트)로 흐려집니다. 스크롤 0에서는 Figma(흰 배경 위 핑크 그라디언트)와 같습니다. 블러 강도·틴트는 사용자 첨부 사진을 보고 정한 **추정**입니다. Android의 상태바 글자 겹침도 이로써 해결됩니다. 핑크 그라디언트는 이 바에 포함되어 있습니다(아래 1장 그라디언트 설명 참고).
+- **상단 바(`HomeTopBar`)는 화면 위에 고정**됩니다(사용자 요청 2026-10-22). 상태바 영역 + 헤더 행(62)이 스크롤하지 않고, 그 뒤로 지나가는 내용은 블러(`topBarBlurSigma` 10, 사용자 첨부 사진 기준 **추정**)로 흐려집니다. 수정안에서 핑크 그라디언트는 없고 흰색 10% 덮개(`topBarTint`)만 있습니다. 헤더의 로고를 누르면 화면 맨 위로 부드럽게 올라갑니다(0.5초, `HomeLayout.scrollToTopDuration`, **추정**). 블러가 날짜 글자를 번지게 해 헤더 바로 아래 옅은 회색 자국이 보이는 점은 확인 필요(블러를 빼면 사라지지만 스크롤 때 흐려지는 효과도 없어집니다).
 - 배경 `rgba(255,255,255,0.1)`(행 전체, 거의 투명), 높이 62.
 - 로고: `logo_reborn.png`(1000×250, 안쪽 여백 있음). Figma는 169×42 영역에 이미지를 꽉 채우고 `left −11.32%`, `top −0.64%` 오프셋을 줘서 글자가 영역 왼쪽 끝(x24)에서 시작하게 합니다. 글자가 보이는 폭은 약 130px입니다.
 - 알림 버튼: 44×44 원, 배경 `bellButton`, 안에 `bell.svg`(28, 안쪽 여백 18.18%).
 
-### 5.2 기록 카드 — Before (`UnWrite`)
-- 354×172, 배경 `cardPink`, 모서리 24, 세로로: 위 1px 빈 줄 → 간격 24 → 문구 블록 → 간격 24 → 버튼 → 아래 21. 좌우 20.
-- 문구 블록(높이 50): 제목 `recordCardTitleBefore`(높이 20), 그 30 아래 부제 `body`(높이 20, `textSecondary`).
-- 버튼: 폭 314, 높이 52, `cta`, 모서리 12, 글자 `button`("감정 기록하기") 가운데.
+### 5.2 기록 카드 — Before (`UnWrite`, 수정안)
+- 354×172, 배경 `cardWhite`, **테두리 1px `cardBorder`**(안쪽 위에 겹쳐 그려 좌표가 변하지 않음, `AppCard.outlined`), 모서리 24, 세로로: 위 1px 빈 줄 → 간격 24 → 문구 블록 → 간격 24 → 버튼 → 아래 21. 좌우 20.
+- 문구 블록(높이 50, **왼쪽 정렬**): 제목 `recordCardTitleBefore`(Bold 18, 검정, 높이 20), 그 30 아래 부제 `recordCardSubtitle`(Medium 16, `recordCardSubtitle` 색 `#7D8492`, 높이 20).
+- 버튼: 폭 314, 높이 52, **`ctaSoft`(`#FFAFC7`)**, 모서리 12, 글자 `buttonLarge`(SemiBold 16, 검정)("감정 기록하기") 가운데. `CtaButton(soft: true)`.
+- 이전 안: 핑크 `cardPink` 카드, 가운데 정렬, `cta` 버튼 + 흰 글자(`button` 14).
 
 ### 5.3 기록 카드 — After (`UnWrite`, 기록 완료)
 - 354×399, 배경 `cardPink`, 모서리 24, 안쪽 여백 20, 블록 사이 간격 22.
@@ -153,23 +165,23 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 - 알약 6개는 모두 `brand`로 채워져 있고(연속 기록 6일일 때의 모습), 연속 일수가 6 미만일 때 빈 알약 모양은 Figma에 없습니다(추정: 앞에서부터 `min(current, 6)`개만 채우고 나머지는 비움, 확인 필요).
 
 ### 5.4 신호 카드 ("최근 관계 신호")
-- 354×104, 배경 `cardWhite`, 테두리 2px `cardBorder`, 모서리 24.
+- 354×104, 배경 `cardWhite`, 모서리 24. **수정안은 테두리가 없습니다.** 안쪽 좌표를 그대로 쓰도록 `AppCard.white`가 투명한 2px 자리를 남겨 둡니다(좌표는 테두리 안쪽 기준 그대로).
 - 아바타 원 48 @(18,26) 배경 `avatar`, 안에 `person.svg`(36, 오프셋 6).
 - 이름 "지민"(`sectionTitle`) x 87·y 18, 오른쪽에 간격 6으로 칩(38×22, `chip`, 모서리 100, 글자 `chipLabel` "친구").
 - 문장 `signalText`(textStrong) 중심 y 57, 캡션 `caption` 중심 y 76 (둘 다 x 87).
 - 오른쪽 끝 `chevron_signal.svg`(20) 세로 가운데, x 314.
 
 ### 5.5 감정 그래프 카드 ("이번 주 감정 흐름")
-- 354×180, 배경 `cardWhite`, 테두리 2px `cardBorder`, 모서리 24. 좌표는 카드 안쪽 기준.
+- 354×180, 배경 `cardWhite`, 모서리 24(수정안은 테두리 없음, 투명 2px 자리 유지). 좌표는 카드 안쪽 기준.
 - 제목 `graphTitle` @(18,12) + `chevron_graph.svg`(17) 간격 2. "✦ 9월" `graphMonth` @(18,48). 오른쪽 위에 이모지(😁 `graphEmoji`, 가장 높은 막대 위, x 212·y 37 중심).
 - 격자선 4개: y 61 / 82 / 103 / 124, x 18, 폭 314, 두께 1, `gridLine`.
 - **좌표 기준 주의:** 제목·격자선·설명·월 라벨·이모지는 테두리(2px) **안쪽** 기준이고, 막대와 요일 라벨은 테두리 **바깥(카드 모서리)** 기준입니다. 구현은 막대·요일 라벨에서 2px를 빼 맞춥니다(`WeeklyEmotionCard._borderInset`).
-- 막대 6개(월~토) 폭 27.437, 왼쪽 x 20 / 67.76 / 115.52 / 163.28 / 211.04 / 258.8, 바닥 y 126, `brand`, 위쪽 모서리 5. 샘플 높이: 월 9 / 화 21 / 수 48 / 목 36 / 금 75.8 / 토 66. **일요일은 막대가 없습니다**(값 없음). 가장 높은 막대 = 75.806px.
+- 막대 6개(월~토) 폭 27.437, 왼쪽 x 20 / 67.76 / 115.52 / 163.28 / 211.04 / 258.8, 바닥 y 126, 위쪽 모서리 5. **색은 값에 따라 3단계(수정안):** 값 ≤ 0.5(월·화·목)는 `barStrong` `#D94F79`, ≤ 0.9(수·토)는 `barMid` `#FF80A6`, 그 위(금)는 `barLight` `#FFB3CA`. 값 구간(`GraphLayout.barStrongMax`·`barMidMax`)은 Figma에 규칙이 없어 샘플 막대에서 정한 **추정**입니다(`WeeklyEmotionCard.barColor`). 샘플 높이: 월 9 / 화 21 / 수 48 / 목 36 / 금 75.8 / 토 66. **일요일은 막대가 없습니다**(값 없음). 가장 높은 막대 = 75.806px.
 - 요일 라벨(월~일 7개) 14 Medium `weekday`, 중심 y 135, 막대 가운데 아래. 글자 상자(폭 13.21)의 왼쪽 x는 월 27.1 / 화 74.9 / 수 122.6 / 목 170.4 / 금 219.2 / 토 266.9 / 일 314.7.
 - 설명 `graphCaption` @(18,159) 중심: "긍정적인 감정이 **조금씩 증가**하고 있어요."(강조 부분 `graphCaptionEmphasis` 밑줄).
 
 ### 5.6 액션 카드 ("오늘 해볼까요?")
-- 354×90, `cardWhite`, 테두리 2px `cardBorder`, 모서리 24, 가로 배치(좌우 18, 위아래 28, 항목 간격 16).
+- 354×90, `cardWhite`, 모서리 24(수정안은 테두리 없음, 투명 2px 자리 유지), 가로 배치
 - 아이콘 타일 48×48(`iconTile`, 모서리 12, 안쪽 6) 안에 `forum.svg`(36).
 - 글자 열 폭 215: 제목 `actionTitle`(높이 32) + 부제 `signalText`(`textSecondary`, 높이 16).
 - 오른쪽 `radio_circle.svg`(20). After는 `radio_circle_after.svg`.
@@ -200,6 +212,21 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 - 플랫폼 분기는 한 곳(`AppBottomNavBar`)에서만 합니다: iOS 26 이상 → 네이티브, 그 외 → Flutter 탭 바.
 - 네이티브 탭 바는 탭을 누르면 Dart로 index를 알리고(`onTap`), Dart에서 탭이 바뀌면(화면 안 버튼 등) 선택 표시를 맞춥니다(`setSelectedIndex`). 같은 탭을 다시 누르면 그 탭의 첫 화면으로 돌아갑니다.
 - **스크롤 가장자리 효과(Figma `Scroll Edge Effect - Soft`)는 쓰지 않습니다.** 탭 바 뒤에서 내용이 흐려지는 구간(블러·배경색 베일)을 요청으로 제거했습니다(2026-10-23). 내용은 탭 바 뒤로 그대로 지나갑니다.
+
+### 5.9 공통 컴포넌트 (`lib/shared/widgets/`)
+
+**Figma에 없는 컴포넌트입니다. 토스 설정·로그아웃 화면의 구조(둥근 모달 + 두 버튼, 둥근 카드로 묶은 설정 목록)를 참고하고 Reborn 색·모서리로 정한 추정 디자인입니다(확인 필요).** 머티리얼(구글) 위젯은 쓰지 않습니다. 치수는 `ComponentLayout`(`app_spacing.dart`), 색은 `AppColors`, 모서리는 `AppRadii`에 있습니다.
+
+| 컴포넌트 | 위젯 | 모양과 동작 |
+|---|---|---|
+| 토글 | `AppToggle` | iOS식 알약 51×31, 흰 동그라미 27(그림자 약하게), 켜짐 `brand` / 꺼짐 `toggleOff`, 200ms 이동, 누르면 햅틱, 누르는 영역 최소 44, 접근성 `toggled` |
+| 모달 | `showAppDialog` / `showAppConfirmDialog` | 흰 둥근 창(모서리 28, 안쪽 24, 좌우 여백 24), 왼쪽 정렬 제목(`sectionTitle`)·설명(`body` `textSecondary`), 가림막 `scrim`, 페이드+0.96→1 확대 200ms. 버튼 높이 52·모서리 12: 취소 = `chip` 배경 + `textStrong`, 확인 = `brand` + 흰 글자, 위험(`destructive`) = `dangerTile` + `danger` 글자. 버튼 2개 이하는 가로, 3개 이상은 세로 |
+| 토스트 | `showAppToast` | 어두운 둥근 상자(`toastFill`, 모서리 16, 가로 20·세로 14) + 흰 `body` 글자, 탭 바 위 16(화면 아래에서 `max(시스템 여백, 34) + 64 + 16`), 아래에서 12 올라오며 나타남(250ms) → 총 3초 → 사라짐. 새 토스트는 이전 것을 바로 대체, 터치는 아래로 통과 |
+| 설정 목록 | `SettingsGroup` / `SettingsRow` | 흰 카드(모서리 24)에 행을 묶음, 좌우 20, 선택적 제목(`groupTitle` Bold 16, 높이 52). 행 높이 56, 제목 `rowTitle`(Medium 16): 토글 행(오른쪽 `AppToggle`) / 링크 행(값 글자 `brand` + `chevron_signal`) / 위험 행(`danger` 글자) |
+| 글자 버튼 | `AppTextButton` | 글자만 있는 버튼(최소 44), 눌리면 흐려짐 |
+| 눌림 효과 | `Pressable` | 머티리얼 번짐(리플) 대신 눌린 동안 불투명도 0.7 |
+
+전체 탭 설정(`SettingsSection`)이 이 컴포넌트로 만들어져 있습니다(동의 3개 = 토글 행, 기록 전체 삭제·계정 삭제 = 위험 행). 기록 입력 화면의 인물 고르기 바텀시트는 아직 머티리얼 `ListTile`입니다(후속 작업).
 
 ## 6. 에셋 목록
 
@@ -233,7 +260,7 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 
 ## 7. 확인이 필요한 부분 (추정으로 처리한 것)
 
-1. 배경 그라디언트: 스크린샷에서 잰 값(높이 120, 맨 위 불투명도 0.40)을 씀. Figma 코드값과 달라서 디자이너 확인 필요(After는 맨 위가 조금 더 진함)
+1. (제거됨) 상단 배경 그라디언트는 수정안에서 없어짐
 2. (결정됨) 헤더는 고정 + 블러 배경으로 구현(사용자 요청)
 3. After의 기록 카드 아래 간격 23 vs Before 35 (→ 35로 통일)
 4. Before에만 있는 "오늘 해볼까요? >" 화살표와 액션 카드 원 색 차이
@@ -242,11 +269,17 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 7. (제거됨) 스크롤 가장자리 효과는 쓰지 않음
 8. 이모지·가변 폰트 설정은 플랫폼에 따라 Figma와 다를 수 있음
 9. (제거됨) 스크롤 가장자리 효과는 쓰지 않음(사용자 요청, 2026-10-23)
-10. 상단 그라디언트 색은 `rgba(217,79,121,0.8)`로 그대로이고 `brand`(`#FF6090`)로 바뀌지 않았습니다(Figma 값을 따름, 디자이너 확인 필요)
+10. (제거됨) 상단 그라디언트 색
 11. Figma 섹션 메모 "그날 적어놓았던 기록을 보여줌 →": 섹션 밖의 화면으로 가는 동작으로 보이며 디자인을 아직 못 봄
+12. 그래프 막대 색 3단계를 정하는 값 구간(0.5 / 0.9)은 Figma에 규칙이 없어 샘플 막대에서 정한 추정
+13. Home After(`466:2704`)는 수정안이 없어 핑크 카드 그대로(Before는 흰 카드로 바뀜) — 맞춰야 하는지 확인
+14. 공통 컴포넌트(토글·모달·토스트·설정 목록)의 치수·색은 모두 추정(토스 구조 참고). 모달 확인 버튼 `brand`, 위험 색 `danger`/`dangerTile`, 토글 꺼짐 `toggleOff`(팔레트 `E8D5DA`), 토스트 `toastFill`, 가림막 `scrim`
+15. 상단 바 블러: 날짜 글자가 번져 헤더 아래 옅은 회색 자국이 보임(블러 유지 여부 결정 필요)
+16. 팔레트 프레임의 `FFF5F8`·`A46273`·노랑 2색의 용도
 
 ## 8. 지켜야 할 규칙
 
 - 화면 코드에 색(`Color(0x…)`), 글자 크기·굵기·자간, 모서리, 에셋 경로를 직접 쓰지 않습니다. 없는 값이 필요하면 `lib/app/theme/`에 상수를 추가하고 이 문서에도 적습니다.
 - 값을 바꾸면 이 문서, `lib/app/theme/`, `test/app/theme/app_theme_test.dart`를 같이 고칩니다.
 - 구현한 화면은 iOS 시뮬레이터와 Android 에뮬레이터에서 실행해 `docs/design/`의 스크린샷과 나란히 비교합니다.
+- **머티리얼(구글) 위젯을 화면에서 직접 쓰지 않습니다**: `Switch`, `SnackBar`, `AlertDialog`/`Dialog`+`TextButton`, `InkWell` 번짐 효과 대신 `lib/shared/widgets/`의 `AppToggle`, `showAppToast`, `showAppConfirmDialog`/`showAppDialog`, `SettingsGroup`/`SettingsRow`, `AppTextButton`, `Pressable`을 씁니다(5.9).
