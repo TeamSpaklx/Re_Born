@@ -52,3 +52,5 @@ app.*.map.json
 ".tools/" 
 ".tools/" 
 .tools/ 
+backend/target/ 
+android/build/ 
