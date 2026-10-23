@@ -111,7 +111,7 @@ class _DesignGalleryScreenState extends State<DesignGalleryScreen> {
               ],
             ),
           ]),
-          section('감정 8색 (임시)', [
+          section('감정 7색', [
             Wrap(
               spacing: AppSpacing.space8,
               runSpacing: AppSpacing.space8,

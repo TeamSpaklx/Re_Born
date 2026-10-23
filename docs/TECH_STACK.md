@@ -12,7 +12,9 @@
 | 폰트 | Pretendard (400·500·600·700·800) | `assets/fonts/`, 라이선스 SIL OFL 1.1 (`OFL-LICENSE.txt`) |
 | 아이콘 | `flutter_svg` ^2.3.0 + Figma에서 내려받은 SVG | `assets/icons/ui/`, 경로는 `lib/app/theme/app_assets.dart`. 원본 라이브러리: 탭 바 투데이·관계·기록 = Phosphor Icons, 전체 = Iconsax, 임시 디자인 화면의 새 아이콘(check, trash)도 Phosphor(MIT)에서 SVG로 받음 (아이콘 패키지는 쓰지 않음) |
 | 디자인 기준 | Figma 홈 화면 (100% 일치 목표) | [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md), 값은 `lib/app/theme/` 상수만 사용 |
-| 인증 | Supabase Auth, 이메일 + 비밀번호 | 구글 로그인은 미정 (SPEC 11장 7번) |
+| 인증 | Supabase Auth, 이메일 + 비밀번호 | 구글·카카오 소셜 로그인 화면은 구현(메모리 동작), 실제 Supabase OAuth 연결은 백엔드 작업 (SPEC 11장 7번) |
+| 프로필 사진 | `image_picker` ^1.2.4 | 갤러리·카메라에서 사진 한 장(긴 변 1024로 축소). iOS `Info.plist`에 사진·카메라 사용 문구. 사진은 지금 메모리에만 저장 |
+| 알림 권한·리마인드 | `flutter_local_notifications` ^22.3.2, `timezone` ^0.11.2, `flutter_timezone` ^5.1.1 | iOS·Android 13+ OS 알림 권한 요청과 매일 정시 로컬 알림(기록 리마인드). 기기 시간대는 `flutter_timezone`, 예약은 `timezone`. 서버·FCM 푸시는 아님. Android는 desugaring·`POST_NOTIFICATIONS`·부팅 receiver 설정(`android/app`), iOS는 `AppDelegate`에서 알림 델리게이트 설정 |
 | 상태 관리 | `flutter_riverpod` ^3.4.3 | 앱 최상단 `ProviderScope`, 데이터는 Repository를 Provider로 주입 ([FRONTEND.md](./FRONTEND.md)) |
 | 라우팅 | `go_router` ^18.1.1 | `lib/app/router.dart`, 하단 탭은 `StatefulShellRoute.indexedStack`(탭마다 상태 유지) |
 | DB | Supabase PostgreSQL | 사용자별 접근은 RLS로 제한 |
