@@ -28,7 +28,11 @@ Future<void> handleSocialSignIn(
     final isNew = await ref
         .read(authActionsProvider)
         .signInWithSocial(provider);
-    router.go(isNew ? AppRoutes.signupConsent : AppRoutes.today);
+    if (isNew) {
+      router.push(AppRoutes.signupConsent);
+    } else {
+      router.go(AppRoutes.today);
+    }
   } on AuthFailure catch (failure) {
     if (context.mounted) showAppToast(context, failure.message);
   } catch (error, stack) {

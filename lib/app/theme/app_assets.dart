@@ -20,6 +20,8 @@ abstract final class AppAssets {
   static const person = '$_icons/person.svg';
   static const forum = '$_icons/forum.svg';
   static const bell = '$_icons/bell.svg';
+  static const bellRead = '$_icons/bell_read.svg';
+  static const bellUnread = '$_icons/bell_unread.svg';
   static const sealCheck = '$_icons/seal_check.svg';
 
   // 임시 디자인 화면용 아이콘. check는 Phosphor Icons(MIT), `ix_*`는 Iconsax(Linear)다.

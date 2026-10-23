@@ -4,7 +4,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../app/theme/app_assets.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
-import '../../../../shared/widgets/app_badge.dart';
 import '../../../../shared/widgets/pressable.dart';
 
 /// 로고와 알림 버튼 행 (높이 62).
@@ -93,16 +92,19 @@ class HomeHeader extends StatelessWidget {
               onTap: onBellTap,
               child: Pressable(
                 onTap: onBellTap,
-                child: Badged(
-                  badge: unreadCount > 0 ? const AppBadge.dot() : null,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: colors.bellButton,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(bell * _bellInsetFraction),
-                      child: SvgPicture.asset(AppAssets.bell),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: colors.bellButton,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(bell * _bellInsetFraction),
+                    child: SvgPicture.asset(
+                      unreadCount > 0
+                          ? AppAssets.bellUnread
+                          : AppAssets.bellRead,
+                      width: HomeLayout.bellIconSize,
+                      height: HomeLayout.bellIconSize,
                     ),
                   ),
                 ),

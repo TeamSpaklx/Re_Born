@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -86,7 +87,16 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.signupConsent,
-        builder: (context, state) => const ConsentScreen(),
+        pageBuilder: (context, state) =>
+            defaultTargetPlatform == TargetPlatform.iOS
+            ? CupertinoPage<void>(
+                key: state.pageKey,
+                child: const ConsentScreen(),
+              )
+            : MaterialPage<void>(
+                key: state.pageKey,
+                child: const ConsentScreen(),
+              ),
       ),
       GoRoute(
         path: AppRoutes.onboarding,
