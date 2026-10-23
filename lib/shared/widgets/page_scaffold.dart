@@ -7,6 +7,7 @@ import '../../app/theme/app_assets.dart';
 import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_text_styles.dart';
+import 'app_text_button.dart';
 
 /// 탭 위로 쌓이는 전체 화면(작성·상세 등)의 공통 틀: 뒤로 가기 + 제목 + 오른쪽 동작. 임시 디자인.
 class PageScaffold extends StatelessWidget {
@@ -87,12 +88,10 @@ class PageAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: onTap,
-      child: Text(
-        label,
-        style: AppTextStyles.button.copyWith(color: context.colors.textStrong),
-      ),
+    return AppTextButton(
+      label: label,
+      color: context.colors.textStrong,
+      onTap: onTap,
     );
   }
 }

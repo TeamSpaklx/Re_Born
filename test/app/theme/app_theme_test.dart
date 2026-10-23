@@ -23,6 +23,14 @@ void main() {
       expect(c.cardPink, const Color(0xFFFEDAE5));
       expect(c.cardBorder, const Color(0xFFEEE6E9));
       expect(c.attendancePanel, const Color(0xFFFFB2CA));
+      expect(c.background, const Color(0xFFFFF8F8));
+      expect(c.recordCardSubtitle, const Color(0xFF7D8492));
+      expect(c.ctaSoft, const Color(0xFFFFAFC7));
+      expect(c.onCtaSoft, const Color(0xFF000000));
+      expect(c.barStrong, const Color(0xFFD94F79));
+      expect(c.barMid, const Color(0xFFFF80A6));
+      expect(c.barLight, const Color(0xFFFFB3CA));
+      expect(c.toggleOff, const Color(0xFFE8D5DA));
     });
 
     test('반투명 색은 Figma rgba 값과 같다', () {
@@ -33,7 +41,9 @@ void main() {
         expect(color.a, closeTo(a, 0.005), reason: 'alpha of $color');
       }
 
-      expectRgba(c.backgroundGradientTop, 217, 79, 121, 0.8);
+      expectRgba(c.toastFill, 26, 26, 26, 0.9);
+      expectRgba(c.scrim, 0, 0, 0, 0.5);
+      expectRgba(c.topBarTint, 255, 255, 255, 0.1);
       expectRgba(c.textSecondary, 76, 83, 95, 0.8);
       expectRgba(c.textDate, 68, 68, 68, 0.6);
       expectRgba(c.iconTile, 217, 217, 217, 0.5);

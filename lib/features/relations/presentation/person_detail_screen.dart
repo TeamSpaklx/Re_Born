@@ -4,11 +4,11 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/router.dart';
 import '../../../app/theme/app_colors.dart';
-import '../../../app/theme/app_radii.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../app/theme/app_text_styles.dart';
 import '../../../core/providers/clock_provider.dart';
 import '../../../shared/widgets/app_card.dart';
+import '../../../shared/widgets/app_dialogs.dart';
 import '../../../shared/widgets/choice_chip_button.dart';
 import '../../../shared/widgets/cta_button.dart';
 import '../../../shared/widgets/empty_state.dart';
@@ -38,60 +38,23 @@ class _PersonDetailScreenState extends ConsumerState<PersonDetailScreen> {
   GraphPeriod _period = GraphPeriod.month;
 
   Future<void> _delete() async {
-    final colors = context.colors;
-    final choice = await showDialog<_DeleteChoice>(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: colors.cardWhite,
-        shape: const RoundedRectangleBorder(
-          borderRadius: AppRadii.cardBorderRadius,
+    final choice = await showAppDialog<_DeleteChoice>(
+      context,
+      title: '인물을 삭제할까요?',
+      message: '이 인물의 지수 이력과 인사이트도 함께 지워져요. 기록은 어떻게 할까요?',
+      actions: const [
+        AppDialogAction(
+          label: '기록은 남기기',
+          value: _DeleteChoice.keepEntries,
+          kind: AppDialogButtonKind.primary,
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '인물을 삭제할까요?',
-                style: AppTextStyles.sectionTitle.copyWith(
-                  color: colors.textBlack,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '이 인물의 지수 이력과 인사이트도 함께 지워져요. 기록은 어떻게 할까요?',
-                style: AppTextStyles.body.copyWith(color: colors.textSecondary),
-              ),
-              const SizedBox(height: 20),
-              CtaButton(
-                label: '기록은 남기기',
-                height: 48,
-                onPressed: () =>
-                    Navigator.of(context).pop(_DeleteChoice.keepEntries),
-              ),
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: () =>
-                    Navigator.of(context).pop(_DeleteChoice.deleteEntries),
-                child: Text(
-                  '기록도 함께 삭제',
-                  style: AppTextStyles.button.copyWith(color: colors.brand),
-                ),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(
-                  '취소',
-                  style: AppTextStyles.button.copyWith(
-                    color: colors.textSecondary,
-                  ),
-                ),
-              ),
-            ],
-          ),
+        AppDialogAction(
+          label: '기록도 함께 삭제',
+          value: _DeleteChoice.deleteEntries,
+          kind: AppDialogButtonKind.destructive,
         ),
-      ),
+        AppDialogAction(label: '취소', value: null),
+      ],
     );
     if (choice == null || !mounted) return;
     final router = GoRouter.of(context);

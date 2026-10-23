@@ -6,6 +6,7 @@ import '../../../app/theme/app_colors.dart';
 import '../../../core/errors/app_error_log.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../app/theme/app_text_styles.dart';
+import '../../../shared/widgets/app_dialogs.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/choice_chip_button.dart';
@@ -91,7 +92,6 @@ class _RecordFormScreenState extends ConsumerState<RecordFormScreen> {
 
     final actions = ref.read(recordActionsProvider);
     final editing = _editing;
-    final messenger = ScaffoldMessenger.of(context);
     final router = GoRouter.of(context);
     try {
       if (editing == null) {
@@ -115,9 +115,7 @@ class _RecordFormScreenState extends ConsumerState<RecordFormScreen> {
       ref.read(appErrorLogProvider).record(error, stack, where: 'save-entry');
       if (!mounted) return;
       setState(() => _saving = false);
-      messenger.showSnackBar(
-        const SnackBar(content: Text('저장하지 못했어요. 다시 시도해 주세요.')),
-      );
+      showAppToast(context, '저장하지 못했어요. 다시 시도해 주세요.');
       return;
     }
     if (!mounted) return;

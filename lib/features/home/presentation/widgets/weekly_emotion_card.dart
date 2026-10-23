@@ -23,6 +23,13 @@ class WeeklyEmotionCard extends StatelessWidget {
   static const _emojiHeight = 22.0;
   static const _barCount = 6;
 
+  /// 막대 색: 값이 낮을수록 진하고 높을수록 연하다(구간은 [GraphLayout.barStrongMax]·[GraphLayout.barMidMax]).
+  static Color barColor(double value, AppColors colors) {
+    if (value <= GraphLayout.barStrongMax) return colors.barStrong;
+    if (value <= GraphLayout.barMidMax) return colors.barMid;
+    return colors.barLight;
+  }
+
   // Figma에서 막대·요일 라벨 좌표는 테두리(2px) 바깥 기준이고, 제목·격자·설명은 안쪽 기준이다.
   static const _borderInset = AppSpacing.cardBorderWidth;
 
@@ -85,7 +92,7 @@ class WeeklyEmotionCard extends StatelessWidget {
                     height: flow.days[i]! * GraphLayout.maxBarHeight,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        color: colors.brand,
+                        color: barColor(flow.days[i]!, colors),
                         borderRadius: AppRadii.graphBarBorderRadius,
                       ),
                     ),

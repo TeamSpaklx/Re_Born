@@ -2,11 +2,12 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 
+import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import 'home_header.dart';
 
 /// 화면 위에 고정되는 상단 바: 상태바 영역 + 로고/알림 행.
-/// 스크롤되는 내용이 이 뒤로 지나가면 블러로 흐려진다. 배경색(핑크 그라디언트)은 넣지 않는다.
+/// 스크롤되는 내용이 이 뒤로 지나가면 블러로 흐려진다. 핑크 그라디언트는 없고 흰색 10%만 덮는다(수정안).
 class HomeTopBar extends StatelessWidget {
   const HomeTopBar({super.key, this.onLogoTap});
 
@@ -29,11 +30,14 @@ class HomeTopBar extends StatelessWidget {
             sigmaX: AppSpacing.topBarBlurSigma,
             sigmaY: AppSpacing.topBarBlurSigma,
           ),
-          child: Column(
-            children: [
-              SizedBox(height: safeTop),
-              HomeHeader(onLogoTap: onLogoTap),
-            ],
+          child: ColoredBox(
+            color: context.colors.topBarTint,
+            child: Column(
+              children: [
+                SizedBox(height: safeTop),
+                HomeHeader(onLogoTap: onLogoTap),
+              ],
+            ),
           ),
         ),
       ),

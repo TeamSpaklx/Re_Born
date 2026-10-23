@@ -52,7 +52,7 @@ class _ChecklistSectionState extends ConsumerState<ChecklistSection> {
     } catch (error, stack) {
       ref.read(appErrorLogProvider).record(error, stack, where: 'toggle-todo');
       // 저장에 실패하면 화면은 바뀌지 않고(원래대로) 안내만 보여 준다.
-      if (mounted) showAppSnackBar(context, '저장하지 못했어요. 다시 시도해 주세요.');
+      if (mounted) showAppToast(context, '저장하지 못했어요. 다시 시도해 주세요.');
     }
   }
 

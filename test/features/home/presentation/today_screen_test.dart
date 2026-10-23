@@ -166,7 +166,7 @@ void main() {
       if (w is! DecoratedBox) return false;
       final d = w.decoration;
       return d is BoxDecoration &&
-          d.color == AppColors.light.brand &&
+          d.color == AppColors.light.barStrong &&
           d.borderRadius == AppRadii.graphBarBorderRadius;
     });
     // 월(평온 0과 서운함 −2의 평균 −1 → 0.3333), 화(−2와 +1의 평균 → 0.4167), 수(−2 → 0.1667)
@@ -186,6 +186,84 @@ void main() {
     );
     expect(find.textContaining('조금씩 줄고', findRichText: true), findsOneWidget);
     expect(find.text('🙂'), findsOneWidget, reason: '가장 높은 화요일(0.4167)');
+  });
+
+  test('막대 색은 값이 낮을수록 진하고 높을수록 연하다 (Figma 수정안 샘플 막대 기준)', () {
+    const c = AppColors.light;
+    // 샘플 막대 높이/최대(75.806): 월 9 → 0.12, 화 21 → 0.28, 목 36 → 0.47 (진함)
+    for (final v in [0.12, 0.28, 0.47, 0.5]) {
+      expect(WeeklyEmotionCard.barColor(v, c), c.barStrong, reason: '$v');
+    }
+    // 수 48 → 0.63, 토 66 → 0.87 (중간)
+    for (final v in [0.63, 0.87, 0.9]) {
+      expect(WeeklyEmotionCard.barColor(v, c), c.barMid, reason: '$v');
+    }
+    // 금 75.8 → 1.0 (연함)
+    expect(WeeklyEmotionCard.barColor(1.0, c), c.barLight);
+  });
+
+  testWidgets('화면 배경은 #FFF8F8이고 상단에 핑크 그라디언트가 없다', (tester) async {
+    useDesignScreen(tester);
+    await pumpHome(tester);
+
+    expect(
+      tester.widget<Scaffold>(find.byType(Scaffold)).backgroundColor,
+      const Color(0xFFFFF8F8),
+    );
+    expect(
+      find.descendant(
+        of: find.byType(HomeTopBar),
+        matching: find.byWidgetPredicate(
+          (w) =>
+              w is DecoratedBox &&
+              w.decoration is BoxDecoration &&
+              (w.decoration as BoxDecoration).gradient != null,
+        ),
+      ),
+      findsNothing,
+    );
+  });
+
+  testWidgets('기록 카드(Before)는 흰색 + 테두리 1px, 글자는 왼쪽 정렬, 버튼은 연한 핑크 + 검정 글자', (
+    tester,
+  ) async {
+    useDesignScreen(tester);
+    await pumpHome(tester);
+
+    final card = find.descendant(
+      of: find.byType(RecordCardBefore),
+      matching: find.byType(Container),
+    );
+    final container = tester.widget<Container>(card.first);
+    final fill = container.decoration! as BoxDecoration;
+    expect(fill.color, AppColors.light.cardWhite);
+    final outline = container.foregroundDecoration! as BoxDecoration;
+    expect(
+      outline.border,
+      Border.all(color: AppColors.light.cardBorder, width: 1),
+    );
+
+    // 제목·부제는 카드 안쪽 왼쪽(20)에서 시작한다.
+    final cardLeft = tester.getTopLeft(find.byType(RecordCardBefore)).dx;
+    expect(
+      tester.getTopLeft(find.text('아직 오늘의 마음을 기록하지 않았어요')).dx - cardLeft,
+      closeTo(20, 0.5),
+    );
+    expect(
+      tester.getTopLeft(find.text('1분만 천천히 돌아볼까요?')).dx - cardLeft,
+      closeTo(20, 0.5),
+    );
+
+    final button = find.ancestor(
+      of: find.text('감정 기록하기'),
+      matching: find.byType(Container),
+    );
+    final buttonFill =
+        tester.widget<Container>(button.first).decoration! as BoxDecoration;
+    expect(buttonFill.color, AppColors.light.ctaSoft);
+    final label = tester.widget<Text>(find.text('감정 기록하기'));
+    expect(label.style!.color, AppColors.light.onCtaSoft);
+    expect(label.style!.fontSize, 16);
   });
 
   testWidgets('폭 360에서도 오버플로 없이 카드가 폭을 채운다', (tester) async {
@@ -405,7 +483,8 @@ void main() {
           matching: find.byKey(const Key('suggestion-add')),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pump(); // 토스트는 3초 뒤 사라지므로 settle하지 않고 바로 확인한다
+      await tester.pump(ComponentLayout.toastFade);
 
       final todos = await container.read(todosRepositoryProvider).list();
       expect(todos.where((t) => t.title.contains('거리를 두고')).length, 1);

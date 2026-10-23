@@ -92,7 +92,7 @@ class _HomeContentState extends ConsumerState<_HomeContent> {
           insightId: suggestion.insightId,
           now: ref.read(clockProvider)(),
         );
-    if (context.mounted) showAppSnackBar(context, '체크리스트에 담았어요');
+    if (context.mounted) showAppToast(context, '체크리스트에 담았어요');
   }
 
   @override

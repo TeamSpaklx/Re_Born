@@ -14,8 +14,11 @@ abstract final class AppSpacing {
   /// 카드 폭 (디자인 기준, 실제로는 화면 폭 − 좌우 여백 × 2).
   static const designCardWidth = 354.0;
 
-  /// 흰 카드 테두리 두께.
+  /// 흰 카드가 테두리 자리로 남겨 두는 두께(수정안은 테두리 없음, 안쪽 좌표 유지용).
   static const cardBorderWidth = 2.0;
+
+  /// 기록 카드(Before)의 테두리 선 두께.
+  static const cardOutlineWidth = 1.0;
 
   /// 기록 카드 안쪽 여백.
   static const recordCardPadding = 20.0;
@@ -23,30 +26,8 @@ abstract final class AppSpacing {
   /// 액션 카드(안부 묻기) 사이 간격.
   static const actionCardGap = 12.0;
 
-  /// 상단 핑크 그라디언트 높이. Figma 코드값(rgba(217,79,121,0.8) → 흰색, 4.327%)은 실제 화면과
-  /// 달라서, Figma 스크린샷(`docs/design/home_before.png`)의 색을 10px 간격으로 재서 정했다.
-  /// 맨 위 불투명도가 약 0.40이고 아래로 부드럽게 줄어 120px 근처에서 흰색이 된다. (추정, 확인 필요)
-  static const backgroundGradientHeight = 120.0;
-
   /// 홈 상단 바(고정) 뒤로 지나가는 내용에 주는 블러 강도 (추정, 사용자 첨부 사진 기준).
   static const topBarBlurSigma = 10.0;
-
-  /// 0px부터 10px 간격(0~120px)의 핑크(`backgroundGradientTop`의 RGB) 불투명도.
-  static const backgroundGradientAlphas = [
-    0.40,
-    0.36,
-    0.31,
-    0.26,
-    0.22,
-    0.17,
-    0.13,
-    0.09,
-    0.07,
-    0.04,
-    0.02,
-    0.01,
-    0.0,
-  ];
 }
 
 /// 홈 화면 세부 치수. y는 Figma 프레임(Before) 기준 좌표이며 "참고용"이다.
@@ -116,6 +97,12 @@ abstract final class GraphLayout {
   static const barBottomY = 126.0;
   static const maxBarHeight = 75.806;
 
+  /// 막대 색 구간(값 0~1): 이 값 이하는 진한 색, 그다음 이 값 이하는 중간 색, 그 위는 연한 색.
+  /// Figma(`8632:1470`)에 규칙이 없어 샘플 막대(월·화·목 ≤0.48 진함, 수·토 0.63~0.87 중간,
+  /// 금 1.0 연함)에서 정했다. (추정, 확인 필요)
+  static const barStrongMax = 0.5;
+  static const barMidMax = 0.9;
+
   static const weekdayLabelY = 135.5;
 
   /// 요일 라벨(월~일) 왼쪽 x.
@@ -161,4 +148,35 @@ abstract final class SplashLayout {
 
   /// 홈이 로고 화면 위로 서서히 나타나는 시간(크로스페이드).
   static const fadeDuration = Duration(milliseconds: 400);
+}
+
+/// 공통 컴포넌트(토글·모달·토스트·설정 목록) 치수. Figma에 없는 값이라 모두 추정이다
+/// (토스 설정·로그아웃 화면의 구조를 참고하고 Reborn 색·모서리로 정함, 확인 필요).
+abstract final class ComponentLayout {
+  // 토글: iOS식 알약
+  static const toggleWidth = 51.0;
+  static const toggleHeight = 31.0;
+  static const toggleThumb = 27.0;
+  static const toggleThumbInset = 2.0;
+  static const toggleMinHit = 44.0;
+  static const toggleDuration = Duration(milliseconds: 200);
+
+  // 모달
+  static const dialogMargin = 24.0;
+  static const dialogPadding = 24.0;
+  static const dialogButtonHeight = 52.0;
+  static const dialogButtonGap = 12.0;
+
+  // 토스트: 전체 시간 안에 나타남 → 머묾 → 사라짐이 모두 들어 있다.
+  static const toastTotal = Duration(milliseconds: 3000);
+  static const toastFade = Duration(milliseconds: 250);
+  static const toastGapAboveNav = 16.0;
+  static const toastPaddingH = 20.0;
+  static const toastPaddingV = 14.0;
+  static const toastRiseOffset = 12.0;
+
+  // 설정 목록
+  static const settingsRowHeight = 56.0;
+  static const settingsGroupPaddingH = 20.0;
+  static const settingsGroupTitleHeight = 52.0;
 }

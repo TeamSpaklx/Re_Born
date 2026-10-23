@@ -16,11 +16,17 @@ abstract final class AppRadii {
   /// 그래프 막대의 위쪽 모서리.
   static const graphBarTop = 5.0;
 
+  /// 모달 창(추정, 토스 구조 참고)과 토스트(추정).
+  static const dialog = 28.0;
+  static const toast = 16.0;
+
   /// 완전한 원/알약 (칩, 아바타, 알림 버튼, 하단 탭 바).
   static const pill = 100.0;
 
   static const cardBorderRadius = BorderRadius.all(Radius.circular(card));
   static const buttonBorderRadius = BorderRadius.all(Radius.circular(button));
+  static const dialogBorderRadius = BorderRadius.all(Radius.circular(dialog));
+  static const toastBorderRadius = BorderRadius.all(Radius.circular(toast));
   static const pillBorderRadius = BorderRadius.all(Radius.circular(pill));
   static const graphBarBorderRadius = BorderRadius.only(
     topLeft: Radius.circular(graphBarTop),

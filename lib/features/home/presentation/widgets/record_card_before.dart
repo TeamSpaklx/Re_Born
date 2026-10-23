@@ -7,7 +7,7 @@ import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/centered_line.dart';
 import '../../../../shared/widgets/cta_button.dart';
 
-/// 오늘 아직 기록하지 않았을 때의 핑크 카드 (Figma `UnWrite` Before, 높이 172).
+/// 오늘 아직 기록하지 않았을 때의 카드 (Figma `UnWrite` Before 수정안: 흰색 + 테두리 1px, 높이 172).
 class RecordCardBefore extends StatelessWidget {
   const RecordCardBefore({super.key, required this.onRecord});
 
@@ -16,7 +16,7 @@ class RecordCardBefore extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    return AppCard.pink(
+    return AppCard.outlined(
       height: HomeLayout.recordCardHeightBefore,
       // 위 1px 빈 줄, 아래 21 (docs/DESIGN_SYSTEM.md 5.2).
       padding: const EdgeInsets.fromLTRB(
@@ -34,7 +34,6 @@ class RecordCardBefore extends StatelessWidget {
               children: [
                 Positioned(
                   left: 0,
-                  right: 0,
                   top: 0,
                   child: CenteredLine(
                     height: 20,
@@ -48,14 +47,13 @@ class RecordCardBefore extends StatelessWidget {
                 ),
                 Positioned(
                   left: 0,
-                  right: 0,
                   top: 30,
                   child: CenteredLine(
                     height: 20,
                     child: Text(
                       '1분만 천천히 돌아볼까요?',
-                      style: AppTextStyles.body.copyWith(
-                        color: colors.textSecondary,
+                      style: AppTextStyles.recordCardSubtitle.copyWith(
+                        color: colors.recordCardSubtitle,
                       ),
                     ),
                   ),
@@ -67,6 +65,7 @@ class RecordCardBefore extends StatelessWidget {
           CtaButton(
             label: '감정 기록하기',
             height: HomeLayout.ctaButtonHeightBefore,
+            soft: true,
             onPressed: onRecord,
           ),
         ],
