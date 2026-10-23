@@ -6,6 +6,7 @@ import '../../../../app/theme/app_assets.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../../../../core/errors/app_error_log.dart';
 import '../../../../core/providers/clock_provider.dart';
 import '../../../../core/utils/app_haptics.dart';
 import '../../../../shared/widgets/app_card.dart';
@@ -48,7 +49,8 @@ class _ChecklistSectionState extends ConsumerState<ChecklistSection> {
     final now = ref.read(clockProvider)();
     try {
       await ref.read(todoActionsProvider).setDone(todo, !todo.done, now);
-    } catch (_) {
+    } catch (error, stack) {
+      ref.read(appErrorLogProvider).record(error, stack, where: 'toggle-todo');
       // 저장에 실패하면 화면은 바뀌지 않고(원래대로) 안내만 보여 준다.
       if (mounted) showAppSnackBar(context, '저장하지 못했어요. 다시 시도해 주세요.');
     }

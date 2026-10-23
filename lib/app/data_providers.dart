@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/errors/app_error_log.dart';
 import '../core/providers/clock_provider.dart';
 import '../features/analysis/analysis_service.dart';
 import '../features/analysis/data/sample_data.dart';
@@ -60,5 +61,7 @@ final analysisServiceProvider = Provider<AnalysisService>(
     indexHistory: ref.watch(indexHistoryRepositoryProvider),
     insights: ref.watch(insightsRepositoryProvider),
     clock: ref.watch(clockProvider),
+    onError: (error, stack) =>
+        ref.read(appErrorLogProvider).record(error, stack, where: 'analysis'),
   ),
 );
