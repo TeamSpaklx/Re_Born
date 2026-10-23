@@ -48,7 +48,8 @@ class _AccountDeleteScreenState extends ConsumerState<AccountDeleteScreen> {
   }
 
   Future<void> _delete() async {
-    if (_password.text.isEmpty) {
+    final social = ref.read(sessionProvider)?.isSocial ?? false;
+    if (!social && _password.text.isEmpty) {
       setState(() => _error = '비밀번호를 입력해 주세요.');
       return;
     }
@@ -65,7 +66,9 @@ class _AccountDeleteScreenState extends ConsumerState<AccountDeleteScreen> {
       _error = null;
     });
     try {
-      await ref.read(authActionsProvider).deleteAccount(_password.text);
+      await ref
+          .read(authActionsProvider)
+          .deleteAccount(social ? null : _password.text);
     } on AuthFailure catch (failure) {
       if (!mounted) return;
       setState(() {
@@ -156,16 +159,22 @@ class _AccountDeleteScreenState extends ConsumerState<AccountDeleteScreen> {
               onChanged: (v) => setState(() => _confirmed = v),
             ),
             const SizedBox(height: AppSpacing.space16),
-            PasswordField(
-              fieldKey: const Key('delete-password'),
-              controller: _password,
-              label: '비밀번호 확인',
-              hint: '본인 확인을 위해 비밀번호를 입력해 주세요',
-              errorText: _error,
-              onChanged: (_) {
-                if (_error != null) setState(() => _error = null);
-              },
-            ),
+            if (ref.watch(sessionProvider)?.isSocial ?? false)
+              Text(
+                '${ref.watch(sessionProvider)!.provider!.label} 계정으로 로그인했어요. 비밀번호 대신 위 확인으로 본인 확인을 마쳐요.',
+                style: AppTextStyles.body.copyWith(color: colors.textSecondary),
+              )
+            else
+              PasswordField(
+                fieldKey: const Key('delete-password'),
+                controller: _password,
+                label: '비밀번호 확인',
+                hint: '본인 확인을 위해 비밀번호를 입력해 주세요',
+                errorText: _error,
+                onChanged: (_) {
+                  if (_error != null) setState(() => _error = null);
+                },
+              ),
           ],
         ),
       ),

@@ -12,6 +12,7 @@ class InMemoryAuthRepository implements AuthRepository {
   static const demoPassword = 'reborn1234';
 
   final Map<String, String> _accounts;
+  final Set<SocialProvider> _socialMembers = {};
   AuthUser? _current;
 
   @override
@@ -43,15 +44,33 @@ class InMemoryAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<SocialSignInResult> signInWithSocial(SocialProvider provider) async {
+    final isNew = _socialMembers.add(provider);
+    final user = AuthUser(
+      email: '${provider.name}.user@social.reborn.app',
+      provider: provider,
+    );
+    _current = user;
+    return SocialSignInResult(user: user, isNewUser: isNew);
+  }
+
+  @override
   Future<void> signOut() async => _current = null;
 
   @override
-  Future<void> deleteAccount({required String password}) async {
+  Future<void> deleteAccount({String? password}) async {
     final user = _current;
-    if (user == null || _accounts[user.email] != password) {
+    if (user == null) {
       throw const AuthFailure(AuthFailureType.invalidCredentials);
     }
-    _accounts.remove(user.email);
+    if (user.isSocial) {
+      _socialMembers.remove(user.provider);
+    } else {
+      if (_accounts[user.email] != password) {
+        throw const AuthFailure(AuthFailureType.invalidCredentials);
+      }
+      _accounts.remove(user.email);
+    }
     _current = null;
   }
 }

@@ -15,6 +15,7 @@ import '../models/auth_user.dart';
 import '../models/auth_validator.dart';
 import 'auth_providers.dart';
 import 'password_field.dart';
+import 'social_login_buttons.dart';
 
 /// 로그인 (F-01). 이메일 + 비밀번호. 실패하면 문구를 보여 주고 다시 시도할 수 있다.
 class LoginScreen extends ConsumerStatefulWidget {
@@ -127,6 +128,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
               ),
             ],
+            const SizedBox(height: AppSpacing.space8),
+            const SocialLoginButtons(dividerLabel: '또는 소셜 계정으로'),
           ],
         ),
       ),

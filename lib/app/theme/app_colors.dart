@@ -46,6 +46,8 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.topBarTint,
     required this.splashBackground,
     required this.skeleton,
+    required this.kakaoYellow,
+    required this.onKakao,
     required this.emotionJoy,
     required this.emotionLove,
     required this.emotionExcited,
@@ -130,6 +132,10 @@ class AppColors extends ThemeExtension<AppColors> {
   /// 로딩 스켈레톤 블록 (흰 카드·#FFF8F8 배경 둘 다에서 보이는 연한 핑크 회색, 추정).
   final Color skeleton;
 
+  /// 카카오 로그인 버튼 배경(브랜드 노랑)과 글자색.
+  final Color kakaoYellow;
+  final Color onKakao;
+
   /// 감정 7색(RebornMood 캐릭터의 이름표 색에서 뽑음): 기쁨
   final Color emotionJoy;
 
@@ -191,6 +197,8 @@ class AppColors extends ThemeExtension<AppColors> {
     topBarTint: Color(0x1AFFFFFF),
     splashBackground: Color(0xFFFFFFFF),
     skeleton: Color(0xFFF1EAED),
+    kakaoYellow: Color(0xFFFEE500),
+    onKakao: Color(0xFF191919),
     emotionJoy: Color(0xFFF4B1CB),
     emotionLove: Color(0xFFFF9EC4),
     emotionExcited: Color(0xFFFAD599),
@@ -240,6 +248,8 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? topBarTint,
     Color? splashBackground,
     Color? skeleton,
+    Color? kakaoYellow,
+    Color? onKakao,
     Color? emotionJoy,
     Color? emotionLove,
     Color? emotionExcited,
@@ -287,6 +297,8 @@ class AppColors extends ThemeExtension<AppColors> {
       topBarTint: topBarTint ?? this.topBarTint,
       splashBackground: splashBackground ?? this.splashBackground,
       skeleton: skeleton ?? this.skeleton,
+      kakaoYellow: kakaoYellow ?? this.kakaoYellow,
+      onKakao: onKakao ?? this.onKakao,
       emotionJoy: emotionJoy ?? this.emotionJoy,
       emotionLove: emotionLove ?? this.emotionLove,
       emotionExcited: emotionExcited ?? this.emotionExcited,
@@ -340,6 +352,8 @@ class AppColors extends ThemeExtension<AppColors> {
       topBarTint: mix(topBarTint, other.topBarTint),
       splashBackground: mix(splashBackground, other.splashBackground),
       skeleton: mix(skeleton, other.skeleton),
+      kakaoYellow: mix(kakaoYellow, other.kakaoYellow),
+      onKakao: mix(onKakao, other.onKakao),
       emotionJoy: mix(emotionJoy, other.emotionJoy),
       emotionLove: mix(emotionLove, other.emotionLove),
       emotionExcited: mix(emotionExcited, other.emotionExcited),

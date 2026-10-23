@@ -33,6 +33,10 @@ abstract final class AppAssets {
   static const ixEye = '$_icons/ix_eye.svg';
   static const ixEyeOff = '$_icons/ix_eye_off.svg';
 
+  /// 소셜 로그인 버튼 마크(단순화한 로고, 출시 전 브랜드 가이드 확인 필요).
+  static const googleG = '$_icons/google_g.svg';
+  static const kakaoBubble = '$_icons/kakao_bubble.svg';
+
   // 화살표: 쓰이는 자리마다 크기·색이 달라 파일이 나뉘어 있다.
   static const chevronSignal = '$_icons/chevron_signal.svg';
   static const chevronGraph = '$_icons/chevron_graph.svg';
@@ -98,6 +102,8 @@ abstract final class AppAssets {
     ixGallery,
     ixEye,
     ixEyeOff,
+    googleG,
+    kakaoBubble,
     chevronSignal,
     chevronGraph,
     chevronSeeAll,

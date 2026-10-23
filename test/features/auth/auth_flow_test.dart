@@ -5,6 +5,7 @@ import 'package:reborn_app/app/app.dart';
 import 'package:reborn_app/app/data_providers.dart';
 import 'package:reborn_app/app/router.dart';
 import 'package:reborn_app/features/auth/data/in_memory_auth_repository.dart';
+import 'package:reborn_app/features/auth/models/auth_user.dart';
 import 'package:reborn_app/features/auth/models/auth_validator.dart';
 import 'package:reborn_app/features/auth/presentation/auth_providers.dart';
 import 'package:reborn_app/features/auth/presentation/login_screen.dart';
@@ -234,5 +235,57 @@ void main() {
     await tester.tap(find.text('처음으로'));
     await tester.pumpAndSettle();
     expect(find.byType(LoginScreen), findsOneWidget);
+  });
+
+  group('소셜 로그인', () {
+    testWidgets('처음 카카오로 들어오면 약관 동의 → 온보딩으로 이어진다', (tester) async {
+      final c = await pumpAt(tester, AppRoutes.login);
+      await tester.tap(find.byKey(const Key('social-kakao')));
+      await tester.pumpAndSettle();
+
+      expect(c.read(sessionProvider)?.provider, SocialProvider.kakao);
+      expect(find.text('약관에\n동의해 주세요'), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('consent-all')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('동의하고 가입하기'));
+      await tester.pumpAndSettle();
+
+      final settings = await c.read(settingsProvider.future);
+      expect(settings.nickname, '카카오 사용자');
+      expect(settings.consents.privacy, isTrue);
+      expect(find.byKey(const Key('onboarding-name')), findsOneWidget);
+    });
+
+    testWidgets('이미 가입한 소셜 계정은 바로 홈으로 간다', (tester) async {
+      final c = await pumpAt(tester, AppRoutes.login);
+      final repo = c.read(authRepositoryProvider);
+      await repo.signInWithSocial(SocialProvider.google); // 처음 한 번
+      await repo.signOut();
+
+      await tester.tap(find.byKey(const Key('social-google')));
+      await tester.pumpAndSettle();
+      expect(find.byType(TodayScreen), findsOneWidget);
+    });
+
+    testWidgets('가입 화면에도 소셜 버튼이 있고, 소셜 계정 삭제는 비밀번호 없이 된다', (tester) async {
+      final c = await pumpAt(tester, AppRoutes.signup);
+      expect(find.byKey(const Key('social-kakao')), findsOneWidget);
+      expect(find.byKey(const Key('social-google')), findsOneWidget);
+
+      await c.read(authActionsProvider).signInWithSocial(SocialProvider.google);
+      c.read(routerProvider).go(AppRoutes.accountDelete);
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('delete-password')), findsNothing);
+
+      await tester.tap(find.byKey(const Key('delete-confirm')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('계정 삭제'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('삭제'));
+      await tester.pumpAndSettle();
+      expect(find.text('계정을 삭제했어요'), findsOneWidget);
+      expect(c.read(sessionProvider), isNull);
+    });
   });
 }
