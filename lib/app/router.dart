@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,12 +13,17 @@ import '../features/relations/presentation/person_detail_screen.dart';
 import '../features/relations/presentation/person_form_screen.dart';
 import '../features/relations/presentation/relations_screen.dart';
 import '../features/splash/presentation/splash_screen.dart';
+import '../shared/dev/design_gallery_screen.dart';
 import 'main_shell.dart';
+import 'theme/app_spacing.dart';
 
 /// 화면 경로. 화면 이동은 문자열 대신 이 상수를 사용한다.
 /// 순서는 하단 탭 순서(투데이 / 관계 / 기록 / 전체)와 같다.
 abstract final class AppRoutes {
   static const splash = '/splash';
+
+  /// 디자인 갤러리(개발용). 디버그 빌드에서만 등록된다.
+  static const devGallery = '/dev/gallery';
 
   static const today = '/today';
   static const relations = '/relations';
@@ -47,6 +53,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.splash,
         builder: (context, state) => const SplashScreen(),
       ),
+      if (kDebugMode)
+        GoRoute(
+          path: AppRoutes.devGallery,
+          builder: (context, state) => const DesignGalleryScreen(),
+        ),
       GoRoute(
         path: AppRoutes.recordNew,
         builder: (context, state) => const RecordFormScreen(),
@@ -81,8 +92,21 @@ final routerProvider = Provider<GoRouter>((ref) {
             RecordDetailScreen(entryId: state.pathParameters['id']!),
       ),
       StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) =>
-            MainShell(navigationShell: navigationShell),
+        // 스플래시에서 넘어올 때 옆에서 밀리지 않고, 로고 화면 위로 서서히 나타난다.
+        pageBuilder: (context, state, navigationShell) =>
+            CustomTransitionPage<void>(
+              key: state.pageKey,
+              transitionDuration: SplashLayout.fadeDuration,
+              reverseTransitionDuration: SplashLayout.fadeDuration,
+              transitionsBuilder: (context, animation, secondary, child) =>
+                  FadeTransition(
+                    opacity: animation.drive(
+                      CurveTween(curve: Curves.easeInOut),
+                    ),
+                    child: child,
+                  ),
+              child: MainShell(navigationShell: navigationShell),
+            ),
         branches: [
           _branch(AppRoutes.today, const TodayScreen()),
           _branch(AppRoutes.relations, const RelationsScreen()),

@@ -12,7 +12,6 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.cta,
     required this.onCta,
     required this.background,
-    required this.backgroundGradientTop,
     required this.cardPink,
     required this.cardWhite,
     required this.cardBorder,
@@ -33,6 +32,28 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.navBorder,
     required this.navShadow,
     required this.navSelection,
+    required this.recordCardSubtitle,
+    required this.ctaSoft,
+    required this.onCtaSoft,
+    required this.barStrong,
+    required this.barMid,
+    required this.barLight,
+    required this.toggleOff,
+    required this.danger,
+    required this.dangerTile,
+    required this.toastFill,
+    required this.scrim,
+    required this.topBarTint,
+    required this.splashBackground,
+    required this.skeleton,
+    required this.emotionJoy,
+    required this.emotionGratitude,
+    required this.emotionExcitement,
+    required this.emotionCalm,
+    required this.emotionHurt,
+    required this.emotionAnxiety,
+    required this.emotionAnger,
+    required this.emotionSadness,
   });
 
   /// 브랜드 핑크: 그래프 막대, 활성 탭, 강조 숫자, 출석 알약.
@@ -42,10 +63,8 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color cta;
   final Color onCta;
 
+  /// 화면 배경 `#FFF8F8` (수정안). 카드는 흰색이라 배경과 구분된다.
   final Color background;
-
-  /// 화면 맨 위 그라디언트 시작색. 흰색으로 끝난다.
-  final Color backgroundGradientTop;
 
   /// 기록 카드(핑크)와 흰 카드, 흰 카드의 테두리.
   final Color cardPink;
@@ -74,13 +93,74 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color navShadow;
   final Color navSelection;
 
+  /// 기록 카드(흰색, Before) 부제.
+  final Color recordCardSubtitle;
+
+  /// 연한 핑크 버튼 배경(기록 카드 Before의 "감정 기록하기").
+  final Color ctaSoft;
+
+  /// 연한 핑크 버튼 위 글자.
+  final Color onCtaSoft;
+
+  /// 그래프 막대 색 3단계: 진함(낮은 값) / 중간 / 연함(높은 값).
+  final Color barStrong;
+  final Color barMid;
+  final Color barLight;
+
+  /// 토글 꺼짐 배경.
+  final Color toggleOff;
+
+  /// 삭제·로그아웃 같은 위험한 동작 글자 (Figma에 없음, 추정).
+  final Color danger;
+
+  /// 위험한 동작 버튼 배경 (추정).
+  final Color dangerTile;
+
+  /// 토스트 배경: #1A1A1A 90% (추정).
+  final Color toastFill;
+
+  /// 모달 뒤 가림막: 검정 50% (추정).
+  final Color scrim;
+
+  /// 홈 상단 바 위에 덮는 흰색 10% (수정안 `rgba(255,255,255,0.1)`).
+  final Color topBarTint;
+
+  /// 스플래시 화면 배경: 흰색(Figma `289:1723`). 화면 배경(`#FFF8F8`)과 다르다. iOS·Android 시작 화면도 흰색이라 이어서 보인다.
+  final Color splashBackground;
+
+  /// 로딩 스켈레톤 블록 (흰 카드·#FFF8F8 배경 둘 다에서 보이는 연한 핑크 회색, 추정).
+  final Color skeleton;
+
+  /// 감정 8색(캐릭터 에셋이 오면 에셋의 대표색으로 교체, 지금은 임시 파스텔·추정): 기쁨
+  final Color emotionJoy;
+
+  /// 감사
+  final Color emotionGratitude;
+
+  /// 설렘
+  final Color emotionExcitement;
+
+  /// 평온
+  final Color emotionCalm;
+
+  /// 서운함
+  final Color emotionHurt;
+
+  /// 불안
+  final Color emotionAnxiety;
+
+  /// 분노
+  final Color emotionAnger;
+
+  /// 슬픔
+  final Color emotionSadness;
+
   /// Figma 홈 화면에서 읽은 라이트 팔레트.
   static const light = AppColors(
     brand: Color(0xFFFF6090),
     cta: Color(0xFFFF6090),
     onCta: Color(0xFFFFFFFF),
-    background: Color(0xFFFFFFFF),
-    backgroundGradientTop: Color(0xCCD94F79), // rgba(217,79,121,0.8)
+    background: Color(0xFFFFF8F8),
     cardPink: Color(0xFFFEDAE5),
     cardWhite: Color(0xFFFFFFFF),
     cardBorder: Color(0xFFEEE6E9),
@@ -101,6 +181,28 @@ class AppColors extends ThemeExtension<AppColors> {
     navBorder: Color(0xFFD0D0D0),
     navShadow: Color(0x1A000000), // rgba(0,0,0,0.1)
     navSelection: Color(0xFFEDEDED),
+    recordCardSubtitle: Color(0xFF7D8492),
+    ctaSoft: Color(0xFFFFAFC7),
+    onCtaSoft: Color(0xFF000000),
+    barStrong: Color(0xFFD94F79),
+    barMid: Color(0xFFFF80A6),
+    barLight: Color(0xFFFFB3CA),
+    toggleOff: Color(0xFFE8D5DA),
+    danger: Color(0xFFE5484D),
+    dangerTile: Color(0xFFFDECEE),
+    toastFill: Color(0xE61A1A1A),
+    scrim: Color(0x80000000),
+    topBarTint: Color(0x1AFFFFFF),
+    splashBackground: Color(0xFFFFFFFF),
+    skeleton: Color(0xFFF1EAED),
+    emotionJoy: Color(0xFFFFD66B),
+    emotionGratitude: Color(0xFFFFB38A),
+    emotionExcitement: Color(0xFFFF9CC2),
+    emotionCalm: Color(0xFF9FD8C0),
+    emotionHurt: Color(0xFF9DB4F2),
+    emotionAnxiety: Color(0xFFC5A8EE),
+    emotionAnger: Color(0xFFF27B72),
+    emotionSadness: Color(0xFF9FB7C9),
   );
 
   @override
@@ -109,7 +211,6 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? cta,
     Color? onCta,
     Color? background,
-    Color? backgroundGradientTop,
     Color? cardPink,
     Color? cardWhite,
     Color? cardBorder,
@@ -130,14 +231,34 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? navBorder,
     Color? navShadow,
     Color? navSelection,
+    Color? recordCardSubtitle,
+    Color? ctaSoft,
+    Color? onCtaSoft,
+    Color? barStrong,
+    Color? barMid,
+    Color? barLight,
+    Color? toggleOff,
+    Color? danger,
+    Color? dangerTile,
+    Color? toastFill,
+    Color? scrim,
+    Color? topBarTint,
+    Color? splashBackground,
+    Color? skeleton,
+    Color? emotionJoy,
+    Color? emotionGratitude,
+    Color? emotionExcitement,
+    Color? emotionCalm,
+    Color? emotionHurt,
+    Color? emotionAnxiety,
+    Color? emotionAnger,
+    Color? emotionSadness,
   }) {
     return AppColors(
       brand: brand ?? this.brand,
       cta: cta ?? this.cta,
       onCta: onCta ?? this.onCta,
       background: background ?? this.background,
-      backgroundGradientTop:
-          backgroundGradientTop ?? this.backgroundGradientTop,
       cardPink: cardPink ?? this.cardPink,
       cardWhite: cardWhite ?? this.cardWhite,
       cardBorder: cardBorder ?? this.cardBorder,
@@ -158,6 +279,28 @@ class AppColors extends ThemeExtension<AppColors> {
       navBorder: navBorder ?? this.navBorder,
       navShadow: navShadow ?? this.navShadow,
       navSelection: navSelection ?? this.navSelection,
+      recordCardSubtitle: recordCardSubtitle ?? this.recordCardSubtitle,
+      ctaSoft: ctaSoft ?? this.ctaSoft,
+      onCtaSoft: onCtaSoft ?? this.onCtaSoft,
+      barStrong: barStrong ?? this.barStrong,
+      barMid: barMid ?? this.barMid,
+      barLight: barLight ?? this.barLight,
+      toggleOff: toggleOff ?? this.toggleOff,
+      danger: danger ?? this.danger,
+      dangerTile: dangerTile ?? this.dangerTile,
+      toastFill: toastFill ?? this.toastFill,
+      scrim: scrim ?? this.scrim,
+      topBarTint: topBarTint ?? this.topBarTint,
+      splashBackground: splashBackground ?? this.splashBackground,
+      skeleton: skeleton ?? this.skeleton,
+      emotionJoy: emotionJoy ?? this.emotionJoy,
+      emotionGratitude: emotionGratitude ?? this.emotionGratitude,
+      emotionExcitement: emotionExcitement ?? this.emotionExcitement,
+      emotionCalm: emotionCalm ?? this.emotionCalm,
+      emotionHurt: emotionHurt ?? this.emotionHurt,
+      emotionAnxiety: emotionAnxiety ?? this.emotionAnxiety,
+      emotionAnger: emotionAnger ?? this.emotionAnger,
+      emotionSadness: emotionSadness ?? this.emotionSadness,
     );
   }
 
@@ -170,10 +313,6 @@ class AppColors extends ThemeExtension<AppColors> {
       cta: mix(cta, other.cta),
       onCta: mix(onCta, other.onCta),
       background: mix(background, other.background),
-      backgroundGradientTop: mix(
-        backgroundGradientTop,
-        other.backgroundGradientTop,
-      ),
       cardPink: mix(cardPink, other.cardPink),
       cardWhite: mix(cardWhite, other.cardWhite),
       cardBorder: mix(cardBorder, other.cardBorder),
@@ -194,6 +333,28 @@ class AppColors extends ThemeExtension<AppColors> {
       navBorder: mix(navBorder, other.navBorder),
       navShadow: mix(navShadow, other.navShadow),
       navSelection: mix(navSelection, other.navSelection),
+      recordCardSubtitle: mix(recordCardSubtitle, other.recordCardSubtitle),
+      ctaSoft: mix(ctaSoft, other.ctaSoft),
+      onCtaSoft: mix(onCtaSoft, other.onCtaSoft),
+      barStrong: mix(barStrong, other.barStrong),
+      barMid: mix(barMid, other.barMid),
+      barLight: mix(barLight, other.barLight),
+      toggleOff: mix(toggleOff, other.toggleOff),
+      danger: mix(danger, other.danger),
+      dangerTile: mix(dangerTile, other.dangerTile),
+      toastFill: mix(toastFill, other.toastFill),
+      scrim: mix(scrim, other.scrim),
+      topBarTint: mix(topBarTint, other.topBarTint),
+      splashBackground: mix(splashBackground, other.splashBackground),
+      skeleton: mix(skeleton, other.skeleton),
+      emotionJoy: mix(emotionJoy, other.emotionJoy),
+      emotionGratitude: mix(emotionGratitude, other.emotionGratitude),
+      emotionExcitement: mix(emotionExcitement, other.emotionExcitement),
+      emotionCalm: mix(emotionCalm, other.emotionCalm),
+      emotionHurt: mix(emotionHurt, other.emotionHurt),
+      emotionAnxiety: mix(emotionAnxiety, other.emotionAnxiety),
+      emotionAnger: mix(emotionAnger, other.emotionAnger),
+      emotionSadness: mix(emotionSadness, other.emotionSadness),
     );
   }
 }

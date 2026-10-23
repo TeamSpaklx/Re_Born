@@ -4,10 +4,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:reborn_app/app/app.dart';
 import 'package:reborn_app/app/data_providers.dart';
 import 'package:reborn_app/app/main_shell.dart';
+import 'package:reborn_app/app/theme/app_spacing.dart';
 import 'package:reborn_app/core/providers/clock_provider.dart';
 import 'package:reborn_app/features/todos/data/in_memory_todos_repository.dart';
 import 'package:reborn_app/features/todos/models/todo.dart';
 import 'package:reborn_app/shared/widgets/app_bottom_nav_bar.dart';
+import 'package:reborn_app/shared/widgets/app_toggle.dart';
 
 final fixedNow = DateTime(2026, 10, 22, 12);
 
@@ -125,7 +127,8 @@ void main() {
 
     expect(find.text('이렇게 해 보면 어떨까요?'), findsOneWidget);
     await tester.tap(find.text('체크리스트에 담기').first);
-    await tester.pumpAndSettle();
+    await tester.pump(); // 토스트는 3초 뒤 사라지므로 settle하지 않고 바로 확인한다
+    await tester.pump(ComponentLayout.toastFade);
 
     final todos = await container.read(todosRepositoryProvider).list();
     final added = todos.where(
@@ -147,7 +150,12 @@ void main() {
       scrollable: find.byType(Scrollable).first,
     );
 
-    await tester.tap(find.byKey(const Key('consent-ai')));
+    await tester.tap(
+      find.descendant(
+        of: find.byKey(const Key('consent-ai')),
+        matching: find.byType(AppToggle),
+      ),
+    );
     await tester.pumpAndSettle();
 
     final settings = await container.read(settingsRepositoryProvider).get();

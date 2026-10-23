@@ -11,7 +11,7 @@ import '../../../../shared/widgets/centered_line.dart';
 import '../../../../shared/widgets/cta_button.dart';
 import '../../models/record_streak.dart';
 
-/// 오늘 기록을 마쳤을 때의 핑크 카드 (Figma `UnWrite` After, 높이 399, docs/DESIGN_SYSTEM.md 5.3).
+/// 오늘 기록을 마쳤을 때의 핑크 카드 (Figma `UnWrite` After, 높이 399, docs/DESIGN_HOME.md 5.3).
 /// 아바타(오늘 기록에 나온 인물) · 완료 문구 · "오늘 기록 보기" · 출석 체크 패널.
 class RecordCardAfter extends StatelessWidget {
   const RecordCardAfter({

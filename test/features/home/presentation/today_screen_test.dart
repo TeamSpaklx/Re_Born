@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:reborn_app/app/app.dart';
 import 'package:reborn_app/app/data_providers.dart';
 import 'package:reborn_app/app/main_shell.dart';
+import 'package:reborn_app/app/theme/app_assets.dart';
 import 'package:reborn_app/app/theme/app_colors.dart';
 import 'package:reborn_app/app/theme/app_radii.dart';
 import 'package:reborn_app/app/theme/app_spacing.dart';
@@ -166,7 +167,7 @@ void main() {
       if (w is! DecoratedBox) return false;
       final d = w.decoration;
       return d is BoxDecoration &&
-          d.color == AppColors.light.brand &&
+          d.color == AppColors.light.barStrong &&
           d.borderRadius == AppRadii.graphBarBorderRadius;
     });
     // 월(평온 0과 서운함 −2의 평균 −1 → 0.3333), 화(−2와 +1의 평균 → 0.4167), 수(−2 → 0.1667)
@@ -185,7 +186,136 @@ void main() {
       reason: '첫 3일은 평균이 내려가는 흐름',
     );
     expect(find.textContaining('조금씩 줄고', findRichText: true), findsOneWidget);
-    expect(find.text('🙂'), findsOneWidget, reason: '가장 높은 화요일(0.4167)');
+    // 최신 안에는 그래프 위 이모지가 없다(데이터의 peakEmoji는 있지만 화면에 그리지 않는다).
+    expect(find.text('🙂'), findsNothing);
+    expect(find.text('😁'), findsNothing);
+    // 격자선은 막대가 서는 바닥선 하나만 보인다(위쪽 3개는 Figma에서 숨김).
+    final lines = find.descendant(
+      of: find.byType(WeeklyEmotionCard),
+      matching: find.byWidgetPredicate(
+        (w) => w is ColoredBox && w.color == AppColors.light.gridLine,
+      ),
+    );
+    expect(lines, findsOneWidget);
+    final card = tester.getTopLeft(find.byType(WeeklyEmotionCard));
+    expect(
+      tester.getTopLeft(lines).dy - card.dy,
+      closeTo(GraphLayout.baselineY + 2, 0.5), // 투명 테두리 2px 안쪽 기준 → 바깥 기준 126
+    );
+  });
+
+  test('막대 색은 값이 낮을수록 진하고 높을수록 연하다 (Figma 수정안 샘플 막대 기준)', () {
+    const c = AppColors.light;
+    // 샘플 막대 높이/최대(75.806): 월 9 → 0.12, 화 21 → 0.28, 목 36 → 0.47 (진함)
+    for (final v in [0.12, 0.28, 0.47, 0.5]) {
+      expect(WeeklyEmotionCard.barColor(v, c), c.barStrong, reason: '$v');
+    }
+    // 수 48 → 0.63, 토 66 → 0.87 (중간)
+    for (final v in [0.63, 0.87, 0.9]) {
+      expect(WeeklyEmotionCard.barColor(v, c), c.barMid, reason: '$v');
+    }
+    // 금 75.8 → 1.0 (연함)
+    expect(WeeklyEmotionCard.barColor(1.0, c), c.barLight);
+  });
+
+  testWidgets('화면 배경은 #FFF8F8이고 상단에 핑크 그라디언트가 없다', (tester) async {
+    useDesignScreen(tester);
+    await pumpHome(tester);
+
+    expect(
+      tester.widget<Scaffold>(find.byType(Scaffold)).backgroundColor,
+      const Color(0xFFFFF8F8),
+    );
+    expect(
+      find.descendant(
+        of: find.byType(HomeTopBar),
+        matching: find.byWidgetPredicate(
+          (w) =>
+              w is DecoratedBox &&
+              w.decoration is BoxDecoration &&
+              (w.decoration as BoxDecoration).gradient != null,
+        ),
+      ),
+      findsNothing,
+    );
+  });
+
+  testWidgets('기록 카드(Before)는 흰색 + 테두리 1px, 글자는 왼쪽 정렬, 버튼은 연한 핑크 + 검정 글자', (
+    tester,
+  ) async {
+    useDesignScreen(tester);
+    await pumpHome(tester);
+
+    final card = find.descendant(
+      of: find.byType(RecordCardBefore),
+      matching: find.byType(Container),
+    );
+    final container = tester.widget<Container>(card.first);
+    final fill = container.decoration! as BoxDecoration;
+    expect(fill.color, AppColors.light.cardWhite);
+    final outline = container.foregroundDecoration! as BoxDecoration;
+    expect(
+      outline.border,
+      Border.all(color: AppColors.light.cardBorder, width: 1),
+    );
+
+    // 제목·부제는 테두리 1px 안쪽 왼쪽(20) → 바깥 기준 21에서 시작한다.
+    final cardLeft = tester.getTopLeft(find.byType(RecordCardBefore)).dx;
+    expect(
+      tester.getTopLeft(find.text('아직 오늘의 마음을 기록하지 않았어요')).dx - cardLeft,
+      closeTo(21, 0.5),
+    );
+    expect(
+      tester.getTopLeft(find.text('1분만 천천히 돌아볼까요?')).dx - cardLeft,
+      closeTo(21, 0.5),
+    );
+
+    final button = find.ancestor(
+      of: find.text('감정 기록하기'),
+      matching: find.byType(Container),
+    );
+    final buttonFill =
+        tester.widget<Container>(button.first).decoration! as BoxDecoration;
+    expect(buttonFill.color, AppColors.light.ctaSoft);
+    final label = tester.widget<Text>(find.text('감정 기록하기'));
+    expect(label.style!.color, AppColors.light.onCtaSoft);
+    expect(label.style!.fontSize, 16);
+  });
+
+  testWidgets('기록 카드(Before)에는 버튼 뒤로 얼굴만 내민 여우원숭이가 있다 (151×98, 위쪽만 보임)', (
+    tester,
+  ) async {
+    useDesignScreen(tester);
+    await pumpHome(tester);
+
+    final card = tester.getRect(find.byType(RecordCardBefore));
+    final mascot = find.byWidgetPredicate(
+      (w) =>
+          w is Image &&
+          w.image is AssetImage &&
+          (w.image as AssetImage).assetName == AppAssets.mascotLemur,
+    );
+    expect(mascot, findsOneWidget);
+    // 보이는 영역은 151×98, 이미지 자체는 정사각(높이 ≈151)이라 아래가 잘린다.
+    final visible = tester.getRect(
+      find.ancestor(of: mascot, matching: find.byType(ClipRect)).first,
+    );
+    expect(visible.size, const Size(151, 98));
+    expect(
+      tester.getSize(mascot),
+      const Size(HomeLayout.mascotWidth, HomeLayout.mascotImageHeight),
+    );
+    // 카드 위에서 96, 가로 가운데, 버튼은 그 바로 아래(194)에서 시작한다.
+    expect(visible.top - card.top, closeTo(96, 0.5));
+    expect(visible.center.dx, closeTo(card.center.dx, 0.5));
+    final button = tester.getRect(
+      find
+          .ancestor(of: find.text('감정 기록하기'), matching: find.byType(Container))
+          .first,
+    );
+    expect(button.top - card.top, closeTo(194, 0.5));
+    expect(button.height, 52);
+    expect(button.left - card.left, closeTo(21, 0.5));
   });
 
   testWidgets('폭 360에서도 오버플로 없이 카드가 폭을 채운다', (tester) async {
@@ -202,8 +332,8 @@ void main() {
     await pumpHome(tester);
 
     final scrollable = tester.state<ScrollableState>(find.byType(Scrollable));
-    // 내용 높이 1205(Figma 프레임) − 화면 874
-    expect(scrollable.position.maxScrollExtent, closeTo(1205 - 874, 1));
+    // 내용 높이 1288(Figma 최신 프레임) − 화면 874
+    expect(scrollable.position.maxScrollExtent, closeTo(1288 - 874, 1));
   });
 
   testWidgets('상단 바는 스크롤해도 화면 위에 고정되고 블러 배경을 가진다', (tester) async {
@@ -220,10 +350,8 @@ void main() {
     final headerY = tester.getTopLeft(find.byType(HomeHeader)).dy;
     final recordCardY = tester.getTopLeft(find.byType(RecordCardBefore)).dy;
 
-    await tester.drag(
-      find.byType(SingleChildScrollView),
-      const Offset(0, -200),
-    );
+    // 글자 위(눌리는 위젯이 없는 곳)에서 끈다. 버튼 위에서 끌면 탭 인식기 때문에 시작 거리가 달라진다.
+    await tester.dragFrom(const Offset(300, 180), const Offset(0, -200));
     await tester.pumpAndSettle();
 
     expect(tester.getTopLeft(find.byType(HomeHeader)).dy, headerY);
@@ -231,6 +359,39 @@ void main() {
     expect(
       tester.getTopLeft(find.byType(RecordCardBefore)).dy,
       closeTo(recordCardY - 200, 1),
+    );
+  });
+
+  testWidgets('로고를 누르면 맨 위로 부드럽게 올라간다', (tester) async {
+    useDesignScreen(tester);
+    await pumpHome(tester);
+
+    final scrollable = tester.state<ScrollableState>(find.byType(Scrollable));
+    await tester.dragFrom(const Offset(300, 180), const Offset(0, -300));
+    await tester.pumpAndSettle();
+    expect(scrollable.position.pixels, closeTo(300, 1));
+
+    await tester.tap(find.bySemanticsLabel('맨 위로 이동'));
+    await tester.pump(); // 애니메이션 시작 프레임
+    // 애니메이션 도중에는 아직 위로 올라가는 중이다.
+    await tester.pump(HomeLayout.scrollToTopDuration ~/ 2);
+    expect(scrollable.position.pixels, inExclusiveRange(0, 300));
+
+    await tester.pumpAndSettle();
+    expect(scrollable.position.pixels, 0);
+  });
+
+  testWidgets('이미 맨 위일 때 로고를 눌러도 오류가 없다', (tester) async {
+    useDesignScreen(tester);
+    await pumpHome(tester);
+
+    await tester.tap(find.bySemanticsLabel('맨 위로 이동'));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(
+      tester.state<ScrollableState>(find.byType(Scrollable)).position.pixels,
+      0,
     );
   });
 
@@ -369,7 +530,8 @@ void main() {
           matching: find.byKey(const Key('suggestion-add')),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pump(); // 토스트는 3초 뒤 사라지므로 settle하지 않고 바로 확인한다
+      await tester.pump(ComponentLayout.toastFade);
 
       final todos = await container.read(todosRepositoryProvider).list();
       expect(todos.where((t) => t.title.contains('거리를 두고')).length, 1);

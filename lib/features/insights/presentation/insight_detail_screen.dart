@@ -48,7 +48,7 @@ class _InsightDetailScreenState extends ConsumerState<InsightDetailScreen> {
           insightId: insight.id,
           now: now,
         );
-    if (mounted) showAppSnackBar(context, '체크리스트에 담았어요');
+    if (mounted) showAppToast(context, '체크리스트에 담았어요');
   }
 
   @override

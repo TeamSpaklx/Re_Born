@@ -28,6 +28,7 @@ class RecordDetailScreen extends ConsumerWidget {
       title: '기록을 삭제할까요?',
       message: '삭제하면 되돌릴 수 없어요.',
       confirmLabel: '삭제',
+      destructive: true,
     );
     if (!ok || !context.mounted) return;
     final router = GoRouter.of(context);

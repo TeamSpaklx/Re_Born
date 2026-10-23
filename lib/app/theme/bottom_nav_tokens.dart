@@ -1,5 +1,5 @@
 /// 하단 탭 바 치수. Figma `ButtonNavigator[Liquid Glass]`(289:1158)에서 읽은 값이며
-/// 출처는 docs/DESIGN_SYSTEM.md.
+/// 출처는 docs/DESIGN_HOME.md.
 ///
 /// iOS는 Figma 값 그대로(반투명 흰색 + 테두리 + 그림자), Android는 같은 치수에
 /// 배경 블러를 더한다. Android 값은 Figma에 없어 추정이다.
@@ -48,20 +48,6 @@ abstract final class BottomNavTokens {
 
   /// 네이티브 탭 바 라벨 글꼴의 PostScript 이름(`AppAssets.pretendardBold` 파일).
   static const nativeLabelFontName = 'Pretendard-Bold';
-
-  /// 탭 바 뒤에서 내용이 흰색으로 흐려지는 구간의 높이 (Scroll Edge Effect, 추정).
-  static const scrollEdgeFadeHeight = 145.0;
-
-  /// iOS 점진 블러의 최대 강도. Figma 변수 `Scroll Edge Effect/Blur Radius` = 10.
-  static const scrollEdgeBlurSigma = 10.0;
-
-  /// 배경색 베일의 최대 불투명도(영역 45% 지점)와 화면 맨 아래 불투명도 (추정값).
-  /// 맨 아래까지 완전히 가리지 않아 내용이 흐리게 비쳐 보인다.
-  static const scrollEdgeVeilPeak = 0.7;
-  static const scrollEdgeVeilEnd = 0.4;
-
-  /// 점진 블러를 나누는 띠 개수 (추정값. 많을수록 부드럽지만 BackdropFilter가 늘어난다).
-  static const scrollEdgeBlurBands = 8;
 
   /// 스크롤 화면 맨 아래 여백: 탭 바 아래 34 + 탭 바 64 + 마지막 카드와의 간격 50.
   static const scrollBottomPadding = 148.0;

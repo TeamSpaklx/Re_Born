@@ -6,6 +6,8 @@ import '../../../app/theme/app_colors.dart';
 import '../../../core/errors/app_error_log.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../app/theme/app_text_styles.dart';
+import '../../../shared/widgets/app_bottom_sheet.dart';
+import '../../../shared/widgets/app_dialogs.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/choice_chip_button.dart';
@@ -91,7 +93,6 @@ class _RecordFormScreenState extends ConsumerState<RecordFormScreen> {
 
     final actions = ref.read(recordActionsProvider);
     final editing = _editing;
-    final messenger = ScaffoldMessenger.of(context);
     final router = GoRouter.of(context);
     try {
       if (editing == null) {
@@ -115,9 +116,7 @@ class _RecordFormScreenState extends ConsumerState<RecordFormScreen> {
       ref.read(appErrorLogProvider).record(error, stack, where: 'save-entry');
       if (!mounted) return;
       setState(() => _saving = false);
-      messenger.showSnackBar(
-        const SnackBar(content: Text('저장하지 못했어요. 다시 시도해 주세요.')),
-      );
+      showAppToast(context, '저장하지 못했어요. 다시 시도해 주세요.');
       return;
     }
     if (!mounted) return;
@@ -127,41 +126,33 @@ class _RecordFormScreenState extends ConsumerState<RecordFormScreen> {
   Future<void> _pickPerson() async {
     final people = ref.read(peopleProvider).value ?? const [];
     final colors = context.colors;
-    final picked = await showModalBottomSheet<_PersonChoice>(
-      context: context,
-      backgroundColor: colors.cardWhite,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: Text(
-                '인물 없음',
-                style: AppTextStyles.body.copyWith(color: colors.textBlack),
+    final picked = await showAppBottomSheet<_PersonChoice>(
+      context,
+      title: '누구와의 기록인가요?',
+      builder: (context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SheetOptionRow(
+            title: '인물 없음',
+            selected: _personId == null,
+            onTap: () => Navigator.of(context).pop(const _PersonChoice(null)),
+          ),
+          if (people.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.space16),
+              child: Text(
+                '등록된 인물이 없어요. 인물 없이 저장할 수 있고, 관계 탭에서 인물을 추가할 수 있어요.',
+                style: AppTextStyles.body.copyWith(color: colors.textSecondary),
               ),
-              onTap: () => Navigator.of(context).pop(const _PersonChoice(null)),
             ),
-            if (people.isEmpty)
-              Padding(
-                padding: const EdgeInsets.all(24),
-                child: Text(
-                  '등록된 인물이 없어요. 인물 없이 저장할 수 있고, 관계 탭에서 인물을 추가할 수 있어요.',
-                  style: AppTextStyles.body.copyWith(
-                    color: colors.textSecondary,
-                  ),
-                ),
-              ),
-            for (final p in people)
-              ListTile(
-                title: Text(
-                  p.name,
-                  style: AppTextStyles.body.copyWith(color: colors.textBlack),
-                ),
-                subtitle: Text(p.relationType.label),
-                onTap: () => Navigator.of(context).pop(_PersonChoice(p.id)),
-              ),
-          ],
-        ),
+          for (final p in people)
+            SheetOptionRow(
+              title: p.name,
+              subtitle: p.relationType.label,
+              selected: _personId == p.id,
+              onTap: () => Navigator.of(context).pop(_PersonChoice(p.id)),
+            ),
+        ],
       ),
     );
     if (picked != null) setState(() => _personId = picked.id);

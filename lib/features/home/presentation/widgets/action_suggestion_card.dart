@@ -10,7 +10,7 @@ import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/centered_line.dart';
 import '../../models/action_suggestion.dart';
 
-/// "오늘 해볼까요?" 카드 하나 (높이 90, docs/DESIGN_SYSTEM.md 5.6).
+/// "오늘 해볼까요?" 카드 하나 (높이 90, docs/DESIGN_HOME.md 5.6).
 class ActionSuggestionCard extends StatelessWidget {
   const ActionSuggestionCard({
     super.key,

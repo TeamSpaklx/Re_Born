@@ -13,7 +13,7 @@ import '../../core/platform/native_ui_support.dart';
 import 'nav_tabs.dart';
 import 'native_tab_bar.dart';
 
-/// 하단 탭 바 (Figma `ButtonNavigator[Liquid Glass]`, docs/DESIGN_SYSTEM.md 5.8).
+/// 하단 탭 바 (Figma `ButtonNavigator[Liquid Glass]`, docs/DESIGN_HOME.md 5.8).
 ///
 /// - iOS 26 이상: 시스템 `UITabBar`(Liquid Glass)를 네이티브로 그린다([NativeTabBar]).
 /// - iOS 26 미만: Figma 값(반투명 흰색 + 테두리 + 그림자) + 약한 블러

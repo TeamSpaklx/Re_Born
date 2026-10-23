@@ -5,12 +5,12 @@ import 'package:go_router/go_router.dart';
 import '../../../app/router.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_spacing.dart';
-import '../../../app/theme/app_text_styles.dart';
 import '../../../shared/widgets/cta_button.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/tab_page_scaffold.dart';
 import '../../people/presentation/people_providers.dart';
 import 'widgets/person_card.dart';
+import '../../../shared/widgets/app_text_button.dart';
 
 /// 관계 탭: 인물 목록과 인물별 관계 지수 (F-02, F-09). **임시 디자인**.
 class RelationsScreen extends ConsumerWidget {
@@ -23,12 +23,10 @@ class RelationsScreen extends ConsumerWidget {
 
     return TabPageScaffold(
       title: '관계',
-      trailing: TextButton(
-        onPressed: () => context.push(AppRoutes.relationsNew),
-        child: Text(
-          '인물 추가',
-          style: AppTextStyles.button.copyWith(color: colors.brand),
-        ),
+      trailing: AppTextButton(
+        label: '인물 추가',
+        color: colors.brand,
+        onTap: () => context.push(AppRoutes.relationsNew),
       ),
       children: [
         const SizedBox(height: HomeLayout.headerToDate),
