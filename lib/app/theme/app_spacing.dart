@@ -1,3 +1,5 @@
+import 'dart:ui' show Offset;
+
 /// 간격과 크기. Figma 홈 화면(402×874 기준)에서 읽은 값이며 출처는 docs/DESIGN_SYSTEM.md.
 ///
 /// 화면 폭은 좌우 여백 [pageMargin]을 고정하고 카드가 남는 폭을 채운다(402일 때 354).
@@ -137,4 +139,15 @@ abstract final class AttendanceLayout {
   static const pillHeight = 13.0;
   static const pillGap = 5.0;
   static const pillCount = 6;
+}
+
+/// 스플래시 화면 치수 (Figma 402×874 "스플릿 화면", 로고는 화면 정중앙).
+abstract final class SplashLayout {
+  static const logoSize = 200.0;
+
+  /// Figma는 이미지를 박스 안에서 left −0.4%, top −0.85% 옮겨 놓았다(200 기준 −0.8, −1.7px).
+  static const logoOffset = Offset(-0.8, -1.7);
+
+  /// 로고를 보여 주는 시간. Figma에 지정이 없어 정한 임시값(팀 확인 필요).
+  static const duration = Duration(milliseconds: 1200);
 }

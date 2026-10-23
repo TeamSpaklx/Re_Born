@@ -225,6 +225,7 @@ Figma 홈 화면에서 읽은 값을 정리한 문서입니다. **화면을 만�
 | `chevronAttendance` | `chevron_attendance.svg` | 20 | "출석 체크 >" |
 | `radioCircle` / `radioCircleAfter` | `radio_circle(_after).svg` | 20 | 액션 카드 오른쪽 원 |
 | `logo` | `assets/images/logo_reborn.png` | 1000×250 | 헤더 로고 |
+| `logoMark` | `assets/images/logo_mark.png` | 2000×2000 (표시 200) | 스플래시 로고 (Figma `651:730`, 배경 투명) |
 
 - **아이콘 출처:** 하단 탭 바의 투데이·관계·기록은 Phosphor Icons(`house-fill`, `users-fill`, 기록), 전체는 Iconsax(`menu`)입니다. 그 밖의 홈 아이콘(`person`, `forum`, `bell`, 화살표류, `seal-check-fill`)의 출처는 확인하지 못했습니다(확인 필요). 새 아이콘이 필요하면 두 라이브러리에서 SVG로 받아 `assets/icons/ui/`에 넣습니다(Flutter 패키지는 쓰지 않음).
 - 폰트: `assets/fonts/Pretendard-{Regular,Medium,SemiBold,Bold,ExtraBold}.otf` (v1.3.9, SIL OFL 1.1, `OFL-LICENSE.txt`). pubspec에서 weight 400/500/600/700/800으로 등록.
