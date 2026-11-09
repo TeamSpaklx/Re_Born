@@ -15,11 +15,11 @@ AI 코딩 도구(Codex, Claude Code 등)가 이 레포에서 작업할 때 따�
 
 ```sh
 flutter pub get    # 의존성 설치
-flutter analyze    # 린트 (CI에서 실행)
-flutter test       # 테스트 (CI에서 실행)
+flutter analyze    # 린트
+flutter test       # 테스트
 ```
 
-PR을 올리기 전에 `flutter analyze`와 `flutter test`가 통과해야 합니다. `main`은 CI 통과 없이 머지되지 않습니다.
+PR을 올리기 전에 로컬에서 `flutter analyze`와 `flutter test`가 통과해야 합니다. 실행 결과를 PR에 적어 주세요.
 
 ## 코드 규칙
 
@@ -46,8 +46,8 @@ PR을 올리기 전에 `flutter analyze`와 `flutter test`가 통과해야 합�
 
 ## Git 규칙
 
-- `main`에 직접 push하지 않습니다. 최신 `main`에서 브랜치를 따서 PR로 머지합니다.
-- 브랜치 이름: `종류/짧은-설명` (예: `feat/login-screen`, `fix/entry-save`, `docs/spec-update`)
+- `main`에 직접 push하지 않습니다. 최신 `main`에서 브랜치를 따서 PR로 머지합니다. 프론트엔드 PR은 `frontend-integration`을 대상으로 올리고, 전체 기능 검증 후 이 브랜치를 `main`에 PR로 병합합니다.
+- 작업 브랜치 이름: `종류/짧은-설명` (예: `feat/login-screen`, `fix/entry-save`, `docs/spec-update`). 통합 브랜치 `frontend-integration`은 예외입니다.
 - 커밋 메시지: `feat:` / `fix:` / `refactor:` / `chore:` / `docs:` / `test:` 접두사 + 한국어 설명
 - PR 본문은 `.github/pull_request_template.md` 형식을 따릅니다.
 - 커밋 메시지와 PR 본문에 AI 도구 표기(`Co-Authored-By: Claude ...`, `Generated with ...` 등)를 넣지 않습니다.
