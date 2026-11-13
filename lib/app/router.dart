@@ -40,7 +40,7 @@ abstract final class AppRoutes {
 /// 테스트는 기본값(투데이)으로 바로 화면을 확인한다.
 final initialLocationProvider = Provider<String>((ref) => AppRoutes.today);
 
-/// 앱 라우터. 시작 세션에 따라 로그인 화면 또는 홈으로 이동한다.
+/// 앱 라우터. 실제 앱은 스플래시 뒤 로그인 목업 화면으로 이동한다.
 final routerProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
     initialLocation: ref.read(initialLocationProvider),
