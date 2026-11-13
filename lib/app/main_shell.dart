@@ -5,15 +5,13 @@ import 'package:go_router/go_router.dart';
 
 import '../core/utils/app_haptics.dart';
 import '../shared/widgets/app_bottom_nav_bar.dart';
-import '../shared/widgets/scroll_edge_effect.dart';
 import 'theme/app_colors.dart';
 import 'theme/app_spacing.dart';
 import 'theme/bottom_nav_tokens.dart';
 
 /// 하단 탭 바가 화면 아래에 떠 있는 메인 틀.
 ///
-/// 탭 바는 화면 아래에서 34 위(홈 인디케이터 영역 위)에 고정되고, 그 뒤로
-/// 내용이 흰색으로 흐려진다. 각 탭 화면은 스크롤 맨 아래에
+/// 탭 바는 화면 아래에서 34 위(홈 인디케이터 영역 위)에 고정된다. 각 탭 화면은 스크롤 맨 아래에
 /// [BottomNavTokens.scrollBottomPadding]만큼 여백을 둬서 탭 바에 가려지지 않게 한다.
 class MainShell extends StatelessWidget {
   const MainShell({super.key, required this.navigationShell});
@@ -37,13 +35,6 @@ class MainShell extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           navigationShell,
-          const Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: BottomNavTokens.scrollEdgeFadeHeight,
-            child: ScrollEdgeEffect(),
-          ),
           Positioned(
             left: 0,
             right: 0,

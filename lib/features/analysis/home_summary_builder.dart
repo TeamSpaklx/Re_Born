@@ -59,38 +59,34 @@ HomeSummary buildHomeSummary({
     );
   }
 
-  // 제안: 인물마다 최신 인사이트의 첫 제안. 하나뿐이면 같은 인사이트의 다음 제안을 이어 붙여 두 장.
-  final suggestions = <ActionSuggestion>[];
+  // 제안: 인물마다 최신 인사이트의 제안 문구를 번갈아 훑어, 이미 체크리스트에 있는 것(완료 포함)은 빼고 처음 두 개를 보여 준다.
   bool isAdded(String title, String insightId) =>
       todos.any((t) => t.insightId == insightId && t.title == title);
+  final pools = <(Insight, Person, List<String>)>[];
   for (final insight in picked) {
     final person = personOf(insight.personId);
     if (person == null) continue;
-    final pool = SuggestionPool.forInsight(insight.type, person.name);
-    suggestions.add(
-      ActionSuggestion(
-        id: '${insight.id}:0',
-        insightId: insight.id,
-        personId: person.id,
-        title: pool.first,
-        reason: insight.message,
-        added: isAdded(pool.first, insight.id),
-      ),
-    );
+    pools.add((
+      insight,
+      person,
+      SuggestionPool.forInsight(insight.type, person.name),
+    ));
   }
-  if (suggestions.length == 1 && picked.isNotEmpty) {
-    final insight = picked.first;
-    final person = personOf(insight.personId);
-    final pool = SuggestionPool.forInsight(insight.type, person?.name ?? '');
-    if (pool.length > 1) {
+  final suggestions = <ActionSuggestion>[];
+  final longest = pools.isEmpty
+      ? 0
+      : pools.map((e) => e.$3.length).reduce((a, b) => a > b ? a : b);
+  for (var k = 0; k < longest && suggestions.length < 2; k++) {
+    for (final (insight, person, pool) in pools) {
+      if (k >= pool.length || suggestions.length >= 2) continue;
+      if (isAdded(pool[k], insight.id)) continue;
       suggestions.add(
         ActionSuggestion(
-          id: '${insight.id}:1',
+          id: '${insight.id}:$k',
           insightId: insight.id,
-          personId: insight.personId,
-          title: pool[1],
+          personId: person.id,
+          title: pool[k],
           reason: insight.message,
-          added: isAdded(pool[1], insight.id),
         ),
       );
     }
@@ -104,6 +100,7 @@ HomeSummary buildHomeSummary({
     relationSignals: signals,
     weeklyEmotion: buildWeeklyEmotion(entries, now),
     suggestions: suggestions,
+    suggestionsDone: pools.isNotEmpty && suggestions.isEmpty,
     todayEntryId: todayEntries.isEmpty
         ? null
         : (todayEntries..sort((a, b) => b.createdAt.compareTo(a.createdAt)))

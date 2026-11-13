@@ -8,20 +8,28 @@ import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/centered_line.dart';
+import '../../../../shared/widgets/pressable.dart';
 import '../../models/weekly_emotion_flow.dart';
 
-/// "이번 주 감정 흐름" 그래프 카드 (높이 180). 좌표는 테두리 안쪽 기준(docs/DESIGN_SYSTEM.md 5.5).
+/// "이번 주 감정 흐름" 그래프 카드 (높이 180). 좌표는 테두리 안쪽 기준(docs/DESIGN_HOME.md 5.5).
 /// 폭이 디자인(안쪽 350)과 다르면 가로 좌표만 같은 비율로 늘리고 줄인다.
 class WeeklyEmotionCard extends StatelessWidget {
-  const WeeklyEmotionCard({super.key, required this.flow});
+  const WeeklyEmotionCard({super.key, required this.flow, this.onTitleTap});
 
   final WeeklyEmotionFlow flow;
 
+  /// 제목("이번 주 감정 흐름 >")을 눌렀을 때. 터치 영역은 높이 44.
+  final VoidCallback? onTitleTap;
+
   static const _weekdays = ['월', '화', '수', '목', '금', '토', '일'];
-  static const _emojiLeft = 212.0;
-  static const _emojiTop = 26.0;
-  static const _emojiHeight = 22.0;
   static const _barCount = 6;
+
+  /// 막대 색: 값이 낮을수록 진하고 높을수록 연하다(구간은 [GraphLayout.barStrongMax]·[GraphLayout.barMidMax]).
+  static Color barColor(double value, AppColors colors) {
+    if (value <= GraphLayout.barStrongMax) return colors.barStrong;
+    if (value <= GraphLayout.barMidMax) return colors.barMid;
+    return colors.barLight;
+  }
 
   // Figma에서 막대·요일 라벨 좌표는 테두리(2px) 바깥 기준이고, 제목·격자·설명은 안쪽 기준이다.
   static const _borderInset = AppSpacing.cardBorderWidth;
@@ -37,19 +45,34 @@ class WeeklyEmotionCard extends StatelessWidget {
           return Stack(
             children: [
               Positioned(
-                left: 18 * s,
-                top: 12,
-                child: Row(
-                  children: [
-                    Text(
-                      '이번 주 감정 흐름',
-                      style: AppTextStyles.graphTitle.copyWith(
-                        color: colors.textBlack,
+                left: 18 * s - 8,
+                top: -2,
+                child: Semantics(
+                  button: onTitleTap != null,
+                  label: '이번 주 감정 흐름, 기록 보기',
+                  excludeSemantics: true,
+                  onTap: onTitleTap,
+                  child: Pressable(
+                    onTap: onTitleTap,
+                    child: SizedBox(
+                      height: 44,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Row(
+                          children: [
+                            Text(
+                              '이번 주 감정 흐름',
+                              style: AppTextStyles.graphTitle.copyWith(
+                                color: colors.textBlack,
+                              ),
+                            ),
+                            const SizedBox(width: 2),
+                            SvgPicture.asset(AppAssets.chevronGraph),
+                          ],
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 2),
-                    SvgPicture.asset(AppAssets.chevronGraph),
-                  ],
+                  ),
                 ),
               ),
               Positioned(
@@ -65,14 +88,14 @@ class WeeklyEmotionCard extends StatelessWidget {
                   ),
                 ),
               ),
-              for (final y in GraphLayout.gridLineYs)
-                Positioned(
-                  left: GraphLayout.gridLeft * s,
-                  top: y,
-                  width: GraphLayout.gridWidth * s,
-                  height: 1,
-                  child: ColoredBox(color: colors.gridLine),
-                ),
+              // 수정안은 막대가 서는 바닥선 하나만 보인다(위쪽 격자선 3개는 Figma에서 숨김).
+              Positioned(
+                left: GraphLayout.gridLeft * s,
+                top: GraphLayout.baselineY,
+                width: GraphLayout.gridWidth * s,
+                height: 1,
+                child: ColoredBox(color: colors.gridLine),
+              ),
               for (var i = 0; i < _barCount; i++)
                 if (flow.days[i] != null)
                   Positioned(
@@ -85,7 +108,7 @@ class WeeklyEmotionCard extends StatelessWidget {
                     height: flow.days[i]! * GraphLayout.maxBarHeight,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        color: colors.brand,
+                        color: barColor(flow.days[i]!, colors),
                         borderRadius: AppRadii.graphBarBorderRadius,
                       ),
                     ),
@@ -100,20 +123,6 @@ class WeeklyEmotionCard extends StatelessWidget {
                       _weekdays[i],
                       style: AppTextStyles.weekday.copyWith(
                         color: colors.textStrong,
-                      ),
-                    ),
-                  ),
-                ),
-              if (flow.peakEmoji != null)
-                Positioned(
-                  left: _emojiLeft * s,
-                  top: _emojiTop,
-                  child: CenteredLine(
-                    height: _emojiHeight,
-                    child: Text(
-                      flow.peakEmoji!,
-                      style: AppTextStyles.graphEmoji.copyWith(
-                        color: colors.emoji,
                       ),
                     ),
                   ),

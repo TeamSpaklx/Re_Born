@@ -50,23 +50,14 @@ void main() {
   Future<void> openRecordForm(WidgetTester tester) async {
     await tester.tap(find.text('기록'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('감정 기록하기').last);
+    await tester.tap(find.text('기록하기'));
     await tester.pumpAndSettle();
   }
 
   Future<void> pickEmotionAndIntensity(WidgetTester tester) async {
-    await tester.scrollUntilVisible(
-      find.text('서운함'),
-      100,
-      scrollable: formScrollable(),
-    );
-    await tester.tap(find.text('서운함'));
-    await tester.scrollUntilVisible(
-      find.text('2 보통'),
-      100,
-      scrollable: formScrollable(),
-    );
-    await tester.tap(find.text('2 보통'));
+    await tester.tap(find.byKey(const Key('emotion-sadness')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('intensity-2')));
     await tester.pump();
   }
 
@@ -80,14 +71,54 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('기록 탭: 날짜별 목록과 "감정 기록하기" 버튼이 보인다', (tester) async {
+  testWidgets('기록 탭: 달력에서 날짜를 고르면 그날의 기록이 보인다', (tester) async {
     await pumpApp(tester);
     await tester.tap(find.text('기록'));
     await tester.pumpAndSettle();
 
-    expect(find.text('감정 기록하기'), findsWidgets);
+    expect(find.text('기록하기'), findsOneWidget);
+    expect(find.text('2026년 10월'), findsOneWidget);
+    expect(find.text('오늘은 아직 기록이 없어요.'), findsOneWidget);
+    expect(find.text('10월의 마음'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('day-2026-10-21')));
+    await tester.pumpAndSettle();
     expect(find.text('10월 21일 수요일'), findsOneWidget);
     expect(find.text('지민이가 답장을 늦게 해서 서운했다.'), findsWidgets);
+  });
+
+  testWidgets('기록 탭: 목록으로 바꾸면 날짜별로 묶여 보인다', (tester) async {
+    await pumpApp(tester);
+    await tester.tap(find.text('기록'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('목록'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('10월 21일 수요일'), findsOneWidget);
+    expect(find.text('지민이가 답장을 늦게 해서 서운했다.'), findsWidgets);
+  });
+
+  testWidgets('기록 탭: 카드를 밀면 확인 팝업 뒤에 삭제된다', (tester) async {
+    final container = await pumpApp(tester);
+    final entries = container.read(entriesRepositoryProvider);
+    final before = (await entries.list()).length;
+    await tester.tap(find.text('기록'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('day-2026-10-21')));
+    await tester.pumpAndSettle();
+
+    await tester.drag(
+      find.byType(SingleChildScrollView).first,
+      const Offset(0, -500),
+    );
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(Dismissible).first, const Offset(-400, 0));
+    await tester.pumpAndSettle();
+    expect(find.text('기록을 삭제할까요?'), findsOneWidget);
+    await tester.tap(find.text('삭제').last);
+    await tester.pumpAndSettle();
+
+    expect((await entries.list()).length, before - 1);
   });
 
   testWidgets('T-11: 공백만 입력하고 저장하면 안내가 나오고 저장되지 않는다', (tester) async {
@@ -115,10 +146,10 @@ void main() {
 
     expect(find.text('감정을 선택해 주세요.'), findsOneWidget);
     expect(find.text('강도를 선택해 주세요.'), findsOneWidget);
-    expect(find.text('새 기록'), findsOneWidget, reason: '작성 화면에 남아 있다');
+    expect(find.text('지금 마음은\n어떤가요?'), findsOneWidget, reason: '작성 화면에 남아 있다');
   });
 
-  testWidgets('T-10: 본문·서운함·강도 2로 저장하면 목록에 생기고 점수는 −2', (tester) async {
+  testWidgets('T-10: 본문·슬픔·강도 2로 저장하면 목록에 생기고 점수는 −2', (tester) async {
     final container = await pumpApp(tester);
     await openRecordForm(tester);
 
@@ -132,7 +163,7 @@ void main() {
     final saved =
         (await container.read(entriesRepositoryProvider).list()).first;
     expect(saved.body, contains('하은이가'));
-    expect(saved.emotion, Emotion.hurt);
+    expect(saved.emotion, Emotion.sadness);
     expect(saved.score, -2);
     expect(find.textContaining('하은이가 노트를'), findsOneWidget);
   });
@@ -175,6 +206,11 @@ void main() {
     await pumpApp(tester, noPeople: true);
     await openRecordForm(tester);
 
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('record-person')),
+      100,
+      scrollable: formScrollable(),
+    );
     await tester.tap(find.byKey(const Key('record-person')));
     await tester.pumpAndSettle();
 
@@ -189,6 +225,8 @@ void main() {
     final entries = container.read(entriesRepositoryProvider);
     final target = (await entries.list(personId: 'p1')).first;
     await tester.tap(find.text('기록'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('목록'));
     await tester.pumpAndSettle();
 
     await tester.tap(find.text(target.body).first);

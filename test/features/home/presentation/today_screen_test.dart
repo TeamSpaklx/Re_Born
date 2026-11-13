@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:reborn_app/app/app.dart';
 import 'package:reborn_app/app/data_providers.dart';
 import 'package:reborn_app/app/main_shell.dart';
+import 'package:reborn_app/app/theme/app_assets.dart';
 import 'package:reborn_app/app/theme/app_colors.dart';
 import 'package:reborn_app/app/theme/app_radii.dart';
 import 'package:reborn_app/app/theme/app_spacing.dart';
@@ -14,7 +15,11 @@ import 'package:reborn_app/features/entries/data/in_memory_entries_repository.da
 import 'package:reborn_app/app/data_revision.dart';
 import 'package:reborn_app/features/entries/models/emotion.dart';
 import 'package:reborn_app/features/entries/models/entry.dart';
+import 'package:reborn_app/features/analysis/suggestion_pool.dart';
+import 'package:reborn_app/features/home/models/greeting_pool.dart';
 import 'package:reborn_app/features/home/presentation/today_screen.dart';
+import 'package:reborn_app/features/insights/models/insight.dart';
+import 'package:reborn_app/features/todos/models/todo.dart';
 import 'package:reborn_app/features/home/presentation/widgets/action_suggestion_card.dart';
 import 'package:reborn_app/features/home/presentation/widgets/home_header.dart';
 import 'package:reborn_app/features/home/presentation/widgets/home_top_bar.dart';
@@ -70,7 +75,11 @@ void main() {
   }) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [clockProvider.overrideWithValue(() => now), ...overrides],
+        overrides: [
+          clockProvider.overrideWithValue(() => now),
+          greetingIndexProvider.overrideWithValue(0),
+          ...overrides,
+        ],
         child: MaterialApp(theme: AppTheme.light, home: const TodayScreen()),
       ),
     );
@@ -99,7 +108,7 @@ void main() {
       '이번 주 감정 흐름',
       '✦ 10월',
       '오늘 해볼까요?',
-      '지민님에게 가볍게 안부 묻기',
+      '오늘은 거리를 두고, 내일 가벼운 간식과 함께 말을 건네 보세요.',
     ]) {
       expect(find.text(text), findsWidgets, reason: text);
     }
@@ -166,10 +175,10 @@ void main() {
       if (w is! DecoratedBox) return false;
       final d = w.decoration;
       return d is BoxDecoration &&
-          d.color == AppColors.light.brand &&
+          d.color == AppColors.light.barStrong &&
           d.borderRadius == AppRadii.graphBarBorderRadius;
     });
-    // 월(평온 0과 서운함 −2의 평균 −1 → 0.3333), 화(−2와 +1의 평균 → 0.4167), 수(−2 → 0.1667)
+    // 월(무표정 0과 슬픔 −2의 평균 −1 → 0.3333), 화(−2와 +1의 평균 → 0.4167), 수(−2 → 0.1667)
     expect(bars, findsNWidgets(3));
     const expected = [0.33333, 0.41667, 0.16667];
     for (var i = 0; i < 3; i++) {
@@ -185,7 +194,136 @@ void main() {
       reason: '첫 3일은 평균이 내려가는 흐름',
     );
     expect(find.textContaining('조금씩 줄고', findRichText: true), findsOneWidget);
-    expect(find.text('🙂'), findsOneWidget, reason: '가장 높은 화요일(0.4167)');
+    // 최신 안에는 그래프 위 이모지가 없다(데이터의 peakEmoji는 있지만 화면에 그리지 않는다).
+    expect(find.text('🙂'), findsNothing);
+    expect(find.text('😁'), findsNothing);
+    // 격자선은 막대가 서는 바닥선 하나만 보인다(위쪽 3개는 Figma에서 숨김).
+    final lines = find.descendant(
+      of: find.byType(WeeklyEmotionCard),
+      matching: find.byWidgetPredicate(
+        (w) => w is ColoredBox && w.color == AppColors.light.gridLine,
+      ),
+    );
+    expect(lines, findsOneWidget);
+    final card = tester.getTopLeft(find.byType(WeeklyEmotionCard));
+    expect(
+      tester.getTopLeft(lines).dy - card.dy,
+      closeTo(GraphLayout.baselineY + 2, 0.5), // 투명 테두리 2px 안쪽 기준 → 바깥 기준 126
+    );
+  });
+
+  test('막대 색은 값이 낮을수록 진하고 높을수록 연하다 (Figma 수정안 샘플 막대 기준)', () {
+    const c = AppColors.light;
+    // 샘플 막대 높이/최대(75.806): 월 9 → 0.12, 화 21 → 0.28, 목 36 → 0.47 (진함)
+    for (final v in [0.12, 0.28, 0.47, 0.5]) {
+      expect(WeeklyEmotionCard.barColor(v, c), c.barStrong, reason: '$v');
+    }
+    // 수 48 → 0.63, 토 66 → 0.87 (중간)
+    for (final v in [0.63, 0.87, 0.9]) {
+      expect(WeeklyEmotionCard.barColor(v, c), c.barMid, reason: '$v');
+    }
+    // 금 75.8 → 1.0 (연함)
+    expect(WeeklyEmotionCard.barColor(1.0, c), c.barLight);
+  });
+
+  testWidgets('화면 배경은 #FFF8F8이고 상단에 핑크 그라디언트가 없다', (tester) async {
+    useDesignScreen(tester);
+    await pumpHome(tester);
+
+    expect(
+      tester.widget<Scaffold>(find.byType(Scaffold)).backgroundColor,
+      const Color(0xFFFFF8F8),
+    );
+    expect(
+      find.descendant(
+        of: find.byType(HomeTopBar),
+        matching: find.byWidgetPredicate(
+          (w) =>
+              w is DecoratedBox &&
+              w.decoration is BoxDecoration &&
+              (w.decoration as BoxDecoration).gradient != null,
+        ),
+      ),
+      findsNothing,
+    );
+  });
+
+  testWidgets('기록 카드(Before)는 흰색 + 테두리 1px, 글자는 왼쪽 정렬, 버튼은 연한 핑크 + 검정 글자', (
+    tester,
+  ) async {
+    useDesignScreen(tester);
+    await pumpHome(tester);
+
+    final card = find.descendant(
+      of: find.byType(RecordCardBefore),
+      matching: find.byType(Container),
+    );
+    final container = tester.widget<Container>(card.first);
+    final fill = container.decoration! as BoxDecoration;
+    expect(fill.color, AppColors.light.cardWhite);
+    final outline = container.foregroundDecoration! as BoxDecoration;
+    expect(
+      outline.border,
+      Border.all(color: AppColors.light.cardBorder, width: 1),
+    );
+
+    // 제목·부제는 테두리 1px 안쪽 왼쪽(20) → 바깥 기준 21에서 시작한다.
+    final cardLeft = tester.getTopLeft(find.byType(RecordCardBefore)).dx;
+    expect(
+      tester.getTopLeft(find.text('아직 오늘의 마음을 기록하지 않았어요')).dx - cardLeft,
+      closeTo(21, 0.5),
+    );
+    expect(
+      tester.getTopLeft(find.text('1분만 천천히 돌아볼까요?')).dx - cardLeft,
+      closeTo(21, 0.5),
+    );
+
+    final button = find.ancestor(
+      of: find.text('감정 기록하기'),
+      matching: find.byType(Container),
+    );
+    final buttonFill =
+        tester.widget<Container>(button.first).decoration! as BoxDecoration;
+    expect(buttonFill.color, AppColors.light.ctaSoft);
+    final label = tester.widget<Text>(find.text('감정 기록하기'));
+    expect(label.style!.color, AppColors.light.onCtaSoft);
+    expect(label.style!.fontSize, 16);
+  });
+
+  testWidgets('기록 카드(Before)에는 버튼 뒤로 얼굴만 내민 여우원숭이가 있다 (151×98, 위쪽만 보임)', (
+    tester,
+  ) async {
+    useDesignScreen(tester);
+    await pumpHome(tester);
+
+    final card = tester.getRect(find.byType(RecordCardBefore));
+    final mascot = find.byWidgetPredicate(
+      (w) =>
+          w is Image &&
+          w.image is AssetImage &&
+          (w.image as AssetImage).assetName == AppAssets.mascotLemur,
+    );
+    expect(mascot, findsOneWidget);
+    // 보이는 영역은 151×98, 이미지 자체는 정사각(높이 ≈151)이라 아래가 잘린다.
+    final visible = tester.getRect(
+      find.ancestor(of: mascot, matching: find.byType(ClipRect)).first,
+    );
+    expect(visible.size, const Size(151, 98));
+    expect(
+      tester.getSize(mascot),
+      const Size(HomeLayout.mascotWidth, HomeLayout.mascotImageHeight),
+    );
+    // 카드 위에서 96, 가로 가운데, 버튼은 그 바로 아래(194)에서 시작한다.
+    expect(visible.top - card.top, closeTo(96, 0.5));
+    expect(visible.center.dx, closeTo(card.center.dx, 0.5));
+    final button = tester.getRect(
+      find
+          .ancestor(of: find.text('감정 기록하기'), matching: find.byType(Container))
+          .first,
+    );
+    expect(button.top - card.top, closeTo(194, 0.5));
+    expect(button.height, 52);
+    expect(button.left - card.left, closeTo(21, 0.5));
   });
 
   testWidgets('폭 360에서도 오버플로 없이 카드가 폭을 채운다', (tester) async {
@@ -202,8 +340,8 @@ void main() {
     await pumpHome(tester);
 
     final scrollable = tester.state<ScrollableState>(find.byType(Scrollable));
-    // 내용 높이 1205(Figma 프레임) − 화면 874
-    expect(scrollable.position.maxScrollExtent, closeTo(1205 - 874, 1));
+    // 내용 높이 1288(Figma 최신 프레임) − 화면 874
+    expect(scrollable.position.maxScrollExtent, closeTo(1288 - 874, 1));
   });
 
   testWidgets('상단 바는 스크롤해도 화면 위에 고정되고 블러 배경을 가진다', (tester) async {
@@ -220,10 +358,8 @@ void main() {
     final headerY = tester.getTopLeft(find.byType(HomeHeader)).dy;
     final recordCardY = tester.getTopLeft(find.byType(RecordCardBefore)).dy;
 
-    await tester.drag(
-      find.byType(SingleChildScrollView),
-      const Offset(0, -200),
-    );
+    // 글자 위(눌리는 위젯이 없는 곳)에서 끈다. 버튼 위에서 끌면 탭 인식기 때문에 시작 거리가 달라진다.
+    await tester.dragFrom(const Offset(300, 180), const Offset(0, -200));
     await tester.pumpAndSettle();
 
     expect(tester.getTopLeft(find.byType(HomeHeader)).dy, headerY);
@@ -231,6 +367,39 @@ void main() {
     expect(
       tester.getTopLeft(find.byType(RecordCardBefore)).dy,
       closeTo(recordCardY - 200, 1),
+    );
+  });
+
+  testWidgets('로고를 누르면 맨 위로 부드럽게 올라간다', (tester) async {
+    useDesignScreen(tester);
+    await pumpHome(tester);
+
+    final scrollable = tester.state<ScrollableState>(find.byType(Scrollable));
+    await tester.dragFrom(const Offset(300, 180), const Offset(0, -300));
+    await tester.pumpAndSettle();
+    expect(scrollable.position.pixels, closeTo(300, 1));
+
+    await tester.tap(find.bySemanticsLabel('맨 위로 이동'));
+    await tester.pump(); // 애니메이션 시작 프레임
+    // 애니메이션 도중에는 아직 위로 올라가는 중이다.
+    await tester.pump(HomeLayout.scrollToTopDuration ~/ 2);
+    expect(scrollable.position.pixels, inExclusiveRange(0, 300));
+
+    await tester.pumpAndSettle();
+    expect(scrollable.position.pixels, 0);
+  });
+
+  testWidgets('이미 맨 위일 때 로고를 눌러도 오류가 없다', (tester) async {
+    useDesignScreen(tester);
+    await pumpHome(tester);
+
+    await tester.tap(find.bySemanticsLabel('맨 위로 이동'));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(
+      tester.state<ScrollableState>(find.byType(Scrollable)).position.pixels,
+      0,
     );
   });
 
@@ -281,7 +450,10 @@ void main() {
       addTearDown(tester.view.reset);
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [clockProvider.overrideWithValue(() => now)],
+          overrides: [
+            clockProvider.overrideWithValue(() => now),
+            greetingIndexProvider.overrideWithValue(0),
+          ],
           child: const RebornApp(),
         ),
       );
@@ -307,10 +479,12 @@ void main() {
 
       expect(find.byType(RecordCardBefore), findsNothing);
       expect(find.byType(RecordCardAfter), findsOneWidget);
-      expect(
-        tester.getSize(find.byType(RecordCardAfter)).height,
-        HomeLayout.recordCardHeightAfter,
-      );
+      if (HomeLayout.showAttendance) {
+        expect(
+          tester.getSize(find.byType(RecordCardAfter)).height,
+          HomeLayout.recordCardHeightAfter,
+        );
+      }
       expect(
         find.text('오늘도 기록 완료!', findRichText: true, skipOffstage: false),
         findsNothing,
@@ -319,15 +493,16 @@ void main() {
         find.textContaining('일 연속 마음을 기록하고 있어요', findRichText: true),
         findsOneWidget,
       );
-      // 샘플은 최근 5일 연속 → 오늘 기록하면 6일, 최장 20일
-      expect(find.textContaining('최장 기록 20일 · 6/20일'), findsOneWidget);
-      Finder pills(String prefix) => find.byWidgetPredicate(
-        (w) =>
-            w.key is ValueKey<String> &&
-            (w.key! as ValueKey<String>).value.startsWith(prefix),
+      // 샘플은 최근 5일 연속 → 오늘 기록하면 6일(문구). 출석 패널은 지금 숨겨져 있다.
+      expect(find.textContaining('6'), findsWidgets);
+      expect(
+        find.text('출석 체크'),
+        HomeLayout.showAttendance ? findsOneWidget : findsNothing,
       );
-      expect(pills('pill-filled'), findsNWidgets(6));
-      expect(pills('pill-empty'), findsNothing);
+      expect(
+        find.textContaining('최장 기록'),
+        HomeLayout.showAttendance ? findsOneWidget : findsNothing,
+      );
       expect(find.text('오늘 기록 보기'), findsOneWidget);
     });
 
@@ -359,21 +534,81 @@ void main() {
       expect(find.text('이렇게 해 보면 어떨까요?'), findsOneWidget);
     });
 
-    testWidgets('제안 카드의 원을 누르면 체크리스트에 담기고 원이 채워진다 (T-26)', (tester) async {
+    testWidgets('제안 카드의 원을 누르면 담기고, 채워진 뒤 다음 제안이 그 자리로 온다 (T-26)', (
+      tester,
+    ) async {
       final container = await pumpApp(tester);
-      // 샘플에는 첫 제안이 이미 체크리스트에 담겨 있다 → 두 번째 제안을 담는다.
-      final cards = find.byType(ActionSuggestionCard);
+      // 샘플에는 첫 제안이 이미 담겨 있어 [두 번째, 세 번째] 제안이 보인다.
+      final pool = SuggestionPool.forInsight(InsightType.negativeTrend, '지민');
+      expect(find.text(pool[1]), findsOneWidget);
+      expect(find.text(pool[2]), findsOneWidget);
+
       await tester.tap(
         find.descendant(
-          of: cards.at(1),
+          of: find.byType(ActionSuggestionCard).first,
           matching: find.byKey(const Key('suggestion-add')),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(ComponentLayout.toastFade);
 
       final todos = await container.read(todosRepositoryProvider).list();
-      expect(todos.where((t) => t.title.contains('거리를 두고')).length, 1);
+      expect(todos.where((t) => t.title == pool[1]).length, 1);
       expect(find.text('체크리스트에 담았어요'), findsWidgets);
+      // 채워진 원이 잠깐 보인다.
+      expect(find.bySemanticsLabel('체크리스트에 담았어요'), findsWidgets);
+
+      await tester.pump(HomeLayout.suggestionSwapDelay);
+      await tester.pump(const Duration(seconds: 4)); // 토스트가 사라질 때까지
+      await tester.pumpAndSettle();
+      expect(find.text(pool[1]), findsNothing, reason: '담은 제안은 빠진다');
+      expect(find.text(pool[2]), findsOneWidget);
+      expect(find.text(pool[3]), findsOneWidget, reason: '다음 제안이 채워진다');
+    });
+
+    testWidgets('제안을 모두 담으면 안내와 체크리스트 버튼이 나온다', (tester) async {
+      final container = await pumpApp(tester);
+      final insight =
+          (await container.read(insightsRepositoryProvider).list()).first;
+      final pool = SuggestionPool.forInsight(insight.type, '지민');
+      for (final title in pool) {
+        if (title == pool.first) continue; // 샘플에 이미 있다
+        await container
+            .read(todosRepositoryProvider)
+            .create(
+              title: title,
+              createdAt: now,
+              source: TodoSource.suggestion,
+              insightId: insight.id,
+            );
+      }
+      container.read(dataRevisionProvider.notifier).bump();
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ActionSuggestionCard), findsNothing);
+      expect(find.text('오늘 제안을 모두 담았어요'), findsOneWidget);
+    });
+
+    testWidgets('"오늘 해볼까요? >"는 체크리스트가 있는 전체 탭으로, "이번 주 감정 흐름 >"는 기록 탭으로 간다', (
+      tester,
+    ) async {
+      await pumpApp(tester);
+      await tester.tap(find.bySemanticsLabel('오늘 해볼까요?'));
+      await tester.pumpAndSettle();
+      expect(find.text('체크리스트'), findsOneWidget);
+
+      await tester.tap(find.text('투데이'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.bySemanticsLabel('이번 주 감정 흐름, 기록 보기'));
+      await tester.pumpAndSettle();
+      expect(find.text('2026년 10월'), findsOneWidget);
+    });
+
+    testWidgets('최근 관계 신호 카드를 누르면 그 인사이트 상세가 열린다', (tester) async {
+      await pumpApp(tester);
+      await tester.tap(find.byType(RelationSignalCard).first);
+      await tester.pumpAndSettle();
+      expect(find.text('이렇게 해 보면 어떨까요?'), findsOneWidget);
     });
 
     testWidgets('기록을 모두 지우면 홈은 안내 문구를 보여 준다', (tester) async {
