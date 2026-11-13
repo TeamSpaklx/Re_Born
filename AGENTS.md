@@ -15,11 +15,11 @@ AI 코딩 도구(Codex, Claude Code 등)가 이 레포에서 작업할 때 따�
 
 ```sh
 flutter pub get    # 의존성 설치
-flutter analyze    # 린트
-flutter test       # 테스트
+flutter analyze    # 린트 (CI에서 실행)
+flutter test       # 테스트 (CI에서 실행)
 ```
 
-PR을 올리기 전에 로컬에서 `flutter analyze`와 `flutter test`가 통과해야 합니다. 실행 결과를 PR에 적어 주세요.
+PR을 올리기 전에 `flutter analyze`와 `flutter test`가 통과해야 합니다. `main`은 CI 통과 없이 머지되지 않습니다.
 
 ## 코드 규칙
 
@@ -29,11 +29,12 @@ PR을 올리기 전에 로컬에서 `flutter analyze`와 `flutter test`가 통�
 
 ## UI 규칙
 
-- 디자인 기준은 Figma이고, 값은 [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)에 정리되어 있습니다. 화면을 만들 때 Figma에 접속하지 말고 이 문서와 `docs/design/`의 스크린샷을 기준으로 합니다.
+- 디자인 기준은 Figma이고, 규칙·토큰·컴포넌트는 [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md), 홈 화면 Figma 값은 [docs/DESIGN_HOME.md](docs/DESIGN_HOME.md)에 정리되어 있습니다. 화면을 만들 때 Figma에 접속하지 말고 이 문서와 `docs/design/`의 스크린샷을 기준으로 합니다. 새 화면은 DESIGN_SYSTEM.md 7장의 공통 컴포넌트를 먼저 재사용하고, 레퍼런스는 `docs/design/references/INDEX.md`를 봅니다.
 - 색·글자·모서리·간격·에셋 경로는 `lib/app/theme/`의 상수(`context.colors`, `AppTextStyles`, `AppRadii`, `AppSpacing`, `AppAssets`)만 사용합니다. 화면 코드에 `Color(0x...)`, 글자 크기, 경로 문자열을 직접 쓰지 않습니다.
 - 지원 OS는 iOS와 Android 둘 다입니다. 확인은 기기에 따라 나눕니다(Windows → Android만, Mac → 둘 다). iOS 전용 코드는 `ios/`와 플랫폼 분기 안에만 두어 Android 빌드가 깨지지 않게 합니다.
 - 글자 크기 배율 1.0·라이트 모드·세로 방향 고정입니다(다크 모드는 나중에 추가 예정이라 색은 반드시 `context.colors`로 읽습니다).
-- 하단 탭은 4개(투데이/관계/기록/전체)이고, 디자인이 없는 화면은 흰 배경의 빈 화면으로 둡니다.
+- 머티리얼(구글) 위젯을 화면에서 직접 쓰지 않습니다. `Switch`, `SnackBar`, `AlertDialog`/`Dialog`+`TextButton`, `InkWell` 번짐 효과 대신 `lib/shared/widgets/`의 `AppToggle`, `showAppToast`, `showAppConfirmDialog`/`showAppDialog`, `SettingsGroup`, `AppTextButton`, `Pressable`을 씁니다([docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) 7·9장).
+- 하단 탭은 4개(투데이/관계/기록/전체)입니다. Figma가 없는 화면은 레퍼런스(`docs/design/references/INDEX.md`)를 해석해 공통 컴포넌트로 만들고, 추정 값은 문서에 표시합니다.
 - 새 화면의 데이터 모양과 Repository 규칙은 [docs/FRONTEND.md](docs/FRONTEND.md)를 따릅니다.
 
 ## 하지 말 것
@@ -48,7 +49,7 @@ PR을 올리기 전에 로컬에서 `flutter analyze`와 `flutter test`가 통�
 
 - `main`과 `frontend-integration`에 직접 push하지 않습니다. 작업 브랜치에서 초안 PR을 일찍 열어 진행 상황을 공유하고, PR 승인 1명 후 병합합니다.
 - 프론트엔드 PR은 `frontend-integration`을 대상으로 합니다. 이 브랜치 전체를 `main`에 병합하면 `main`의 서버 코드가 삭제됩니다. `main` 반영은 `main`에서 새 브랜치를 만들고 승인된 프론트 변경만 선별해 PR로 올립니다.
-- 작업 브랜치 이름: `종류/짧은-설명` (예: `feat/login-screen`, `fix/entry-save`, `docs/spec-update`). 통합 브랜치 `frontend-integration`은 예외입니다.
+- 브랜치 이름: `종류/짧은-설명` (예: `feat/login-screen`, `fix/entry-save`, `docs/spec-update`)
 - 커밋 메시지: `feat:` / `fix:` / `refactor:` / `chore:` / `docs:` / `test:` 접두사 + 한국어 설명
 - PR 본문은 `.github/pull_request_template.md` 형식을 따릅니다.
 - 커밋 메시지와 PR 본문에 AI 도구 표기(`Co-Authored-By: Claude ...`, `Generated with ...` 등)를 넣지 않습니다.

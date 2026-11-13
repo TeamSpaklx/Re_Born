@@ -17,6 +17,15 @@ class ActionSuggestion {
   final String title;
   final String reason;
 
-  /// 이미 체크리스트에 담았는지(F-04). 오른쪽 원이 채워진다.
+  /// 방금 체크리스트에 담았는지. 홈이 잠깐 채워진 원을 보여 줄 때만 true다(담은 제안은 곧 목록에서 빠진다).
   final bool added;
+
+  ActionSuggestion asAdded() => ActionSuggestion(
+    id: id,
+    insightId: insightId,
+    personId: personId,
+    title: title,
+    reason: reason,
+    added: true,
+  );
 }

@@ -4,17 +4,41 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:reborn_app/app/app.dart';
 import 'package:reborn_app/app/data_providers.dart';
 import 'package:reborn_app/app/main_shell.dart';
+import 'package:reborn_app/app/theme/app_spacing.dart';
+import 'package:reborn_app/core/platform/image_picker_service.dart';
 import 'package:reborn_app/core/providers/clock_provider.dart';
+import 'package:reborn_app/features/auth/data/in_memory_auth_repository.dart';
+import 'package:reborn_app/features/auth/presentation/auth_providers.dart';
+import 'package:reborn_app/features/auth/presentation/login_screen.dart';
 import 'package:reborn_app/features/todos/data/in_memory_todos_repository.dart';
 import 'package:reborn_app/features/todos/models/todo.dart';
 import 'package:reborn_app/shared/widgets/app_bottom_nav_bar.dart';
+import 'package:reborn_app/shared/widgets/app_toggle.dart';
 
 final fixedNow = DateTime(2026, 10, 22, 12);
+
+/// 고른 사진 경로를 정해 둔 가짜 선택기. [fail]이면 권한 거부처럼 실패한다.
+class _FakePicker implements ImagePickerService {
+  _FakePicker({this.path, this.fail = false});
+
+  final String? path;
+  final bool fail;
+  final picked = <PhotoSource>[];
+
+  @override
+  Future<String?> pick(PhotoSource source) async {
+    picked.add(source);
+    if (fail) throw PhotoPickException(source);
+    return path;
+  }
+}
 
 void main() {
   Future<ProviderContainer> pumpAll(
     WidgetTester tester, {
     bool emptyTodos = false,
+    bool signedIn = false,
+    ImagePickerService? picker,
   }) async {
     tester.view.devicePixelRatio = 1;
     tester.view.physicalSize = const Size(402, 1400);
@@ -23,6 +47,14 @@ void main() {
       ProviderScope(
         overrides: [
           clockProvider.overrideWithValue(() => fixedNow),
+          if (picker != null)
+            imagePickerServiceProvider.overrideWithValue(picker),
+          if (signedIn)
+            authRepositoryProvider.overrideWithValue(
+              InMemoryAuthRepository(
+                signedInEmail: InMemoryAuthRepository.demoEmail,
+              ),
+            ),
           if (emptyTodos)
             todosRepositoryProvider.overrideWithValue(
               InMemoryTodosRepository(),
@@ -125,7 +157,8 @@ void main() {
 
     expect(find.text('이렇게 해 보면 어떨까요?'), findsOneWidget);
     await tester.tap(find.text('체크리스트에 담기').first);
-    await tester.pumpAndSettle();
+    await tester.pump(); // 토스트는 3초 뒤 사라지므로 settle하지 않고 바로 확인한다
+    await tester.pump(ComponentLayout.toastFade);
 
     final todos = await container.read(todosRepositoryProvider).list();
     final added = todos.where(
@@ -147,7 +180,12 @@ void main() {
       scrollable: find.byType(Scrollable).first,
     );
 
-    await tester.tap(find.byKey(const Key('consent-ai')));
+    await tester.tap(
+      find.descendant(
+        of: find.byKey(const Key('consent-ai')),
+        matching: find.byType(AppToggle),
+      ),
+    );
     await tester.pumpAndSettle();
 
     final settings = await container.read(settingsRepositoryProvider).get();
@@ -178,7 +216,7 @@ void main() {
     expect(await container.read(peopleRepositoryProvider).list(), isNotEmpty);
   });
 
-  testWidgets('계정 삭제는 로그인 연결 뒤에 사용할 수 있다는 안내만 보여 준다', (tester) async {
+  testWidgets('계정 삭제 행은 재인증 화면으로 이동한다', (tester) async {
     await pumpAll(tester);
     await tester.scrollUntilVisible(
       find.byKey(const Key('delete-account')),
@@ -187,6 +225,93 @@ void main() {
     );
     await tester.tap(find.byKey(const Key('delete-account')));
     await tester.pumpAndSettle();
-    expect(find.textContaining('로그인 기능이 연결된 뒤'), findsOneWidget);
+    expect(find.text('계정을\n삭제할까요?'), findsOneWidget);
+    expect(find.byKey(const Key('delete-password')), findsOneWidget);
+  });
+
+  testWidgets('로그아웃은 확인 뒤 세션을 지우고 로그인 화면으로 간다', (tester) async {
+    final container = await pumpAll(tester, signedIn: true);
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('logout')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.byKey(const Key('logout')));
+    await tester.pumpAndSettle();
+    expect(find.text('로그아웃할까요?'), findsOneWidget);
+    await tester.tap(find.text('로그아웃').last);
+    await tester.pumpAndSettle();
+
+    expect(container.read(sessionProvider), isNull);
+    expect(find.byType(LoginScreen), findsOneWidget);
+  });
+
+  testWidgets('프로필: 닉네임과 이메일이 보이고 닉네임을 바꿀 수 있다', (tester) async {
+    final container = await pumpAll(tester, signedIn: true);
+    expect(find.text('규리'), findsOneWidget);
+    expect(find.text(InMemoryAuthRepository.demoEmail), findsOneWidget);
+
+    await tester.tap(find.text('규리'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const Key('nickname-field')), '새이름');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('저장'));
+    await tester.pump();
+    await tester.pump(ComponentLayout.toastFade);
+
+    expect(
+      (await container.read(settingsRepositoryProvider).get()).nickname,
+      '새이름',
+    );
+    expect(find.text('닉네임을 바꿨어요'), findsOneWidget);
+  });
+
+  testWidgets('요약 카드: 기록·인물·체크 완료 수가 보인다', (tester) async {
+    await pumpAll(tester);
+    expect(find.text('체크 완료'), findsOneWidget);
+    expect(find.text('1/2'), findsOneWidget);
+  });
+
+  testWidgets('프로필 편집: 앨범에서 사진을 고르면 저장되고, 기본 캐릭터로 되돌릴 수 있다', (tester) async {
+    final picker = _FakePicker(path: '/tmp/none.jpg');
+    final container = await pumpAll(tester, signedIn: true, picker: picker);
+    await tester.tap(find.text('규리'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('profile-reset')), findsNothing);
+
+    await tester.tap(find.byKey(const Key('profile-gallery')));
+    await tester.pumpAndSettle();
+    expect(picker.picked, [PhotoSource.gallery]);
+    expect(
+      (await container.read(settingsRepositoryProvider).get()).profileImagePath,
+      '/tmp/none.jpg',
+    );
+
+    await tester.tap(find.byKey(const Key('profile-reset')));
+    await tester.pumpAndSettle();
+    expect(
+      (await container.read(settingsRepositoryProvider).get()).profileImagePath,
+      isNull,
+    );
+  });
+
+  testWidgets('프로필 편집: 카메라 권한이 거부되면 안내 토스트가 나온다', (tester) async {
+    final container = await pumpAll(
+      tester,
+      signedIn: true,
+      picker: _FakePicker(fail: true),
+    );
+    await tester.tap(find.text('규리'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('profile-camera')));
+    await tester.pump();
+    await tester.pump(ComponentLayout.toastFade);
+
+    expect(find.textContaining('카메라를 쓸 수 없어요'), findsOneWidget);
+    expect(
+      (await container.read(settingsRepositoryProvider).get()).profileImagePath,
+      isNull,
+    );
+    await tester.pump(const Duration(seconds: 4));
   });
 }
