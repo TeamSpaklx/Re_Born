@@ -1,4 +1,4 @@
-### 👥TEAM SPAKLX MEMBER
+### 👥TEAM SPAKLX MEMBER - FRONTEND PARTS BRANCH
 | <img src="https://github.com/Linkshimcat.png" width="200" alt="Linkshimcat 프로필"> | <img src="https://github.com/heekungkkk.png" width="200" alt="heekungkkk 프로필"> | <img src="https://github.com/gy-urii.png" width="200" alt="gy-urii 프로필"> |
 | :---: | :---: | :---: |
 | **[이윤재](https://github.com/Linkshimcat)** | **[고희경](https://github.com/heekungkkk)** | **[김규리](https://github.com/gy-urii)** |
