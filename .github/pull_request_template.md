@@ -22,7 +22,7 @@
 - [ ] `flutter analyze` 통과
 - [ ] `flutter test` 통과
 - [ ] 시뮬레이터/실기기에서 동작 확인
-- [ ] Supabase 스키마/마이그레이션 변경 시 `supabase/`에 반영하고 위에 명시
+- [ ] `frontend-integration` 대상 PR에는 서버 코드·API 클라이언트·Auth/DB 연동·마이그레이션이 없음
 - [ ] 시크릿/키(.env, anon key 등)가 커밋에 포함되지 않음
 
 ## 👀 리뷰어에게

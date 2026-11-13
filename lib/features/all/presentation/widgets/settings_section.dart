@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../app/router.dart';
 import '../../../../app/theme/app_colors.dart';
@@ -134,9 +133,8 @@ class SettingsSection extends ConsumerWidget {
                 '계정 삭제',
                 () => _deleteAccount(context),
               ),
-              actionRow(const Key('sign-out'), '로그아웃', () async {
-                await Supabase.instance.client.auth.signOut();
-                if (context.mounted) context.go(AppRoutes.auth);
+              actionRow(const Key('sign-out'), '로그아웃', () {
+                context.go(AppRoutes.auth);
               }),
             ],
           ),

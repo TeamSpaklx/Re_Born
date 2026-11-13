@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:reborn_app/app/app.dart';
 import 'package:reborn_app/app/router.dart';
 import 'package:reborn_app/app/theme/app_assets.dart';
@@ -12,18 +10,6 @@ import 'package:reborn_app/features/auth/presentation/auth_screen.dart';
 import 'package:reborn_app/features/splash/presentation/splash_screen.dart';
 
 void main() {
-  setUpAll(() async {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(
-          const MethodChannel('plugins.flutter.io/shared_preferences'),
-          (call) async => <String, Object>{},
-        );
-    await Supabase.initialize(
-      url: 'https://example.supabase.co',
-      publishableKey: 'sb_publishable_test',
-    );
-  });
-
   Future<void> pumpSplash(WidgetTester tester) async {
     tester.view.physicalSize = const Size(402, 874);
     tester.view.devicePixelRatio = 1;
@@ -61,7 +47,7 @@ void main() {
     await tester.pumpAndSettle();
   });
 
-  testWidgets('세션이 없으면 잠시 뒤 로그인 화면으로 넘어간다', (tester) async {
+  testWidgets('잠시 뒤 로그인 화면으로 넘어간다', (tester) async {
     await pumpSplash(tester);
 
     await tester.pump(SplashLayout.duration - const Duration(milliseconds: 1));

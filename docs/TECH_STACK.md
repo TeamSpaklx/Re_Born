@@ -12,20 +12,19 @@
 | 폰트 | Pretendard (400·500·600·700·800) | `assets/fonts/`, 라이선스 SIL OFL 1.1 (`OFL-LICENSE.txt`) |
 | 아이콘 | `flutter_svg` ^2.3.0 + Figma에서 내려받은 SVG | `assets/icons/ui/`, 경로는 `lib/app/theme/app_assets.dart`. 원본 라이브러리: 탭 바 투데이·관계·기록 = Phosphor Icons, 전체 = Iconsax, 임시 디자인 화면의 새 아이콘(check, trash)도 Phosphor(MIT)에서 SVG로 받음 (아이콘 패키지는 쓰지 않음) |
 | 디자인 기준 | Figma 홈 화면 (100% 일치 목표) | [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md), 값은 `lib/app/theme/` 상수만 사용 |
-| 인증 | Supabase Auth, 이메일 + 비밀번호 | 구글 로그인은 미정 (SPEC 11장 7번) |
+| 인증 화면 | 로컬 목업 | 입력 검증 뒤 샘플 화면으로 이동하며 계정을 만들지 않음 |
 | 상태 관리 | `flutter_riverpod` ^3.4.3 | 앱 최상단 `ProviderScope`, 데이터는 Repository를 Provider로 주입 ([FRONTEND.md](./FRONTEND.md)) |
 | 라우팅 | `go_router` ^18.1.1 | `lib/app/router.dart`, 하단 탭은 `StatefulShellRoute.indexedStack`(탭마다 상태 유지) |
-| DB | Supabase PostgreSQL | 사용자별 접근은 RLS로 제한 |
-| 클라이언트 SDK | `supabase_flutter` 2.17.2 | 초기화: `lib/main.dart`, 설정: `lib/core/config/supabase_config.dart` |
+| 화면 데이터 | 메모리 저장소와 샘플 데이터 | 앱을 다시 시작하면 초기화됨 |
+| 클라이언트 SDK | `supabase_flutter` 2.17.2 | 초기화만 수행: `lib/main.dart`, 설정: `lib/core/config/supabase_config.dart` |
 | 감정 분석·관계 지수 | Flutter 앱 내부 규칙 기반 계산 | 외부 AI·분석 API 없음 |
-| DB 스키마 관리 | Supabase CLI 마이그레이션 | `supabase/migrations/` |
 | 린트 | `flutter_lints` 6 | `analysis_options.yaml` |
 
 ## 쓰지 않는 것
 
 - **Firebase / Firestore**: SPEC의 `users/{uid}/entries/{entryId}` 같은 경로는 Firestore 시절 표기입니다. PostgreSQL 테이블 + `user_id` 컬럼 + RLS로 읽어 주세요.
 - **외부 AI API**: 기록 본문을 외부로 보내지 않습니다 (SPEC 6.7).
-- **별도 서버**: 계산은 앱에서, 저장은 Supabase에서 합니다.
+- **서버/API 연결**: 이 브랜치에서는 화면 데이터를 메모리에 보관합니다.
 - **SwiftUI, WidgetKit, ActivityKit**: SPEC 6장 스택에 적혀 있지만 MVP 범위가 아닙니다.
 
 ## 폴더 구조
@@ -42,8 +41,6 @@ assets/
   fonts/             Pretendard
   icons/ui/          Figma에서 내려받은 SVG 아이콘
   images/            로고 등
-supabase/
-  migrations/        DB 스키마·RLS 마이그레이션
 docs/                명세서, 디자인 시스템, 프론트 문서 (design/ 은 Figma 스크린샷)
 ```
 
@@ -51,7 +48,7 @@ docs/                명세서, 디자인 시스템, 프론트 문서 (design/ �
 
 - **하단 탭 4개:** 투데이(홈) / 관계 / 기록 / 전체. 디자인이 있는 화면은 홈뿐이고, 나머지 탭은 흰 배경의 빈 화면으로 둡니다.
 - **고정 규칙:** 글자 크기 배율 1.0(시스템 글자 크기 설정 무시), 라이트 모드만, 세로 방향만. **다크 모드는 나중에 추가할 예정**이라 색은 `AppColors` 팔레트로만 씁니다.
-- 앱은 스플래시 화면(로고만, 약 1.2초)으로 시작해 Supabase 세션에 따라 로그인 화면 또는 홈으로 이동합니다. 이메일 가입·로그인은 F-01 화면에서 처리합니다. 시작 경로는 `initialLocationProvider`이고 `main.dart`에서만 스플래시로 바꿉니다(테스트는 기본값 투데이).
+- 앱은 스플래시 화면(로고만, 약 1.2초) 뒤 로그인 목업 화면으로 이동합니다. 입력 검증을 통과하면 샘플 홈을 보여 줍니다. 시작 경로는 `initialLocationProvider`이고 `main.dart`에서만 스플래시로 바꿉니다(테스트는 기본값 투데이).
 - 앱이 켜지는 동안의 네이티브 시작 화면(iOS `LaunchScreen.storyboard`, Android `launch_background.xml`)도 같은 로고(200)로 맞춰 두었습니다. Android 12 이상은 시스템 스플래시(앱 아이콘 기반)가 먼저 나와 완전히 같지는 않습니다.
 - 하단 탭 바는 플랫폼별로 다릅니다: **iOS 26 이상 = 네이티브 `UITabBar`(Liquid Glass)**, iOS 26 미만·Android = Flutter가 그린 탭 바(블러). 분기는 `lib/shared/widgets/app_bottom_nav_bar.dart` 한 곳이고, 네이티브 쪽은 `ios/Runner/NativeTabBarView.swift`(플랫폼 뷰)와 `lib/shared/widgets/native_tab_bar.dart`입니다. 새 패키지는 쓰지 않습니다.
 - iOS 네이티브 탭 바(Liquid Glass)는 **Xcode 26 이상(iOS 26 SDK)으로 빌드**해야 유리 모양이 나옵니다. iOS 시뮬레이터 런타임 26.5와 27.0에서 확인했습니다.
@@ -60,7 +57,7 @@ docs/                명세서, 디자인 시스템, 프론트 문서 (design/ �
 ## 보안 규칙
 
 - 앱에는 Supabase **publishable key**만 둡니다. `service_role` 키나 비밀 키는 절대 커밋하지 않습니다.
-- 모든 사용자 데이터 테이블에 RLS를 켜고, 본인 `user_id`의 행만 읽고 쓰게 합니다.
+- 현재 브랜치는 사용자 데이터 테이블에 연결하지 않습니다.
 
 ## 미정 (팀 결정 필요)
 

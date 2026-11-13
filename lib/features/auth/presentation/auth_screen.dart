@@ -1,34 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../app/data_providers.dart';
 import '../../../app/router.dart';
 import '../../../app/theme/app_assets.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../app/theme/app_text_styles.dart';
-import '../../../core/network/backend_api_client.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/cta_button.dart';
 
-class AuthScreen extends ConsumerStatefulWidget {
+class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
 
   @override
-  ConsumerState<AuthScreen> createState() => _AuthScreenState();
+  State<AuthScreen> createState() => _AuthScreenState();
 }
 
-class _AuthScreenState extends ConsumerState<AuthScreen> {
+class _AuthScreenState extends State<AuthScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isSignUp = true;
-  bool _busy = false;
   bool _consentPrivacy = false;
   bool _consentAiAnalysis = false;
   String? _error;
-  String? _message;
 
   @override
   void dispose() {
@@ -37,7 +31,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     super.dispose();
   }
 
-  Future<void> _submit() async {
+  void _submit() {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email)) {
@@ -53,41 +47,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       return;
     }
 
-    setState(() {
-      _busy = true;
-      _error = null;
-      _message = null;
-    });
-
-    try {
-      final auth = ref.read(authServiceProvider);
-      if (_isSignUp) {
-        final hasSession = await auth.signUp(
-          email: email,
-          password: password,
-          consentPrivacy: _consentPrivacy,
-          consentAiAnalysis: _consentAiAnalysis,
-        );
-        if (!hasSession) {
-          setState(() {
-            _message = '인증 메일을 확인한 뒤 로그인해 주세요.';
-            _isSignUp = false;
-          });
-          return;
-        }
-      } else {
-        await auth.signIn(email: email, password: password);
-      }
-      if (mounted) context.go(AppRoutes.today);
-    } on AuthException catch (exception) {
-      setState(() => _error = exception.message);
-    } on BackendApiException catch (exception) {
-      setState(() => _error = '로그인은 됐지만 백엔드 연결에 실패했어요. ${exception.message}');
-    } catch (_) {
-      setState(() => _error = '연결에 실패했어요. 잠시 후 다시 시도해 주세요.');
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
+    setState(() => _error = null);
+    context.go(AppRoutes.today);
   }
 
   @override
@@ -123,8 +84,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                   const SizedBox(height: AppSpacing.actionCardGap),
                   Text(
                     _isSignUp
-                        ? '이메일로 계정을 만들고 마음을 기록해 보세요.'
-                        : '이메일과 비밀번호로 로그인해 주세요.',
+                        ? '화면을 미리 둘러보세요. 계정은 만들어지지 않아요.'
+                        : '화면을 미리 둘러보세요. 로그인 정보는 저장되지 않아요.',
                     textAlign: TextAlign.center,
                     style: AppTextStyles.body.copyWith(
                       color: colors.textSecondary,
@@ -194,33 +155,17 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       style: AppTextStyles.body.copyWith(color: colors.brand),
                     ),
                   ],
-                  if (_message != null) ...[
-                    const SizedBox(height: AppSpacing.actionCardGap),
-                    Text(
-                      _message!,
-                      style: AppTextStyles.body.copyWith(
-                        color: colors.textSecondary,
-                      ),
-                    ),
-                  ],
                   const SizedBox(height: AppSpacing.recordCardPadding),
                   CtaButton(
-                    label: _busy
-                        ? '잠시만요…'
-                        : _isSignUp
-                        ? '회원가입'
-                        : '로그인',
-                    onPressed: _busy ? () {} : _submit,
+                    label: _isSignUp ? '회원가입' : '로그인',
+                    onPressed: _submit,
                     height: HomeLayout.ctaButtonHeightAfter,
                   ),
                   TextButton(
-                    onPressed: _busy
-                        ? null
-                        : () => setState(() {
-                            _isSignUp = !_isSignUp;
-                            _error = null;
-                            _message = null;
-                          }),
+                    onPressed: () => setState(() {
+                      _isSignUp = !_isSignUp;
+                      _error = null;
+                    }),
                     child: Text(
                       _isSignUp ? '이미 계정이 있나요? 로그인' : '계정이 없나요? 회원가입',
                       style: AppTextStyles.body.copyWith(color: colors.brand),

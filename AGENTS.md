@@ -25,7 +25,7 @@ PR을 올리기 전에 로컬에서 `flutter analyze`와 `flutter test`가 통�
 
 - 기능 코드는 `lib/features/<기능>/`에, 여러 기능이 같이 쓰는 코드는 `lib/shared/`, 공통 설정은 `lib/core/`에 둡니다.
 - 감정 분석·관계 지수·패턴 감지(F-05~F-07)는 UI·DB와 분리된 순수 Dart 함수로 작성하고 단위 테스트를 붙입니다.
-- DB 스키마와 RLS 변경은 `supabase/migrations/`에 마이그레이션 파일로 남깁니다. 대시보드에서만 바꾸지 않습니다.
+- `frontend-integration`에는 Flutter 화면·메모리 저장소와 Supabase SDK 초기화만 둡니다. 서버 코드, API 클라이언트, Auth/DB 연동, 마이그레이션은 올리지 않습니다.
 
 ## UI 규칙
 
@@ -46,7 +46,8 @@ PR을 올리기 전에 로컬에서 `flutter analyze`와 `flutter test`가 통�
 
 ## Git 규칙
 
-- `main`에 직접 push하지 않습니다. 최신 `main`에서 브랜치를 따서 PR로 머지합니다. 프론트엔드 PR은 `frontend-integration`을 대상으로 올리고, 전체 기능 검증 후 이 브랜치를 `main`에 PR로 병합합니다.
+- `main`과 `frontend-integration`에 직접 push하지 않습니다. 작업 브랜치에서 초안 PR을 일찍 열어 진행 상황을 공유하고, PR 승인 1명 후 병합합니다.
+- 프론트엔드 PR은 `frontend-integration`을 대상으로 합니다. 이 브랜치 전체를 `main`에 병합하면 `main`의 서버 코드가 삭제됩니다. `main` 반영은 `main`에서 새 브랜치를 만들고 승인된 프론트 변경만 선별해 PR로 올립니다.
 - 작업 브랜치 이름: `종류/짧은-설명` (예: `feat/login-screen`, `fix/entry-save`, `docs/spec-update`). 통합 브랜치 `frontend-integration`은 예외입니다.
 - 커밋 메시지: `feat:` / `fix:` / `refactor:` / `chore:` / `docs:` / `test:` 접두사 + 한국어 설명
 - PR 본문은 `.github/pull_request_template.md` 형식을 따릅니다.
