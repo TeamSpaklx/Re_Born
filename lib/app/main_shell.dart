@@ -24,9 +24,9 @@ class MainShell extends StatelessWidget {
     final safeBottom = MediaQuery.paddingOf(context).bottom;
     final screenWidth = MediaQuery.sizeOf(context).width;
     final navBottom = math.max(safeBottom, BottomNavTokens.bottomOffset);
-    final navWidth = math.min(
-      BottomNavTokens.width,
-      screenWidth - AppSpacing.pageMargin * 2,
+    final navWidth = math.max(
+      0.0,
+      math.min(BottomNavTokens.width, screenWidth - AppSpacing.pageMargin * 2),
     );
 
     return Scaffold(
@@ -35,28 +35,29 @@ class MainShell extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           navigationShell,
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: navBottom,
-            child: Center(
-              child: AppBottomNavBar(
-                width: navWidth,
-                currentIndex: navigationShell.currentIndex,
-                onTap: (index) {
-                  // 다른 탭으로 바뀔 때만 햅틱. (iOS 네이티브 탭 바도 같은 콜백을 쓴다.)
-                  if (index != navigationShell.currentIndex) {
-                    AppHaptics.selection();
-                  }
-                  navigationShell.goBranch(
-                    index,
-                    // 이미 선택된 탭을 다시 누르면 그 탭의 첫 화면으로 돌아간다.
-                    initialLocation: index == navigationShell.currentIndex,
-                  );
-                },
+          if (navWidth > 0)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: navBottom,
+              child: Center(
+                child: AppBottomNavBar(
+                  width: navWidth,
+                  currentIndex: navigationShell.currentIndex,
+                  onTap: (index) {
+                    // 다른 탭으로 바뀔 때만 햅틱. (iOS 네이티브 탭 바도 같은 콜백을 쓴다.)
+                    if (index != navigationShell.currentIndex) {
+                      AppHaptics.selection();
+                    }
+                    navigationShell.goBranch(
+                      index,
+                      // 이미 선택된 탭을 다시 누르면 그 탭의 첫 화면으로 돌아간다.
+                      initialLocation: index == navigationShell.currentIndex,
+                    );
+                  },
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

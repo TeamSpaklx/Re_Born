@@ -461,6 +461,15 @@ void main() {
       return ProviderScope.containerOf(tester.element(find.byType(MainShell)));
     }
 
+    testWidgets('Android 첫 프레임처럼 화면 너비가 0이면 탭 바를 그리지 않는다', (tester) async {
+      await pumpApp(tester);
+      tester.view.physicalSize = const Size(0, 1400);
+      await tester.pump();
+
+      expect(find.byType(AppBottomNavBar), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('오늘 기록을 저장하면 홈이 After로 바뀌고 출석 체크가 계산된다', (tester) async {
       final container = await pumpApp(tester);
       expect(find.byType(RecordCardBefore), findsOneWidget);
