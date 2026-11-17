@@ -15,9 +15,6 @@ abstract final class AppMotion {
   /// 맨 위로 스크롤처럼 긴 이동.
   static const slow = Duration(milliseconds: 500);
 
-  /// 스켈레톤이 한 번 깜빡이는 시간.
-  static const skeletonPulse = Duration(milliseconds: 1200);
-
   /// 나타날 때(감속), 사라질 때(가속), 위치가 바뀔 때.
   static const enter = Curves.easeOutCubic;
   static const exit = Curves.easeInCubic;

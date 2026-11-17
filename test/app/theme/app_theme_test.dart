@@ -24,8 +24,7 @@ void main() {
       expect(c.cardPink, const Color(0xFFFEDAE5));
       expect(c.cardBorder, const Color(0xFFEEE6E9));
       expect(c.attendancePanel, const Color(0xFFFFB2CA));
-      expect(c.background, const Color(0xFFFFF8F8));
-      expect(c.splashBackground, const Color(0xFFFFFFFF));
+      expect(c.background, const Color(0xFFF2F2F4));
       expect(c.recordCardSubtitle, const Color(0xFF7D8492));
       expect(c.ctaSoft, const Color(0xFFFFAFC7));
       expect(c.onCtaSoft, const Color(0xFF000000));
@@ -33,7 +32,6 @@ void main() {
       expect(c.barMid, const Color(0xFFFF80A6));
       expect(c.barLight, const Color(0xFFFFB3CA));
       expect(c.toggleOff, const Color(0xFFE8D5DA));
-      expect(c.skeleton, const Color(0xFFF1EAED));
       expect(c.danger, const Color(0xFFE5484D));
       expect(c.dangerTile, const Color(0xFFFDECEE));
     });

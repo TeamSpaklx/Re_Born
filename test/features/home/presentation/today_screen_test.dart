@@ -226,13 +226,13 @@ void main() {
     expect(WeeklyEmotionCard.barColor(1.0, c), c.barLight);
   });
 
-  testWidgets('화면 배경은 #FFF8F8이고 상단에 핑크 그라디언트가 없다', (tester) async {
+  testWidgets('화면 배경은 #F2F2F4이고 상단에 핑크 그라디언트가 없다', (tester) async {
     useDesignScreen(tester);
     await pumpHome(tester);
 
     expect(
       tester.widget<Scaffold>(find.byType(Scaffold)).backgroundColor,
-      const Color(0xFFFFF8F8),
+      const Color(0xFFF2F2F4),
     );
     expect(
       find.descendant(
@@ -460,6 +460,15 @@ void main() {
       await tester.pumpAndSettle();
       return ProviderScope.containerOf(tester.element(find.byType(MainShell)));
     }
+
+    testWidgets('Android 첫 프레임처럼 화면 너비가 0이면 탭 바를 그리지 않는다', (tester) async {
+      await pumpApp(tester);
+      tester.view.physicalSize = const Size(0, 1400);
+      await tester.pump();
+
+      expect(find.byType(AppBottomNavBar), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
 
     testWidgets('오늘 기록을 저장하면 홈이 After로 바뀌고 출석 체크가 계산된다', (tester) async {
       final container = await pumpApp(tester);

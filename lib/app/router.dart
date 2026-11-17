@@ -21,16 +21,12 @@ import '../features/record/presentation/record_screen.dart';
 import '../features/relations/presentation/person_detail_screen.dart';
 import '../features/relations/presentation/person_form_screen.dart';
 import '../features/relations/presentation/relations_screen.dart';
-import '../features/splash/presentation/splash_screen.dart';
 import '../shared/dev/design_gallery_screen.dart';
 import 'main_shell.dart';
-import 'theme/app_spacing.dart';
 
 /// 화면 경로. 화면 이동은 문자열 대신 이 상수를 사용한다.
 /// 순서는 하단 탭 순서(투데이 / 관계 / 기록 / 전체)와 같다.
 abstract final class AppRoutes {
-  static const splash = '/splash';
-
   /// 디자인 갤러리(개발용). 디버그 빌드에서만 등록된다.
   static const devGallery = '/dev/gallery';
 
@@ -59,19 +55,14 @@ abstract final class AppRoutes {
   static String relationsEdit(String id) => '/relations/$id/edit';
 }
 
-/// 앱이 처음 여는 경로. 실제 앱은 `main.dart`에서 스플래시로 바꾸고,
-/// 테스트는 기본값(투데이)으로 바로 화면을 확인한다.
+/// 앱이 처음 여는 경로. 기본값은 투데이이며, 디버그 실행에서 경로를 바꿀 수 있다.
 final initialLocationProvider = Provider<String>((ref) => AppRoutes.today);
 
-/// 앱 라우터. 앱은 스플래시로 시작해 투데이(홈)로 넘어간다. 로그인 화면은 디자인이 나올 때까지 없다.
+/// 앱 라우터. 앱은 투데이(홈)로 시작한다.
 final routerProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
     initialLocation: ref.read(initialLocationProvider),
     routes: [
-      GoRoute(
-        path: AppRoutes.splash,
-        builder: (context, state) => const SplashScreen(),
-      ),
       if (kDebugMode)
         GoRoute(
           path: AppRoutes.devGallery,
@@ -152,19 +143,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             RecordDetailScreen(entryId: state.pathParameters['id']!),
       ),
       StatefulShellRoute.indexedStack(
-        // 스플래시에서 넘어올 때 옆에서 밀리지 않고, 로고 화면 위로 서서히 나타난다.
+        // 하단 탭 셸은 별도 화면 전환 없이 바로 표시한다.
         pageBuilder: (context, state, navigationShell) =>
-            CustomTransitionPage<void>(
+            NoTransitionPage<void>(
               key: state.pageKey,
-              transitionDuration: SplashLayout.fadeDuration,
-              reverseTransitionDuration: SplashLayout.fadeDuration,
-              transitionsBuilder: (context, animation, secondary, child) =>
-                  FadeTransition(
-                    opacity: animation.drive(
-                      CurveTween(curve: Curves.easeInOut),
-                    ),
-                    child: child,
-                  ),
               child: MainShell(navigationShell: navigationShell),
             ),
         branches: [

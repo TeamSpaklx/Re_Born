@@ -64,7 +64,7 @@ void main() {
     expect(formatRelativeTime(DateTime(2026, 10, 3), now), '10월 3일');
   });
 
-  testWidgets('홈 벨에 읽지 않은 알림이 있으면 점이 붙고, 누르면 알림 목록이 열린다', (tester) async {
+  testWidgets('홈 벨은 Figma 아이콘을 유지하고, 읽지 않은 수를 알리며 알림 목록을 연다', (tester) async {
     final c = await pumpAt(tester, AppRoutes.today);
     expect(c.read(unreadNotificationCountProvider), 1);
     expect(find.bySemanticsLabel('알림, 읽지 않은 알림 1개'), findsOneWidget);

@@ -14,17 +14,16 @@ import 'core/errors/error_handlers.dart';
 
 const _initialRoute = String.fromEnvironment('INITIAL_ROUTE');
 
-Future<void> main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   // 처리되지 않은 오류를 앱 안 기록에 남긴다(본문·인물 이름 제외, SPEC F-12).
   final errorLog = AppErrorLog();
   installErrorHandlers(errorLog);
 
-  // 세로 방향만 지원한다 (iOS Info.plist, AndroidManifest에서도 고정).
-  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  // 상태바·내비게이션 바 뒤까지 앱 화면을 그리고, 상태바 글자는 어둡게 한다.
-  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  // 세로 방향은 iOS Info.plist와 AndroidManifest에서 고정한다.
+  // 상태바·내비게이션 바 설정은 첫 화면을 기다리게 하지 않는다.
+  unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -44,16 +43,17 @@ Future<void> main() async {
         initialLocationProvider.overrideWithValue(
           kDebugMode && _initialRoute.isNotEmpty
               ? _initialRoute
-              : AppRoutes.splash,
+              : AppRoutes.today,
         ),
       ],
       child: const RebornApp(),
     ),
   );
 
-  // 아직 화면이 Supabase를 쓰지 않으므로, 첫 화면(스플래시 로고)이 뜨는 것을 막지 않게 앱을 켠 뒤에 준비한다.
-  // Supabase를 처음 쓰는 코드가 생기면 이 준비가 끝난 뒤에 쓰도록 바꾼다.
-  unawaited(_initSupabase(errorLog));
+  // 현재 화면은 Supabase를 쓰지 않으므로 첫 프레임 이후에 초기화한다.
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    unawaited(_initSupabase(errorLog));
+  });
 }
 
 Future<void> _initSupabase(AppErrorLog errorLog) async {

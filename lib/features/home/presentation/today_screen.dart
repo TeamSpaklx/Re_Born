@@ -20,7 +20,6 @@ import 'home_providers.dart';
 import 'widgets/action_suggestion_card.dart';
 import 'widgets/home_error_view.dart';
 import 'widgets/home_greeting.dart';
-import 'widgets/home_skeleton.dart';
 import 'widgets/home_top_bar.dart';
 import 'widgets/record_card_after.dart';
 import 'widgets/record_card_before.dart';
@@ -41,7 +40,7 @@ class TodayScreen extends ConsumerWidget {
       backgroundColor: background,
       body: summary.when(
         data: (data) => _HomeContent(summary: data),
-        loading: () => const HomeSkeleton(),
+        loading: () => const SizedBox.shrink(),
         error: (error, stack) =>
             HomeErrorView(onRetry: () => ref.invalidate(homeSummaryProvider)),
       ),

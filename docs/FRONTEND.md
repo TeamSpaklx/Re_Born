@@ -37,7 +37,7 @@ test/features/<기능>/   lib과 같은 구조
 
 **홈 인사말:** `GreetingPool`(8개 문구)에서 앱을 켤 때 한 번 뽑습니다(`greetingIndexProvider`). 출석 체크 패널은 `HomeLayout.showAttendance`(false)로 숨겨 둡니다. "오늘 해볼까요?"는 이미 체크리스트에 있는 제안(완료 포함)을 빼고 두 장을 보여 주고, 담으면 원이 채워졌다가 0.7초 뒤 다음 제안이 옵니다.
 
-**인증 흐름(F-01):** 앱은 스플래시(`/splash`)에서 시작해, 로그인되어 있으면 홈 데이터가 준비되는 대로(최소 0.8초, 최대 3초) 홈으로, 아니면 로그인 화면으로 갑니다. 인증 저장소는 `authRepositoryProvider`(`app/data_providers.dart`)이고 지금은 메모리 구현이라 **앱을 다시 켜면 로그인이 풀립니다**. 시연용 계정은 `demo@reborn.app` / `reborn1234`이고 가입도 됩니다(메모리에만 저장). 백엔드가 Supabase Auth 구현을 만들면 provider 한 줄만 바꿉니다. 알림은 앱 안 목록(인사이트에서 생성)만 구현했고 기기 푸시(F-10 확장)는 없습니다.
+**인증 흐름(F-01):** 앱은 스플래시 화면을 제거해 투데이(`/today`)에서 시작합니다. 로그인·가입 화면은 로그아웃 등 인증 흐름에서 계속 사용할 수 있습니다. 인증 저장소는 `authRepositoryProvider`(`app/data_providers.dart`)이고 지금은 메모리 구현이라 **앱을 다시 켜면 로그인이 풀립니다**. 시연용 계정은 `demo@reborn.app` / `reborn1234`이고 가입도 됩니다(메모리에만 저장). 백엔드가 Supabase Auth 구현을 만들면 provider 한 줄만 바꿉니다. 알림은 앱 안 목록(인사이트에서 생성)만 구현했고 기기 푸시(F-10 확장)는 없습니다.
 
 ## 3. 홈 화면 데이터 모양
 

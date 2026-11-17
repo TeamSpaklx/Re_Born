@@ -44,8 +44,6 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.toastFill,
     required this.scrim,
     required this.topBarTint,
-    required this.splashBackground,
-    required this.skeleton,
     required this.kakaoYellow,
     required this.onKakao,
     required this.emotionJoy,
@@ -64,7 +62,7 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color cta;
   final Color onCta;
 
-  /// 화면 배경 `#FFF8F8` (수정안). 카드는 흰색이라 배경과 구분된다.
+  /// 화면 배경 `#F2F2F4` (홈 리디자인). 흰 카드가 배경과 구분된다.
   final Color background;
 
   /// 기록 카드(핑크)와 흰 카드, 흰 카드의 테두리.
@@ -126,12 +124,6 @@ class AppColors extends ThemeExtension<AppColors> {
   /// 홈 상단 바 위에 덮는 흰색 10% (수정안 `rgba(255,255,255,0.1)`).
   final Color topBarTint;
 
-  /// 스플래시 화면 배경: 흰색(Figma `289:1723`). 화면 배경(`#FFF8F8`)과 다르다. iOS·Android 시작 화면도 흰색이라 이어서 보인다.
-  final Color splashBackground;
-
-  /// 로딩 스켈레톤 블록 (흰 카드·#FFF8F8 배경 둘 다에서 보이는 연한 핑크 회색, 추정).
-  final Color skeleton;
-
   /// 카카오 로그인 버튼 배경(브랜드 노랑)과 글자색.
   final Color kakaoYellow;
   final Color onKakao;
@@ -162,7 +154,7 @@ class AppColors extends ThemeExtension<AppColors> {
     brand: Color(0xFFFF6090),
     cta: Color(0xFFFF6090),
     onCta: Color(0xFFFFFFFF),
-    background: Color(0xFFFFF8F8),
+    background: Color(0xFFF2F2F4),
     cardPink: Color(0xFFFEDAE5),
     cardWhite: Color(0xFFFFFFFF),
     cardBorder: Color(0xFFEEE6E9),
@@ -195,8 +187,6 @@ class AppColors extends ThemeExtension<AppColors> {
     toastFill: Color(0xE61A1A1A),
     scrim: Color(0x80000000),
     topBarTint: Color(0x1AFFFFFF),
-    splashBackground: Color(0xFFFFFFFF),
-    skeleton: Color(0xFFF1EAED),
     kakaoYellow: Color(0xFFFEE500),
     onKakao: Color(0xFF191919),
     emotionJoy: Color(0xFFF4B1CB),
@@ -246,8 +236,6 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? toastFill,
     Color? scrim,
     Color? topBarTint,
-    Color? splashBackground,
-    Color? skeleton,
     Color? kakaoYellow,
     Color? onKakao,
     Color? emotionJoy,
@@ -295,8 +283,6 @@ class AppColors extends ThemeExtension<AppColors> {
       toastFill: toastFill ?? this.toastFill,
       scrim: scrim ?? this.scrim,
       topBarTint: topBarTint ?? this.topBarTint,
-      splashBackground: splashBackground ?? this.splashBackground,
-      skeleton: skeleton ?? this.skeleton,
       kakaoYellow: kakaoYellow ?? this.kakaoYellow,
       onKakao: onKakao ?? this.onKakao,
       emotionJoy: emotionJoy ?? this.emotionJoy,
@@ -350,8 +336,6 @@ class AppColors extends ThemeExtension<AppColors> {
       toastFill: mix(toastFill, other.toastFill),
       scrim: mix(scrim, other.scrim),
       topBarTint: mix(topBarTint, other.topBarTint),
-      splashBackground: mix(splashBackground, other.splashBackground),
-      skeleton: mix(skeleton, other.skeleton),
       kakaoYellow: mix(kakaoYellow, other.kakaoYellow),
       onKakao: mix(onKakao, other.onKakao),
       emotionJoy: mix(emotionJoy, other.emotionJoy),

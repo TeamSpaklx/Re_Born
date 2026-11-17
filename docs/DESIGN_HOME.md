@@ -4,8 +4,8 @@
 코드로 옮긴 값은 `lib/app/theme/`에 있으며, 화면 코드는 그 상수만 사용합니다 ([AGENTS.md](../AGENTS.md) UI 규칙).
 
 - 출처 표시: **Figma** = Figma 노드에서 읽은 값, **추정** = Figma에 없어서 정한 값(확인 필요)
-- **2026-10-23 수정안(`8632:1470`)과 2026-10-24 최신 안(`736:213`)이 나와 아래 값이 바뀌었습니다.** 화면 배경 `#FFF8F8`, 상단 핑크 그라디언트 없음, 기록 카드(Before)가 흰 카드 + 여우원숭이 일러스트로(높이 268), 카드 테두리 없음, 막대 색 3단계. 최신 안은 수정안과 같은 색·카드이고 기록 카드와 그 아래 위치만 다릅니다. After(`466:2704`)는 최신 안이 없어 핑크 카드 그대로입니다(확인 필요).
-- Figma: [홈 화면 섹션](https://www.figma.com/design/W8guqOac0W71P3l7e23ZsN/%E1%84%85%E1%85%B5%E1%84%87%E1%85%A9%E1%86%ABRe_born-%E1%84%83%E1%85%B5%E1%84%8C%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%AB?node-id=654-827) (파일 `W8guqOac0W71P3l7e23ZsN`, 섹션 `654:827`). 2026-10-21에 디자인이 새 Figma 파일로 옮겨지면서 색과 탭 바 "전체" 아이콘이 바뀌었습니다(노드 ID는 그대로, 이전 파일 `PJNOc5b1S7pmmtoObtP9mw`).
+- **2026-11-17 홈 리디자인(`8805:1043`)**에서 화면 배경이 `#F2F2F4`로 바뀌었습니다. 기존 홈의 카드, 타이포, 배치, 에셋은 그대로 유지하고, 이 프레임에 표시된 색을 공통 디자인 시스템에 반영합니다. 이전 안의 기록 카드(Before)는 흰 카드 + 여우원숭이 일러스트(높이 268), 카드 테두리 없음, 그래프 막대 색 3단계입니다. After(`466:2704`)는 아직 핑크 카드라 확인이 필요합니다.
+- Figma: [홈 리디자인 프레임](https://www.figma.com/design/W8guqOac0W71P3l7e23ZsN/%E1%84%85%E1%85%B5%E1%84%87%E1%85%A9%E1%86%ABRe_born-%E1%84%83%E1%85%B5%E1%84%8C%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%AB?node-id=8805-1043) (`8805:1043`), [홈 화면 섹션](https://www.figma.com/design/W8guqOac0W71P3l7e23ZsN/%E1%84%85%E1%85%B5%E1%84%87%E1%85%A9%E1%86%ABRe_born-%E1%84%83%E1%85%B5%E1%84%8C%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%AB?node-id=654-827) (섹션 `654:827`). 2026-10-21에 디자인이 새 Figma 파일로 옮겨지면서 색과 탭 바 "전체" 아이콘이 바뀌었습니다(노드 ID는 그대로, 이전 파일 `PJNOc5b1S7pmmtoObtP9mw`).
 
 | 노드 | ID | 스크린샷 |
 |---|---|---|
@@ -45,7 +45,7 @@
 
 참고: Figma에서 "✦ 9월"에는 `CTGR`, `wdth` 가변 폰트 설정이 있지만 Flutter에서는 무시될 수 있습니다(추정, 확인 필요). 이모지는 플랫폼 기본 폰트라 Figma와 모양이 다를 수 있습니다.
 
-**배경:** 수정안에서 화면 배경은 `#FFF8F8`이고 상단 핑크 그라디언트는 없습니다(이전 안의 그라디언트는 2026-10-23에 제거). 상단 바는 흰색 10% 덮개(`topBarTint`)와 블러(`topBarBlurSigma` 10)만 씁니다.
+**배경:** 최신 리디자인 화면 배경은 `#F2F2F4`입니다. 상단 핑크 그라디언트는 없고, 상단 바는 흰색 10% 덮개(`topBarTint`)와 블러(`topBarBlurSigma` 10)만 씁니다.
 
 홈 레이아웃 치수(`HomeLayout`, `GraphLayout`, `AttendanceLayout`, `BottomNavTokens`)는 4~5장에 있습니다.
 
@@ -83,7 +83,7 @@
 - **상단 바(`HomeTopBar`)는 화면 위에 고정**됩니다(사용자 요청 2026-10-22). 상태바 영역 + 헤더 행(62)이 스크롤하지 않고, 그 뒤로 지나가는 내용은 블러(`topBarBlurSigma` 10, 사용자 첨부 사진 기준 **추정**)로 흐려집니다. 수정안에서 핑크 그라디언트는 없고 흰색 10% 덮개(`topBarTint`)만 있습니다. 헤더의 로고를 누르면 화면 맨 위로 부드럽게 올라갑니다(0.5초, `HomeLayout.scrollToTopDuration`, **추정**). 블러가 날짜 글자를 번지게 해 헤더 바로 아래 옅은 회색 자국이 보이는 점은 확인 필요(블러를 빼면 사라지지만 스크롤 때 흐려지는 효과도 없어집니다).
 - 배경 `rgba(255,255,255,0.1)`(행 전체, 거의 투명), 높이 62.
 - 로고: `logo_reborn.png`(1000×250, 안쪽 여백 있음). Figma는 169×42 영역에 이미지를 꽉 채우고 `left −11.32%`, `top −0.64%` 오프셋을 줘서 글자가 영역 왼쪽 끝(x24)에서 시작하게 합니다. 글자가 보이는 폭은 약 130px입니다.
-- 알림 버튼: 44×44 원, 배경 `bellButton`, 안에 30×30 `bell_read.svg` / `bell_unread.svg`를 상태에 따라 표시.
+- 알림 버튼: 44×44 원, 배경 `bellButton`, 가운데 24×24 검정 `bell.svg`. Figma 프레임에는 읽지 않음 표시 점이 없으며, 접근성 라벨에는 읽지 않은 알림 수를 알립니다.
 
 ### 5.2 기록 카드 — Before (`UnWrite`, 최신 안 `736:301`)
 - 354×**268**, 배경 `cardWhite`, **테두리 1px `cardBorder`**(안쪽 위에 겹쳐 그려 좌표가 변하지 않음, `AppCard.outlined`), 모서리 24. 안쪽 좌표는 테두리 1px 안쪽 기준이라 바깥 기준으로는 +1(좌우 21).
@@ -167,7 +167,7 @@
 | `tabSelection` | `tab_selection.svg` | 92×56 | 선택 알약 |
 | `person` | `person.svg` | 36 | 신호 카드 아바타 |
 | `forum` | `forum.svg` | 36 | 액션 카드 |
-| `bell` | `bell.svg` | 28 | 알림 버튼 |
+| `bell` | `bell.svg` | 24 | 알림 버튼 |
 | `sealCheck` | `seal_check.svg` | 44 | After 기록 카드 |
 | `chevronSignal` | `chevron_signal.svg` | 20 | 신호 카드 |
 | `chevronGraph` | `chevron_graph.svg` | 17 | 그래프 제목 |
@@ -176,7 +176,6 @@
 | `chevronAttendance` | `chevron_attendance.svg` | 20 | "출석 체크 >" |
 | `radioCircle` / `radioCircleAfter` | `radio_circle(_after).svg` | 20 | 액션 카드 오른쪽 원 |
 | `logo` | `assets/images/logo_reborn.png` | 1000×250 | 헤더 로고 |
-| `logoMark` | `assets/images/logo_mark.png` | 2000×2000 (표시 200) | 스플래시 로고 (Figma `651:730`, 배경 투명) |
 | `mascotLemur` | `assets/images/mascot_lemur.png` | 604×604 (원본 1254×1254, 표시 151×150.77에서 위 98만 보임) | 기록 카드(Before) 일러스트 (Figma `736:309`, 배경 투명) |
 
 - **아이콘 출처:** 하단 탭 바의 투데이·관계·기록은 Phosphor Icons(`house-fill`, `users-fill`, 기록), 전체는 Iconsax(`menu`)입니다. 그 밖의 홈 아이콘(`person`, `forum`, `bell`, 화살표류, `seal-check-fill`)의 출처는 확인하지 못했습니다(확인 필요). 새 아이콘이 필요하면 두 라이브러리에서 SVG로 받아 `assets/icons/ui/`에 넣습니다(Flutter 패키지는 쓰지 않음).

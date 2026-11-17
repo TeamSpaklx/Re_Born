@@ -36,7 +36,6 @@ import '../widgets/page_scaffold.dart';
 import '../widgets/profile_row.dart';
 import '../widgets/segmented_control.dart';
 import '../widgets/settings_group.dart';
-import '../widgets/skeleton.dart';
 
 /// 디자인 갤러리(개발용): 리본 디자인 시스템의 토큰과 공통 컴포넌트를 한 화면에 모아 눈으로 검수한다.
 /// 디버그 빌드에서만 열린다(`/dev/gallery`, 전체 탭 설정 맨 아래 "디자인 갤러리").
@@ -105,7 +104,6 @@ class _DesignGalleryScreenState extends State<DesignGalleryScreen> {
                 _swatch('danger', colors.danger),
                 _swatch('dangerTile', colors.dangerTile),
                 _swatch('toggleOff', colors.toggleOff),
-                _swatch('skeleton', colors.skeleton),
                 _swatch('textBlack', colors.textBlack),
                 _swatch('textSecondary', colors.textSecondary),
               ],
@@ -303,16 +301,7 @@ class _DesignGalleryScreenState extends State<DesignGalleryScreen> {
               child: Center(child: Text('pink (기록 완료)')),
             ),
           ]),
-          section('로딩 · 빈 상태 · 오류', [
-            const SkeletonScope(
-              child: Column(
-                children: [
-                  SkeletonListCard(),
-                  SizedBox(height: AppSpacing.space12),
-                  SkeletonBox(height: 120, radius: AppRadii.card),
-                ],
-              ),
-            ),
+          section('빈 상태 · 오류', [
             const EmptyState(
               message: '아직 기록이 없어요',
               hint: '첫 마음을 남겨 볼까요?',
