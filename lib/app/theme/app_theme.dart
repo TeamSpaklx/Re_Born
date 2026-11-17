@@ -23,7 +23,7 @@ abstract final class AppTheme {
           surface: _colors.background,
           onSurface: _colors.textBlack,
         ),
-    // 홈 화면은 항상 흰 배경 위에 카드를 올리므로 머티리얼이 색을 덧입히지 않게 한다.
+    // 화면 배경과 카드 색을 그대로 사용하고 머티리얼이 색을 덧입히지 않게 한다.
     splashFactory: NoSplash.splashFactory,
     extensions: const [AppColors.light],
   );

@@ -1,5 +1,3 @@
-import 'dart:ui' show Offset;
-
 /// 간격과 크기. Figma 홈 화면(402×874 기준)에서 읽은 값이며 출처는 docs/DESIGN_HOME.md.
 ///
 /// 화면 폭은 좌우 여백 [pageMargin]을 고정하고 카드가 남는 폭을 채운다(402일 때 354).
@@ -52,7 +50,7 @@ abstract final class HomeLayout {
   static const headerLogoWidth = 169.0;
   static const headerLogoHeight = 42.0;
   static const bellButtonSize = 44.0;
-  static const bellIconSize = 30.0;
+  static const bellIconSize = 24.0;
 
   /// 로고를 누르면 맨 위로 올라가는 시간. Figma에 지정이 없어 정한 임시값(팀 확인 필요).
   static const scrollToTopDuration = Duration(milliseconds: 500);
@@ -161,25 +159,6 @@ abstract final class AttendanceLayout {
   static const pillCount = 6;
 }
 
-/// 스플래시 화면 치수 (Figma 402×874 "스플릿 화면", 로고는 화면 정중앙).
-abstract final class SplashLayout {
-  static const logoSize = 200.0;
-
-  /// Figma는 이미지를 박스 안에서 left −0.4%, top −0.85% 옮겨 놓았다(200 기준 −0.8, −1.7px).
-  static const logoOffset = Offset(-0.8, -1.7);
-
-  // 아래 시간은 모두 Figma에 지정이 없어 정한 임시값(팀 확인 필요).
-
-  /// 로고를 최소한 이만큼은 보여 준다(로딩이 빨라도 번쩍 사라지지 않게).
-  static const minDuration = Duration(milliseconds: 800);
-
-  /// 로딩이 끝나지 않아도 이 시간이 지나면 홈으로 넘어간다.
-  static const maxDuration = Duration(seconds: 3);
-
-  /// 홈이 로고 화면 위로 서서히 나타나는 시간(크로스페이드).
-  static const fadeDuration = Duration(milliseconds: 400);
-}
-
 /// 공통 컴포넌트(토글·모달·토스트·설정 목록) 치수. Figma에 없는 값이라 모두 추정이다
 /// (토스 설정·로그아웃 화면의 구조를 참고하고 Reborn 색·모서리로 정함, 확인 필요).
 abstract final class ComponentLayout {
@@ -233,9 +212,6 @@ abstract final class ComponentLayout {
   // 빈·오류 상태
   static const stateMascotSize = 120.0;
   static const stateButtonWidth = 200.0;
-
-  // 스켈레톤
-  static const skeletonPulseMin = 0.55;
 
   // 설정 목록
   static const settingsRowHeight = 56.0;

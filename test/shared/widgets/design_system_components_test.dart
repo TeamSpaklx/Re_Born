@@ -3,7 +3,6 @@ import 'dart:ui' show Tristate;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reborn_app/app/theme/app_colors.dart';
-import 'package:reborn_app/app/theme/app_motion.dart';
 import 'package:reborn_app/app/theme/app_radii.dart';
 import 'package:reborn_app/app/theme/app_spacing.dart';
 import 'package:reborn_app/app/theme/app_theme.dart';
@@ -21,7 +20,6 @@ import 'package:reborn_app/shared/widgets/list_section_header.dart';
 import 'package:reborn_app/shared/widgets/page_scaffold.dart';
 import 'package:reborn_app/shared/widgets/profile_row.dart';
 import 'package:reborn_app/shared/widgets/segmented_control.dart';
-import 'package:reborn_app/shared/widgets/skeleton.dart';
 
 import '../../helpers/load_fonts.dart';
 
@@ -347,64 +345,6 @@ void main() {
     testWidgets('Badged는 뱃지가 null이면 아무것도 겹치지 않는다', (tester) async {
       await pump(tester, const Badged(child: Icon(Icons.circle)));
       expect(find.byType(AppBadge), findsNothing);
-    });
-  });
-
-  group('Skeleton', () {
-    testWidgets('스코프 안의 블록은 깜빡이고 컨트롤러는 하나뿐이다', (tester) async {
-      await pump(
-        tester,
-        const SkeletonScope(
-          child: Column(
-            children: [
-              SkeletonBox(width: 100, height: 20),
-              SkeletonBox(width: 100, height: 20),
-            ],
-          ),
-        ),
-      );
-      await tester.pump(AppMotion.skeletonPulse ~/ 2);
-      final fades = tester
-          .widgetList<FadeTransition>(find.byType(FadeTransition))
-          .where((f) => f.opacity.value < 1)
-          .toList();
-      expect(fades, isNotEmpty);
-      expect(
-        tester.getSize(find.byType(SkeletonBox).first),
-        const Size(100, 20),
-      );
-      expect(tester.takeException(), isNull);
-    });
-
-    testWidgets('애니메이션 줄이기가 켜져 있으면 깜빡이지 않는다', (tester) async {
-      tester.view.devicePixelRatio = 1;
-      tester.view.physicalSize = const Size(402, 874);
-      addTearDown(tester.view.reset);
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(disableAnimations: true),
-          child: MaterialApp(
-            theme: AppTheme.light,
-            home: const Scaffold(
-              body: SkeletonScope(child: SkeletonBox(width: 100, height: 20)),
-            ),
-          ),
-        ),
-      );
-      await tester.pump(const Duration(milliseconds: 400));
-      for (final f in tester.widgetList<FadeTransition>(
-        find.byType(FadeTransition),
-      )) {
-        expect(f.opacity.value, 1);
-      }
-    });
-
-    testWidgets('스코프 밖의 블록은 가만히 있다', (tester) async {
-      await pump(
-        tester,
-        const SkeletonBox(width: 80, height: 16, circle: true),
-      );
-      expect(tester.getSize(find.byType(SkeletonBox)), const Size(16, 16));
     });
   });
 

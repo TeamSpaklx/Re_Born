@@ -226,13 +226,13 @@ void main() {
     expect(WeeklyEmotionCard.barColor(1.0, c), c.barLight);
   });
 
-  testWidgets('화면 배경은 #FFF8F8이고 상단에 핑크 그라디언트가 없다', (tester) async {
+  testWidgets('화면 배경은 #F2F2F4이고 상단에 핑크 그라디언트가 없다', (tester) async {
     useDesignScreen(tester);
     await pumpHome(tester);
 
     expect(
       tester.widget<Scaffold>(find.byType(Scaffold)).backgroundColor,
-      const Color(0xFFFFF8F8),
+      const Color(0xFFF2F2F4),
     );
     expect(
       find.descendant(

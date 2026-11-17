@@ -34,7 +34,7 @@
 
 ```
 lib/
-  main.dart          앱 진입점, 세로 고정·시스템 바 설정, Supabase 초기화
+  main.dart          앱 진입점, 시스템 바 설정, 첫 프레임 뒤 Supabase 초기화
   app/               앱 전체 설정 (app.dart 앱 위젯, router.dart 라우팅, main_shell.dart 하단 탭 틀)
     theme/           색·글자·모서리·간격·탭 바 치수·에셋 경로 상수, ThemeData
   core/              공통 기반 (config, 상수, 유틸)
@@ -49,13 +49,13 @@ docs/                명세서, 디자인 시스템, 프론트 문서 (design/ �
 
 ## 화면 규칙
 
-- **하단 탭 4개:** 투데이(홈) / 관계 / 기록 / 전체. Figma가 있는 화면은 홈뿐이고(2026-10-23 수정안 반영, 배경 `#FFF8F8`), 관계·기록·전체 탭과 로그인·가입·알림 등은 레퍼런스를 해석해 만들었습니다(FRONTEND.md 2장). 토글·모달·토스트·설정 목록은 Figma에 없어 Reborn 공통 컴포넌트로 만들어 쓰고 머티리얼 위젯은 쓰지 않습니다(DESIGN_SYSTEM.md 7장).
+- **하단 탭 4개:** 투데이(홈) / 관계 / 기록 / 전체. Figma가 있는 화면은 홈뿐이고(2026-11-17 리디자인, 배경 `#F2F2F4`), 관계·기록·전체 탭과 로그인·가입·알림 등은 레퍼런스를 해석해 만들었습니다(FRONTEND.md 2장). 토글·모달·토스트·설정 목록은 Figma에 없어 Reborn 공통 컴포넌트로 만들어 쓰고 머티리얼 위젯은 쓰지 않습니다(DESIGN_SYSTEM.md 7장).
 - **고정 규칙:** 글자 크기 배율 1.0(시스템 글자 크기 설정 무시), 라이트 모드만, 세로 방향만. **다크 모드는 나중에 추가할 예정**이라 색은 `AppColors` 팔레트로만 씁니다.
-- 앱은 스플래시 화면(로고만)으로 시작해, 홈 데이터가 준비되면(최소 0.8초, 최대 3초) 홈이 로고 화면 위로 서서히 나타납니다(크로스페이드 0.4초, 시간은 임시값). 로고에는 투명도·크기 애니메이션이 없습니다. 로그인 여부에 따라 로그인 화면 또는 홈으로 갑니다(인증은 메모리 구현, FRONTEND.md 2장). 시작 경로는 `initialLocationProvider`이고 `main.dart`에서만 스플래시로 바꿉니다(테스트는 기본값 투데이). Supabase 초기화는 첫 화면을 막지 않도록 `runApp` 뒤에 합니다(화면이 Supabase를 쓰기 시작하면 그 전에 끝나도록 바꿀 것).
-- 앱이 켜지는 동안의 네이티브 시작 화면(iOS `LaunchScreen.storyboard`, Android `launch_background.xml`)도 같은 로고(200)로 맞춰 두었습니다. **알려진 한계(iOS 시뮬레이터 iOS 27·26.5에서 확인):** 시스템이 그리는 시작 화면의 로고가 앱 안에서 그린 로고(RGB 230,106,141)보다 진하게(248,96,141) 보이는 구간이 앱을 켠 직후 잠깐 있습니다. sRGB 태그, 템플릿 tint, 화면 색공간별 이미지, `UILaunchScreen`, 번들 PNG를 시도했지만 해결되지 않았고 실제 기기에서는 확인하지 못했습니다. 앱 시작을 빠르게 해(Supabase 초기화 지연) 이 구간을 줄입니다. Android 12 이상은 시스템 스플래시(앱 아이콘 기반)가 먼저 나와 완전히 같지는 않습니다.
+- 앱은 스플래시 화면을 제거해 투데이(`/today`)에서 바로 시작합니다. 로그인 화면은 가입·로그아웃 등 인증 흐름에서 계속 사용할 수 있습니다. 시작 경로는 `initialLocationProvider`이며, Supabase 초기화는 첫 프레임 뒤에 시작합니다(화면이 Supabase를 쓰기 시작하면 그 전에 끝나도록 바꿀 것).
+- iOS와 Android는 첫 Flutter 프레임을 준비하는 동안 OS가 요구하는 네이티브 시작 창을 흰 배경으로 표시합니다. 브랜드 로고나 별도 스플래시 화면은 표시하지 않습니다.
 - 하단 탭 바는 플랫폼별로 다릅니다: **iOS 26 이상 = 네이티브 `UITabBar`(Liquid Glass)**, iOS 26 미만·Android = Flutter가 그린 탭 바(블러). 분기는 `lib/shared/widgets/app_bottom_nav_bar.dart` 한 곳이고, 네이티브 쪽은 `ios/Runner/NativeTabBarView.swift`(플랫폼 뷰)와 `lib/shared/widgets/native_tab_bar.dart`입니다. 새 패키지는 쓰지 않습니다.
 - iOS 네이티브 탭 바(Liquid Glass)는 **Xcode 26 이상(iOS 26 SDK)으로 빌드**해야 유리 모양이 나옵니다. iOS 시뮬레이터 런타임 26.5와 27.0에서 확인했습니다.
-- 세로 고정은 세 곳에서 합니다: `main.dart`(SystemChrome), iOS `Info.plist`, Android `AndroidManifest.xml`.
+- 세로 고정은 iOS `Info.plist`와 Android `AndroidManifest.xml`에서 합니다.
 
 ## 보안 규칙
 

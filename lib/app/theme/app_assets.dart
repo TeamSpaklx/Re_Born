@@ -53,9 +53,6 @@ abstract final class AppAssets {
   /// 헤더 로고 (1000×250, 안쪽 여백 포함).
   static const logo = 'assets/images/logo_reborn.png';
 
-  /// 스플래시 화면 로고 마크 (2000×2000, 배경 투명).
-  static const logoMark = 'assets/images/logo_mark.png';
-
   /// 기록 카드(Before)의 여우원숭이 일러스트 (604×604, 배경 투명, 원본 1254×1254를 줄임).
   static const mascotLemur = 'assets/images/mascot_lemur.png';
 
@@ -114,7 +111,6 @@ abstract final class AppAssets {
     radioCircle,
     radioCircleAfter,
     logo,
-    logoMark,
     mascotLemur,
     ...emotionImages,
     pretendardBold,
