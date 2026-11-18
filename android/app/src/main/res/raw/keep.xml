@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 알림 아이콘·소리는 코드에서 이름 문자열로만 부르므로, 릴리스 빌드의 리소스 축소가 지우지 않게 지킨다. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ic_notification,@raw/reborn_notification" />

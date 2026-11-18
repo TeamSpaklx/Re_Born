@@ -29,7 +29,7 @@ class SettingsSection extends ConsumerWidget {
     );
     if (!ok) return;
     await ref.read(settingsActionsProvider).deleteAllRecords();
-    if (context.mounted) showAppToast(context, '기록을 모두 삭제했어요');
+    if (context.mounted) showAppToast(context, '기록을 모두 삭제했어요', success: true);
   }
 
   Future<void> _logout(BuildContext context, WidgetRef ref) async {
@@ -41,7 +41,7 @@ class SettingsSection extends ConsumerWidget {
     );
     if (!ok) return;
     await ref.read(authActionsProvider).signOut();
-    if (context.mounted) context.go(AppRoutes.login);
+    if (context.mounted) context.go(AppRoutes.today);
   }
 
   @override

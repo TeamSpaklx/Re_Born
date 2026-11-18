@@ -8,7 +8,7 @@ import 'package:reborn_app/features/auth/data/in_memory_auth_repository.dart';
 import 'package:reborn_app/features/auth/models/auth_user.dart';
 import 'package:reborn_app/features/auth/models/auth_validator.dart';
 import 'package:reborn_app/features/auth/presentation/auth_providers.dart';
-import 'package:reborn_app/features/auth/presentation/login_screen.dart';
+import 'package:reborn_app/features/auth/presentation/signup_screen.dart';
 import 'package:reborn_app/features/home/presentation/today_screen.dart';
 import 'package:reborn_app/features/people/presentation/people_providers.dart';
 import 'package:reborn_app/features/settings/presentation/settings_providers.dart';
@@ -58,46 +58,6 @@ void main() {
       );
       expect(AuthValidator.validateNickname('   '), isNotNull);
       expect(AuthValidator.validateNickname('열세글자를넘는닉네임입니다만'), isNotNull);
-    });
-  });
-
-  group('로그인', () {
-    testWidgets('형식이 틀리면 필드별 문구가 나오고 요청하지 않는다', (tester) async {
-      final c = await pumpAt(tester, AppRoutes.login);
-      await tester.enterText(find.byKey(const Key('login-email')), 'abc');
-      await tester.tap(find.text('로그인').last);
-      await tester.pumpAndSettle();
-
-      expect(find.text('이메일 형식이 올바르지 않아요.'), findsOneWidget);
-      expect(find.text('비밀번호를 입력해 주세요.'), findsOneWidget);
-      expect(c.read(sessionProvider), isNull);
-    });
-
-    testWidgets('비밀번호가 틀리면 안내 문구가 나오고 다시 시도할 수 있다', (tester) async {
-      final c = await pumpAt(tester, AppRoutes.login);
-      await tester.enterText(
-        find.byKey(const Key('login-email')),
-        InMemoryAuthRepository.demoEmail,
-      );
-      await tester.enterText(
-        find.byKey(const Key('login-password')),
-        'wrongpass1',
-      );
-      await tester.tap(find.text('로그인').last);
-      await tester.pumpAndSettle();
-
-      expect(find.byKey(const Key('login-error')), findsOneWidget);
-      expect(find.byType(LoginScreen), findsOneWidget);
-
-      await tester.enterText(
-        find.byKey(const Key('login-password')),
-        InMemoryAuthRepository.demoPassword,
-      );
-      await tester.tap(find.text('로그인').last);
-      await tester.pumpAndSettle();
-
-      expect(c.read(sessionProvider)?.email, InMemoryAuthRepository.demoEmail);
-      expect(find.byType(TodayScreen), findsOneWidget);
     });
   });
 
@@ -241,12 +201,12 @@ void main() {
 
     await tester.tap(find.text('처음으로'));
     await tester.pumpAndSettle();
-    expect(find.byType(LoginScreen), findsOneWidget);
+    expect(find.byType(TodayScreen), findsOneWidget);
   });
 
   group('소셜 로그인', () {
     testWidgets('처음 카카오로 들어오면 약관 동의 → 온보딩으로 이어진다', (tester) async {
-      final c = await pumpAt(tester, AppRoutes.login);
+      final c = await pumpAt(tester, AppRoutes.signup);
       await tester.tap(find.byKey(const Key('social-kakao')));
       await tester.pumpAndSettle();
 
@@ -267,14 +227,14 @@ void main() {
     testWidgets('동의 화면에서 뒤로 간 뒤 같은 소셜 계정으로 재시도해도 동의 화면을 건너뛰지 않는다', (
       tester,
     ) async {
-      final c = await pumpAt(tester, AppRoutes.login);
+      final c = await pumpAt(tester, AppRoutes.signup);
       await tester.tap(find.byKey(const Key('social-kakao')));
       await tester.pumpAndSettle();
       expect(find.text('약관에\n동의해 주세요'), findsOneWidget);
 
       await tester.tap(find.bySemanticsLabel('뒤로'));
       await tester.pumpAndSettle();
-      expect(find.byType(LoginScreen), findsOneWidget);
+      expect(find.byType(SignupScreen), findsOneWidget);
 
       await tester.tap(find.byKey(const Key('social-kakao')));
       await tester.pumpAndSettle();
@@ -285,7 +245,7 @@ void main() {
     });
 
     testWidgets('이미 가입한 소셜 계정은 바로 홈으로 간다', (tester) async {
-      final c = await pumpAt(tester, AppRoutes.login);
+      final c = await pumpAt(tester, AppRoutes.signup);
       final repo = c.read(authRepositoryProvider);
       await repo.signInWithSocial(SocialProvider.google); // 처음 한 번
       await repo.signOut();

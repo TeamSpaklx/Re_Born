@@ -43,7 +43,7 @@ void main() {
         initialLocationProvider.overrideWithValue(
           kDebugMode && _initialRoute.isNotEmpty
               ? _initialRoute
-              : AppRoutes.today,
+              : AppRoutes.splash,
         ),
       ],
       child: const RebornApp(),

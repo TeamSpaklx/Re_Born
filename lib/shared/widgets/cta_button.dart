@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_motion.dart';
 import '../../app/theme/app_radii.dart';
+import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_text_styles.dart';
 import '../../core/utils/app_haptics.dart';
 import 'pressable.dart';
 
 /// 버튼 모양. 화면당 주요 행동(primary)은 하나만 둔다.
 enum CtaVariant {
-  /// 브랜드 핑크 + 흰 글자: 화면의 주요 행동 ("저장", "감정 기록하기").
+  /// 분홍 #FF80A6 + 흰 글자: 화면의 주요 행동 ("저장", "감정 기록하기"). Figma CTA `862:2951`.
   primary,
 
   /// 연한 핑크 + 검정 글자: 기록 카드처럼 카드 안의 부드러운 주요 행동.
@@ -22,7 +23,9 @@ enum CtaVariant {
   destructive,
 }
 
-/// 주요 버튼. 폭은 부모를 채운다. 높이가 52 이상이면 글자가 16, 그보다 낮으면 14다.
+/// 주요 버튼. Figma CTA(`862:2951`)처럼 알약 모양이고 폭은 부모를 채운다.
+/// 글자는 높이 60 이상이면 18 SemiBold(Figma CTA), 52 이상이면 16, 그보다 낮으면 14다.
+/// 하단 고정 버튼은 높이 60([BottomCtaBar]), 카드 안 버튼은 자리에 맞춘 높이(44·48·52)를 쓴다.
 /// [onPressed]가 null이면 비활성(흐리게, 눌리지 않음). 눌리면 살짝 흐려진다(머티리얼 번짐 없음).
 class CtaButton extends StatelessWidget {
   const CtaButton({
@@ -48,12 +51,14 @@ class CtaButton extends StatelessWidget {
     final colors = context.colors;
     final enabled = onPressed != null;
     final (fill, text) = switch (variant) {
-      CtaVariant.primary => (colors.cta, colors.onCta),
+      CtaVariant.primary => (colors.ctaPrimary, colors.onCta),
       CtaVariant.soft => (colors.ctaSoft, colors.onCtaSoft),
       CtaVariant.secondary => (colors.chip, colors.textStrong),
       CtaVariant.destructive => (colors.dangerTile, colors.danger),
     };
-    final style = height >= 52
+    final style = height >= ComponentLayout.ctaLargeTextMinHeight
+        ? AppTextStyles.ctaLarge
+        : height >= ComponentLayout.ctaMediumTextMinHeight
         ? AppTextStyles.buttonLarge
         : AppTextStyles.button;
     return Semantics(
@@ -73,7 +78,7 @@ class CtaButton extends StatelessWidget {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: fill,
-              borderRadius: AppRadii.buttonBorderRadius,
+              borderRadius: AppRadii.pillBorderRadius,
             ),
             child: Text(label, style: style.copyWith(color: text)),
           ),

@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import '../features/all/presentation/all_screen.dart';
 import '../features/auth/presentation/account_delete_screen.dart';
 import '../features/auth/presentation/consent_screen.dart';
-import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/onboarding_screen.dart';
 import '../features/auth/presentation/permission_screen.dart';
 import '../features/auth/presentation/signup_screen.dart';
@@ -21,17 +19,21 @@ import '../features/record/presentation/record_screen.dart';
 import '../features/relations/presentation/person_detail_screen.dart';
 import '../features/relations/presentation/person_form_screen.dart';
 import '../features/relations/presentation/relations_screen.dart';
+import '../features/splash/presentation/splash_screen.dart';
 import '../shared/dev/design_gallery_screen.dart';
 import 'main_shell.dart';
+import 'swipe_back_page.dart';
+import 'theme/app_spacing.dart';
 
 /// 화면 경로. 화면 이동은 문자열 대신 이 상수를 사용한다.
 /// 순서는 하단 탭 순서(투데이 / 관계 / 기록 / 전체)와 같다.
 abstract final class AppRoutes {
+  static const splash = '/splash';
+
   /// 디자인 갤러리(개발용). 디버그 빌드에서만 등록된다.
   static const devGallery = '/dev/gallery';
 
   // 인증·온보딩
-  static const login = '/login';
   static const signup = '/signup';
   static const signupConsent = '/signup/consent';
   static const onboarding = '/onboarding';
@@ -55,98 +57,117 @@ abstract final class AppRoutes {
   static String relationsEdit(String id) => '/relations/$id/edit';
 }
 
-/// 앱이 처음 여는 경로. 기본값은 투데이이며, 디버그 실행에서 경로를 바꿀 수 있다.
+/// 앱이 처음 여는 경로. 실제 앱은 `main.dart`에서 스플래시로 바꾸고,
+/// 테스트는 기본값(투데이)으로 바로 화면을 확인한다.
 final initialLocationProvider = Provider<String>((ref) => AppRoutes.today);
 
-/// 앱 라우터. 앱은 투데이(홈)로 시작한다.
+/// 앱 라우터. 앱은 스플래시로 시작해 투데이(홈)로 넘어간다.
 final routerProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
     initialLocation: ref.read(initialLocationProvider),
     routes: [
+      GoRoute(
+        path: AppRoutes.splash,
+        builder: (context, state) => const SplashScreen(),
+      ),
       if (kDebugMode)
         GoRoute(
           path: AppRoutes.devGallery,
-          builder: (context, state) => const DesignGalleryScreen(),
+          pageBuilder: (context, state) =>
+              _swipe(state, const DesignGalleryScreen()),
         ),
       GoRoute(
-        path: AppRoutes.login,
-        builder: (context, state) => const LoginScreen(),
-      ),
-      GoRoute(
         path: AppRoutes.signup,
-        builder: (context, state) => const SignupScreen(),
+        pageBuilder: (context, state) => _swipe(state, const SignupScreen()),
       ),
       GoRoute(
         path: AppRoutes.signupConsent,
-        pageBuilder: (context, state) =>
-            defaultTargetPlatform == TargetPlatform.iOS
-            ? CupertinoPage<void>(
-                key: state.pageKey,
-                child: const ConsentScreen(),
-              )
-            : MaterialPage<void>(
-                key: state.pageKey,
-                child: const ConsentScreen(),
-              ),
+        pageBuilder: (context, state) => _swipe(state, const ConsentScreen()),
       ),
       GoRoute(
         path: AppRoutes.onboarding,
-        builder: (context, state) => const OnboardingScreen(),
+        pageBuilder: (context, state) =>
+            _swipe(state, const OnboardingScreen()),
       ),
       GoRoute(
         path: AppRoutes.onboardingPermission,
-        builder: (context, state) => const PermissionScreen(),
+        pageBuilder: (context, state) =>
+            _swipe(state, const PermissionScreen()),
       ),
       GoRoute(
         path: AppRoutes.notifications,
-        builder: (context, state) => const NotificationsScreen(),
+        pageBuilder: (context, state) =>
+            _swipe(state, const NotificationsScreen()),
       ),
       GoRoute(
         path: AppRoutes.notificationSettings,
-        builder: (context, state) => const NotificationSettingsScreen(),
+        pageBuilder: (context, state) =>
+            _swipe(state, const NotificationSettingsScreen()),
       ),
       GoRoute(
         path: AppRoutes.accountDelete,
-        builder: (context, state) => const AccountDeleteScreen(),
+        pageBuilder: (context, state) =>
+            _swipe(state, const AccountDeleteScreen()),
       ),
       GoRoute(
         path: AppRoutes.recordNew,
-        builder: (context, state) => const RecordFormScreen(),
+        pageBuilder: (context, state) =>
+            _swipe(state, const RecordFormScreen()),
       ),
       GoRoute(
         path: '/insight/:id',
-        builder: (context, state) =>
-            InsightDetailScreen(insightId: state.pathParameters['id']!),
+        pageBuilder: (context, state) => _swipe(
+          state,
+          InsightDetailScreen(insightId: state.pathParameters['id']!),
+        ),
       ),
       GoRoute(
         path: '/record/:id/edit',
-        builder: (context, state) =>
-            RecordFormScreen(entryId: state.pathParameters['id']),
+        pageBuilder: (context, state) => _swipe(
+          state,
+          RecordFormScreen(entryId: state.pathParameters['id']),
+        ),
       ),
       GoRoute(
         path: AppRoutes.relationsNew,
-        builder: (context, state) => const PersonFormScreen(),
+        pageBuilder: (context, state) =>
+            _swipe(state, const PersonFormScreen()),
       ),
       GoRoute(
         path: '/relations/:id/edit',
-        builder: (context, state) =>
-            PersonFormScreen(personId: state.pathParameters['id']),
+        pageBuilder: (context, state) => _swipe(
+          state,
+          PersonFormScreen(personId: state.pathParameters['id']),
+        ),
       ),
       GoRoute(
         path: '/relations/:id',
-        builder: (context, state) =>
-            PersonDetailScreen(personId: state.pathParameters['id']!),
+        pageBuilder: (context, state) => _swipe(
+          state,
+          PersonDetailScreen(personId: state.pathParameters['id']!),
+        ),
       ),
       GoRoute(
         path: '/record/:id',
-        builder: (context, state) =>
-            RecordDetailScreen(entryId: state.pathParameters['id']!),
+        pageBuilder: (context, state) => _swipe(
+          state,
+          RecordDetailScreen(entryId: state.pathParameters['id']!),
+        ),
       ),
       StatefulShellRoute.indexedStack(
-        // 하단 탭 셸은 별도 화면 전환 없이 바로 표시한다.
+        // 스플래시에서 넘어올 때 옆에서 밀리지 않고, 로고 화면 위로 서서히 나타난다.
         pageBuilder: (context, state, navigationShell) =>
-            NoTransitionPage<void>(
+            CustomTransitionPage<void>(
               key: state.pageKey,
+              transitionDuration: SplashLayout.fadeDuration,
+              reverseTransitionDuration: SplashLayout.fadeDuration,
+              transitionsBuilder: (context, animation, secondary, child) =>
+                  FadeTransition(
+                    opacity: animation.drive(
+                      CurveTween(curve: Curves.easeInOut),
+                    ),
+                    child: child,
+                  ),
               child: MainShell(navigationShell: navigationShell),
             ),
         branches: [
@@ -161,6 +182,10 @@ final routerProvider = Provider<GoRouter>((ref) {
   ref.onDispose(router.dispose);
   return router;
 });
+
+/// 탭 위로 쌓이는 화면: 화면 어디서나 오른쪽으로 밀어 뒤로 갈 수 있다([SwipeBackPage]).
+Page<void> _swipe(GoRouterState state, Widget child) =>
+    SwipeBackPage<void>(key: state.pageKey, name: state.uri.path, child: child);
 
 StatefulShellBranch _branch(String path, Widget screen) {
   return StatefulShellBranch(

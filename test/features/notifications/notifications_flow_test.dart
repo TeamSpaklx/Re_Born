@@ -10,6 +10,11 @@ import 'package:reborn_app/features/insights/presentation/insight_detail_screen.
 import 'package:reborn_app/features/notifications/models/app_notification.dart';
 import 'package:reborn_app/features/notifications/presentation/notifications_providers.dart';
 import 'package:reborn_app/features/settings/presentation/settings_providers.dart';
+import 'package:reborn_app/shared/widgets/empty_state.dart';
+import 'package:reborn_app/shared/widgets/notification_bell_button.dart';
+import 'package:reborn_app/app/theme/app_assets.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:reborn_app/features/notifications/presentation/notification_settings_screen.dart';
 
 import '../../helpers/fakes.dart';
 
@@ -71,9 +76,33 @@ void main() {
 
     await tester.tap(find.bySemanticsLabel('알림, 읽지 않은 알림 1개'));
     await tester.pumpAndSettle();
-    expect(find.text('알림 설정'), findsOneWidget);
+    expect(find.text('알림'), findsWidgets);
+    expect(find.byKey(const Key('notification-settings')), findsOneWidget);
     expect(find.text('새 알림'), findsOneWidget);
     expect(find.textContaining('관계를 살펴보세요'), findsOneWidget);
+  });
+
+  testWidgets('홈 벨: 안 읽은 알림이 있으면 분홍 점 종(Figma 828:960)을 쓴다', (tester) async {
+    await pumpAt(tester, AppRoutes.today);
+    final svg = tester.widget<SvgPicture>(
+      find.descendant(
+        of: find.byType(NotificationBellButton),
+        matching: find.byType(SvgPicture),
+      ),
+    );
+    expect((svg.bytesLoader as SvgAssetLoader).assetName, AppAssets.bellUnread);
+  });
+
+  testWidgets('알림 화면: 가운데 제목, 전체/안 읽음 세그먼트, 톱니를 누르면 알림 설정', (tester) async {
+    await pumpAt(tester, AppRoutes.notifications);
+    expect(find.text('전체'), findsOneWidget);
+    expect(find.text('안 읽음'), findsOneWidget);
+    final title = tester.getCenter(find.text('알림').first);
+    expect(title.dx, closeTo(402 / 2, 1));
+
+    await tester.tap(find.byKey(const Key('notification-settings')));
+    await tester.pumpAndSettle();
+    expect(find.byType(NotificationSettingsScreen), findsOneWidget);
   });
 
   testWidgets('알림을 누르면 인사이트가 열리고 읽음 처리되어 점이 사라진다', (tester) async {
@@ -95,12 +124,13 @@ void main() {
     await tester.tap(find.text('안 읽음'));
     await tester.pumpAndSettle();
 
-    expect(find.text('읽지 않은 알림이 없어요'), findsOneWidget);
+    expect(find.text('받은 알림이 없습니다'), findsOneWidget);
   });
 
   testWidgets('인사이트가 없으면 빈 상태 안내', (tester) async {
     await pumpAt(tester, AppRoutes.notifications, noInsights: true);
-    expect(find.text('아직 알림이 없어요'), findsOneWidget);
+    expect(find.text('받은 알림이 없습니다'), findsOneWidget);
+    expect(find.byType(QuietEmptyState), findsOneWidget);
   });
 
   testWidgets('알림 설정: 리마인드를 켜면 시간 행이 생기고, 인사이트 알림을 끄면 목록이 비어진다', (
@@ -142,6 +172,37 @@ void main() {
           )).notifications.copyWith(insight: false),
         );
     expect(await c.read(notificationsProvider.future), isEmpty);
+  });
+
+  testWidgets('디버그 테스트 알림: 바로·10초 뒤 항목이 권한을 확인하고 알림을 요청한다', (tester) async {
+    await pumpAt(tester, AppRoutes.notificationSettings);
+
+    await tester.tap(find.byKey(const Key('notify-test-now')));
+    await tester.pumpAndSettle();
+    expect(service.permissionRequests, 1);
+    expect(service.testNotifications, [Duration.zero]);
+
+    await tester.tap(find.byKey(const Key('notify-test-delayed')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(service.testNotifications.last, const Duration(seconds: 10));
+    expect(find.textContaining('10초 뒤에 알림이 와요'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 4));
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('디버그 테스트 알림: OS 권한이 거부되면 보내지 않고 안내한다', (tester) async {
+    service.allowed = false;
+    await pumpAt(tester, AppRoutes.notificationSettings);
+
+    await tester.tap(find.byKey(const Key('notify-test-now')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(service.testNotifications, isEmpty);
+    expect(find.textContaining('알림 권한이 꺼져 있어요'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 4));
+    await tester.pumpAndSettle();
   });
 
   testWidgets('OS 권한이 거부되면 리마인드를 켜지 못하고 안내한다', (tester) async {

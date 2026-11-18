@@ -17,12 +17,19 @@ abstract final class AppAssets {
   static const tabSelection = '$_icons/tab_selection.svg';
 
   // 홈 화면 아이콘
-  static const person = '$_icons/person.svg';
   static const forum = '$_icons/forum.svg';
+
+  /// 알림 종 (Phosphor Bell, Figma `828:955`)과 안 읽은 알림이 있을 때의 종(분홍 점, Figma `828:960`).
   static const bell = '$_icons/bell.svg';
-  static const bellRead = '$_icons/bell_read.svg';
   static const bellUnread = '$_icons/bell_unread.svg';
   static const sealCheck = '$_icons/seal_check.svg';
+
+  /// 알림 화면 오른쪽 위 설정 톱니 (Iconsax setting, Figma `834:1153`).
+  static const ixSetting = '$_icons/ix_setting.svg';
+
+  /// 아이콘 세그먼트 예시 아이콘 (Phosphor Rabbit·Smiley, Figma `834:1241`, `834:1244`).
+  static const segmentRabbit = '$_icons/seg_rabbit.svg';
+  static const segmentSmiley = '$_icons/seg_smiley.svg';
 
   // 임시 디자인 화면용 아이콘. check는 Phosphor Icons(MIT), `ix_*`는 Iconsax(Linear)다.
   // 한 가지 색이라 쓰는 곳에서 `colorFilter`로 색을 입힌다.
@@ -46,12 +53,14 @@ abstract final class AppAssets {
   static const chevronSection = '$_icons/chevron_section.svg';
   static const chevronAttendance = '$_icons/chevron_attendance.svg';
 
-  /// 액션 카드 오른쪽 원. Before는 `#D0D0D0`, After는 `#EEE6E9`(디자인 불일치, 확인 필요).
+  /// 액션 카드 오른쪽 원 (`#D0D0D0`, Figma Before). After용 `#EEE6E9` 원은 쓰지 않아 지웠다.
   static const radioCircle = '$_icons/radio_circle.svg';
-  static const radioCircleAfter = '$_icons/radio_circle_after.svg';
 
   /// 헤더 로고 (1000×250, 안쪽 여백 포함).
   static const logo = 'assets/images/logo_reborn.png';
+
+  /// 스플래시 화면 로고 마크 (640×640, 배경 투명, 원본 2000×2000을 줄임. Figma 805:953).
+  static const logoMark = 'assets/images/logo_mark.png';
 
   /// 기록 카드(Before)의 여우원숭이 일러스트 (604×604, 배경 투명, 원본 1254×1254를 줄임).
   static const mascotLemur = 'assets/images/mascot_lemur.png';
@@ -89,9 +98,12 @@ abstract final class AppAssets {
     tabAll,
     tabAllActive,
     tabSelection,
-    person,
     forum,
     bell,
+    bellUnread,
+    ixSetting,
+    segmentRabbit,
+    segmentSmiley,
     sealCheck,
     check,
     trash,
@@ -109,8 +121,8 @@ abstract final class AppAssets {
     chevronSection,
     chevronAttendance,
     radioCircle,
-    radioCircleAfter,
     logo,
+    logoMark,
     mascotLemur,
     ...emotionImages,
     pretendardBold,

@@ -74,8 +74,8 @@
 
 - **기록 카드만 다릅니다.** Before는 높이 **268**(안내문 + 여우원숭이 일러스트 + 버튼), After는 높이 399(아바타·완료 문구·버튼·출석 체크). 아래 섹션은 그만큼 밀립니다.
 - ⚠️ **디자인 불일치 (확인 필요):** After는 기록 카드와 "최근 관계 신호" 제목 사이 간격이 23(카드 끝 636 → 제목 659)이고 Before 최신 안은 **22**(카드 끝 505 → 제목 527)입니다. 구현은 둘 다 22(`recordCardToSignalTitle`)로 통일합니다(After 최신 안 확인 필요).
-- ⚠️ **디자인 불일치 (확인 필요):** "오늘 해볼까요?" 옆 `>` 화살표가 Before에만 있습니다. 액션 카드 오른쪽 원 색도 Before `#D0D0D0`, After `#EEE6E9`로 다릅니다(`radioCircle`, `radioCircleAfter`).
-- 샘플 아바타 사진 3장(After)은 더미 이미지라 에셋에 넣지 않았습니다. 실제로는 오늘 기록한 인물의 프로필(없으면 `avatar` 색 원 + `person` 아이콘)을 보여줍니다(추정).
+- ⚠️ **디자인 불일치 (확인 필요):** "오늘 해볼까요?" 옆 `>` 화살표가 Before에만 있습니다. 액션 카드 오른쪽 원 색도 Before `#D0D0D0`, After `#EEE6E9`로 다릅니다. 앱은 Before 원(`radioCircle`)만 쓰고, After 원 파일은 쓰지 않아 지웠습니다.
+- 샘플 아바타 사진 3장(After)은 더미 이미지라 에셋에 넣지 않았습니다. 실제로는 오늘 기록한 인물의 프로필(없으면 캐릭터 아바타 `CharacterAvatar`)을 보여줍니다(추정).
 
 ## 5. 컴포넌트
 
@@ -103,7 +103,7 @@
 
 ### 5.4 신호 카드 ("최근 관계 신호")
 - 354×104, 배경 `cardWhite`, 모서리 24. **수정안은 테두리가 없습니다.** 안쪽 좌표를 그대로 쓰도록 `AppCard.white`가 투명한 2px 자리를 남겨 둡니다(좌표는 테두리 안쪽 기준 그대로).
-- 아바타 원 48 @(18,26) 배경 `avatar`, 안에 `person.svg`(36, 오프셋 6).
+- 아바타 원 48 @(18,26). Figma는 `avatar` 색 원 안에 사람 아이콘(36)이지만, 앱은 캐릭터 아바타(`CharacterAvatar`)를 쓰므로 `person.svg`는 지웠습니다.
 - 이름 "지민"(`sectionTitle`) x 87·y 18, 오른쪽에 간격 6으로 칩(38×22, `chip`, 모서리 100, 글자 `chipLabel` "친구").
 - 문장 `signalText`(textStrong) 중심 y 57, 캡션 `caption` 중심 y 76 (둘 다 x 87).
 - 오른쪽 끝 `chevron_signal.svg`(20) 세로 가운데, x 314.
@@ -121,7 +121,7 @@
 - 354×90, `cardWhite`, 모서리 24(수정안은 테두리 없음, 투명 2px 자리 유지), 가로 배치
 - 아이콘 타일 48×48(`iconTile`, 모서리 12, 안쪽 6) 안에 `forum.svg`(36).
 - 글자 열 폭 215: 제목 `actionTitle`(높이 32) + 부제 `signalText`(`textSecondary`, 높이 16).
-- 오른쪽 `radio_circle.svg`(20). After는 `radio_circle_after.svg`.
+- 오른쪽 `radio_circle.svg`(20). After 색(`#EEE6E9`) 파일은 쓰지 않아 지웠습니다.
 
 ### 5.7 섹션 제목 줄
 - 제목 `sectionTitle`. "최근 관계 신호" 오른쪽 끝에 "전체 보기"(`seeAll`) + `chevron_see_all.svg`(11.3×14), "오늘 해볼까요?" 오른쪽에 `chevron_section.svg`(20)(Before만).
@@ -165,7 +165,6 @@
 | `tabRecord` / `tabRecordActive` | `tab_record(_active).svg` | 28 | 탭 3 (기록) |
 | `tabAll` / `tabAllActive` | `tab_all(_active).svg` | 28 | 탭 4 (Iconsax `menu`, 가로줄 3개). Figma는 마스크+선 SVG 두 장으로 내보내서 `flutter_svg`가 마스크를 못 그릴 수 있어, 선 SVG를 28×28 뷰박스의 Figma 위치(2.75, 7.4167)에 놓아 한 파일로 합쳤습니다 |
 | `tabSelection` | `tab_selection.svg` | 92×56 | 선택 알약 |
-| `person` | `person.svg` | 36 | 신호 카드 아바타 |
 | `forum` | `forum.svg` | 36 | 액션 카드 |
 | `bell` | `bell.svg` | 24 | 알림 버튼 |
 | `sealCheck` | `seal_check.svg` | 44 | After 기록 카드 |
@@ -174,11 +173,11 @@
 | `chevronSeeAll` | `chevron_see_all.svg` | 11.3×14 | "전체 보기" |
 | `chevronSection` | `chevron_section.svg` | 20 | "오늘 해볼까요?"(Before) |
 | `chevronAttendance` | `chevron_attendance.svg` | 20 | "출석 체크 >" |
-| `radioCircle` / `radioCircleAfter` | `radio_circle(_after).svg` | 20 | 액션 카드 오른쪽 원 |
+| `radioCircle` | `radio_circle.svg` | 20 | 액션 카드 오른쪽 원 |
 | `logo` | `assets/images/logo_reborn.png` | 1000×250 | 헤더 로고 |
 | `mascotLemur` | `assets/images/mascot_lemur.png` | 604×604 (원본 1254×1254, 표시 151×150.77에서 위 98만 보임) | 기록 카드(Before) 일러스트 (Figma `736:309`, 배경 투명) |
 
-- **아이콘 출처:** 하단 탭 바의 투데이·관계·기록은 Phosphor Icons(`house-fill`, `users-fill`, 기록), 전체는 Iconsax(`menu`)입니다. 그 밖의 홈 아이콘(`person`, `forum`, `bell`, 화살표류, `seal-check-fill`)의 출처는 확인하지 못했습니다(확인 필요). 새 아이콘이 필요하면 두 라이브러리에서 SVG로 받아 `assets/icons/ui/`에 넣습니다(Flutter 패키지는 쓰지 않음).
+- **아이콘 출처:** 하단 탭 바의 투데이·관계·기록은 Phosphor Icons(`house-fill`, `users-fill`, 기록), 전체는 Iconsax(`menu`)입니다. 알림 종(`bell`, `bell_unread`)은 Phosphor(Figma 컴포넌트 `828:959`)이고, 그 밖의 홈 아이콘(`forum`, 화살표류, `seal-check-fill`)의 출처는 확인하지 못했습니다(확인 필요). 새 아이콘이 필요하면 두 라이브러리에서 SVG로 받아 `assets/icons/ui/`에 넣습니다(Flutter 패키지는 쓰지 않음).
 - 폰트: `assets/fonts/Pretendard-{Regular,Medium,SemiBold,Bold,ExtraBold}.otf` (v1.3.9, SIL OFL 1.1, `OFL-LICENSE.txt`). pubspec에서 weight 400/500/600/700/800으로 등록.
 - Figma 에셋 URL은 7일 후 만료되므로 이미 이 레포에 내려받아 두었습니다. 새 에셋이 필요하면 디자이너에게 SVG/PNG를 받아 `assets/icons/ui/`에 넣고 `AppAssets`에 상수를 추가합니다.
 - `tab_selection.svg`는 Figma가 내려준 파일에서 배경 블러용 `foreignObject`·`mix-blend-mode`를 지우고 알약 도형(`#EDEDED`)만 남겼습니다. `flutter_svg`가 `foreignObject`를 처리하지 못해 "unhandled element" 경고를 냈기 때문이고, 그려지는 모양은 같습니다.
@@ -199,7 +198,7 @@
 11. Figma 섹션 메모 "그날 적어놓았던 기록을 보여줌 →": 섹션 밖의 화면으로 가는 동작으로 보이며 디자인을 아직 못 봄
 12. 그래프 막대 색 3단계를 정하는 값 구간(0.5 / 0.9)은 Figma에 규칙이 없어 샘플 막대에서 정한 추정
 13. Home After(`466:2704`)는 수정안이 없어 핑크 카드 그대로(Before는 흰 카드로 바뀜) — 맞춰야 하는지 확인
-14. 공통 컴포넌트(토글·모달·토스트·설정 목록)의 치수·색은 모두 추정(토스 구조 참고). 모달 확인 버튼 `brand`, 위험 색 `danger`/`dangerTile`, 토글 꺼짐 `toggleOff`(팔레트 `E8D5DA`), 토스트 `toastFill`, 가림막 `scrim`
+14. 공통 컴포넌트 중 토글·세그먼트·토스트·바텀시트·CTA·알림 종·스켈레톤은 Figma 컴포넌트 섹션(`749:337`) 값으로 바꿨다([DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md) 7장). 모달·설정 목록의 치수와 모달 확인 버튼 `brand`, 위험 색 `danger`/`dangerTile`, 가림막 `scrim`은 아직 추정(토스 구조 참고)
 15. 상단 바 블러: 날짜 글자가 번져 헤더 아래 옅은 회색 자국이 보임(블러 유지 여부 결정 필요)
 16. 팔레트 프레임의 `FFF5F8`·`A46273`·노랑 2색의 용도
 

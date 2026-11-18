@@ -20,6 +20,7 @@ import 'home_providers.dart';
 import 'widgets/action_suggestion_card.dart';
 import 'widgets/home_error_view.dart';
 import 'widgets/home_greeting.dart';
+import 'widgets/home_skeleton.dart';
 import 'widgets/home_top_bar.dart';
 import 'widgets/record_card_after.dart';
 import 'widgets/record_card_before.dart';
@@ -39,8 +40,9 @@ class TodayScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: background,
       body: summary.when(
+        skipLoadingOnReload: true,
         data: (data) => _HomeContent(summary: data),
-        loading: () => const SizedBox.shrink(),
+        loading: () => const HomeSkeleton(),
         error: (error, stack) =>
             HomeErrorView(onRetry: () => ref.invalidate(homeSummaryProvider)),
       ),
@@ -107,7 +109,7 @@ class _HomeContentState extends ConsumerState<_HomeContent> {
           insightId: suggestion.insightId,
           now: ref.read(clockProvider)(),
         );
-    if (context.mounted) showAppToast(context, '체크리스트에 담았어요');
+    if (context.mounted) showAppToast(context, '체크리스트에 담았어요', success: true);
   }
 
   /// 화면에 보일 제안: 새로 계산된 제안 앞에 방금 담은 카드를 제자리에 끼워 넣고 두 장으로 자른다.

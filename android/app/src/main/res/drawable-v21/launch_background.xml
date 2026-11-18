@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Android가 첫 Flutter 프레임을 준비하는 동안 흰 배경만 표시한다. -->
+<!-- 앱이 켜지는 동안 보이는 시작 화면: 흰 배경 + 가운데 로고(160dp), Flutter 스플래시 화면(Figma 805:953)과 같은 모양 -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@android:color/white" />
+    <item>
+        <bitmap
+            android:gravity="center"
+            android:src="@drawable/launch_logo" />
+    </item>
+    <!-- 아래 팀 표기 "TeamSpaklx": 안전 영역 위 32dp(Figma 805:955). 내비게이션 바 높이는 기기마다 달라 약간 다를 수 있다. -->
+    <item android:bottom="32dp">
+        <bitmap
+            android:gravity="bottom|center_horizontal"
+            android:src="@drawable/launch_brand" />
+    </item>
 </layer-list>

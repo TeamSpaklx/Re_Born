@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
@@ -21,7 +23,11 @@ import 'package:reborn_app/features/home/presentation/today_screen.dart';
 import 'package:reborn_app/features/insights/models/insight.dart';
 import 'package:reborn_app/features/todos/models/todo.dart';
 import 'package:reborn_app/features/home/presentation/widgets/action_suggestion_card.dart';
+import 'package:reborn_app/features/home/models/home_summary.dart';
+import 'package:reborn_app/features/home/presentation/home_providers.dart';
 import 'package:reborn_app/features/home/presentation/widgets/home_header.dart';
+import 'package:reborn_app/features/home/presentation/widgets/home_skeleton.dart';
+import 'package:reborn_app/shared/widgets/skeleton.dart';
 import 'package:reborn_app/features/home/presentation/widgets/home_top_bar.dart';
 import 'package:reborn_app/features/home/presentation/widgets/record_card_after.dart';
 import 'package:reborn_app/features/home/presentation/widgets/record_card_before.dart';
@@ -421,6 +427,47 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
     await tester.pumpAndSettle();
     expect(find.byType(RecordCardBefore), findsOneWidget);
+  });
+
+  testWidgets('불러오는 동안 Figma 스켈레톤(834:2351)을 깜빡이며 보여 준다', (tester) async {
+    useDesignScreen(tester);
+    final gate = Completer<HomeSummary>();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          clockProvider.overrideWithValue(() => now),
+          greetingIndexProvider.overrideWithValue(0),
+          homeSummaryProvider.overrideWith((ref) => gate.future),
+        ],
+        child: MaterialApp(theme: AppTheme.light, home: const TodayScreen()),
+      ),
+    );
+    await tester.pump();
+    expect(find.byType(HomeSkeleton), findsOneWidget);
+    expect(find.byType(HomeTopBar), findsOneWidget, reason: '로고·알림은 그대로');
+    expect(find.byType(SkeletonBox), findsWidgets);
+    // 기록 카드 자리는 Figma와 같은 y(237)에서 시작한다.
+    final card = find.byType(SkeletonCard).first;
+    expect(tester.getTopLeft(card).dy, closeTo(HomeLayout.recordCardY, 0.5));
+
+    // 깜빡임은 계속 반복된다(불투명도가 바뀐다).
+    Color barColor() =>
+        ((tester.widget<DecoratedBox>(
+                  find
+                      .descendant(
+                        of: find.byType(SkeletonBox).first,
+                        matching: find.byType(DecoratedBox),
+                      )
+                      .first,
+                )).decoration
+                as BoxDecoration)
+            .color!;
+    final first = barColor();
+    await tester.pump(ComponentLayout.skeletonPulse);
+    expect(barColor(), isNot(first));
+
+    // 끝나지 않은 로딩을 정리한다(내용으로 바뀌는 흐름은 위 테스트들이 확인).
+    await tester.pumpWidget(const SizedBox());
   });
 
   testWidgets('실패하면 오류 문구와 "다시 시도"가 나오고, 누르면 다시 불러온다', (tester) async {

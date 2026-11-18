@@ -61,6 +61,9 @@ abstract final class AppTextStyles {
   /// 연한 핑크 버튼 글자 16 SemiBold ("감정 기록하기", 수정안).
   static final buttonLarge = _style(16, _semiBold, -0.4);
 
+  /// 스플래시 하단 팀 표기 "TeamSpaklx" (Figma 805:955: 16 SemiBold, 자간 -0.4, 줄 높이 32).
+  static final splashBrand = _style(16, _semiBold, -0.4, lineHeight: 32);
+
   /// 기록 카드(Before) 부제 16 Medium ("1분만 천천히 돌아볼까요?", 수정안).
   static final recordCardSubtitle = _style(16, _medium, -0.4);
 
@@ -118,4 +121,29 @@ abstract final class AppTextStyles {
 
   /// 그래프 위 이모지.
   static final graphEmoji = _style(22, _regular, -0.22);
+
+  // ── 공통 컴포넌트 (Figma 컴포넌트 섹션 `749:337`) ──
+
+  /// 큰 CTA 글자 18 SemiBold, 자간 -0.45 (Figma `862:2952`).
+  static final ctaLarge = _style(18, _semiBold, -0.45);
+
+  /// 세그먼트 칸 글자 12 SemiBold, 자간 -0.3 (Figma `834:1234`).
+  static final segmentLabel = _style(12, _semiBold, -0.3);
+
+  /// 토스트 문구 14 Medium / '확인' 14 SemiBold, 줄 높이 22 (Figma `834:2091`, `834:2093`).
+  static final toastMessage = _style(14, _medium, 0, lineHeight: 22);
+  static final toastAction = _style(14, _semiBold, 0, lineHeight: 22);
+
+  /// 토스트 성공 체크 ✓ 17 SemiBold (Figma `834:2090`).
+  static final toastCheck = _style(17, _semiBold, 0, lineHeight: 22);
+
+  /// 바텀시트 제목 20 Bold 줄 높이 28, 행 글자 16 Medium 줄 높이 24 (Figma `763:49`, `763:55`).
+  static final sheetTitle = _style(20, _bold, 0, lineHeight: 28);
+  static final sheetRow = _style(16, _medium, 0, lineHeight: 24);
+
+  /// 가운데 정렬 화면 제목 22 Bold, 자간 -0.55 (Figma 알림 `834:1152`).
+  static final pageTitle = _style(22, _bold, -0.55);
+
+  /// 빈 화면 안내 20 Regular, 자간 -0.5 (Figma 알림 `834:1161`).
+  static final emptyMessage = _style(20, _regular, -0.5);
 }

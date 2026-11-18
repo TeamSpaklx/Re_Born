@@ -1,3 +1,5 @@
+import 'package:flutter/painting.dart' show Alignment, Offset;
+
 /// 간격과 크기. Figma 홈 화면(402×874 기준)에서 읽은 값이며 출처는 docs/DESIGN_HOME.md.
 ///
 /// 화면 폭은 좌우 여백 [pageMargin]을 고정하고 카드가 남는 폭을 채운다(402일 때 354).
@@ -49,8 +51,6 @@ abstract final class HomeLayout {
   // 헤더
   static const headerLogoWidth = 169.0;
   static const headerLogoHeight = 42.0;
-  static const bellButtonSize = 44.0;
-  static const bellIconSize = 24.0;
 
   /// 로고를 누르면 맨 위로 올라가는 시간. Figma에 지정이 없어 정한 임시값(팀 확인 필요).
   static const scrollToTopDuration = Duration(milliseconds: 500);
@@ -103,7 +103,6 @@ abstract final class HomeLayout {
 
   // 아이콘·아바타
   static const avatarSize = 48.0;
-  static const personIconSize = 36.0;
   static const iconTileSize = 48.0;
   static const forumIconSize = 36.0;
   static const radioSize = 20.0;
@@ -159,13 +158,37 @@ abstract final class AttendanceLayout {
   static const pillCount = 6;
 }
 
-/// 공통 컴포넌트(토글·모달·토스트·설정 목록) 치수. Figma에 없는 값이라 모두 추정이다
-/// (토스 설정·로그아웃 화면의 구조를 참고하고 Reborn 색·모서리로 정함, 확인 필요).
+/// 스플래시 화면 치수 (Figma 402×874 "스플릿 화면" 805:953, 로고는 화면 정중앙).
+abstract final class SplashLayout {
+  static const logoSize = 160.0;
+
+  /// Figma는 이미지를 박스 안에서 left −0.4%, top −0.85% 옮겨 놓았다(160 기준 −0.64, −1.36px).
+  static const logoOffset = Offset(-0.64, -1.36);
+
+  /// 하단 "TeamSpaklx"의 아래 여백: Figma에서 글자 상자 아래가 화면 아래에서 66px,
+  /// 홈 인디케이터 영역(34px)을 빼면 안전 영역 위로 32px.
+  static const brandBottom = 32.0;
+
+  // 아래 시간은 모두 Figma에 지정이 없어 정한 임시값(팀 확인 필요).
+
+  /// 로고를 최소한 이만큼은 보여 준다(로딩이 빨라도 번쩍 사라지지 않게).
+  static const minDuration = Duration(milliseconds: 1000);
+
+  /// 로딩이 끝나지 않아도 이 시간이 지나면 투데이로 넘어간다.
+  static const maxDuration = Duration(seconds: 3);
+
+  /// 투데이가 로고 화면 위로 서서히 나타나는 시간(크로스페이드).
+  static const fadeDuration = Duration(milliseconds: 400);
+}
+
+/// 공통 컴포넌트 치수. 토글·세그먼트·토스트·바텀시트·CTA·알림 버튼·스켈레톤은
+/// Figma 컴포넌트 섹션(`749:337`) 값이고, 모달·설정 목록·애니메이션 시간은 Figma에 없어 추정이다.
 abstract final class ComponentLayout {
-  // 토글: iOS식 알약
-  static const toggleWidth = 51.0;
-  static const toggleHeight = 31.0;
-  static const toggleThumb = 27.0;
+  // 토글 (Figma `834:1302`): 64×28 알약, 흰 손잡이 38×24, 안쪽 2.
+  static const toggleWidth = 64.0;
+  static const toggleHeight = 28.0;
+  static const toggleThumbWidth = 38.0;
+  static const toggleThumbHeight = 24.0;
   static const toggleThumbInset = 2.0;
   static const toggleMinHit = 44.0;
   static const toggleDuration = Duration(milliseconds: 200);
@@ -176,32 +199,78 @@ abstract final class ComponentLayout {
   static const dialogButtonHeight = 52.0;
   static const dialogButtonGap = 12.0;
 
-  // 토스트: 전체 시간 안에 나타남 → 머묾 → 사라짐이 모두 들어 있다.
+  // 토스트 (Figma `834:2088`): 흰 알약, 좌우 16, 간격 12, 체크 원 28, '확인' 터치 영역 32×44.
+  // 시간(전체 3초 안에 나타남 → 머묾 → 사라짐)은 추정.
   static const toastTotal = Duration(milliseconds: 3000);
   static const toastFade = Duration(milliseconds: 250);
   static const toastGapAboveNav = 16.0;
-  static const toastPaddingH = 20.0;
-  static const toastPaddingV = 14.0;
+  static const toastHeight = 64.0;
+  static const toastPaddingH = 16.0;
+  static const toastGap = 12.0;
+  static const toastCheckSize = 28.0;
+  static const toastActionWidth = 32.0;
+  static const toastBorderWidth = 1.0;
   static const toastRiseOffset = 12.0;
 
   // 입력창
   static const inputBorderWidth = 1.5;
   static const inputPadding = 16.0;
 
-  // 세그먼트 컨트롤
-  static const segmentedHeight = 44.0;
-  static const segmentedPadding = 4.0;
+  // 세그먼트 컨트롤 (Figma `834:1232`): 흰 트랙 안쪽 좌우 6·상하 5, 칸 높이 36, 칸 사이 20.
+  static const segmentHeight = 36.0;
+  static const segmentPaddingH = 6.0;
+  static const segmentPaddingV = 5.0;
+  static const segmentGap = 20.0;
+  static const segmentIconSize = 24.0;
+  static const segmentDuration = Duration(milliseconds: 200);
 
-  // 바텀시트
+  // 바텀시트 (Figma `834:1374`): 화면 좌우 24 띄운 카드, 안쪽 위 12·좌우 20·아래 20.
+  static const sheetMargin = 24.0;
+  static const sheetPaddingTop = 12.0;
+  static const sheetPaddingH = 20.0;
+  static const sheetPaddingBottom = 20.0;
   static const sheetHandleWidth = 40.0;
   static const sheetHandleHeight = 4.0;
+  static const sheetHandleRadius = 2.0;
+  static const sheetHandleGap = 24.0;
+  static const sheetHeaderPaddingH = 4.0;
+  static const sheetHeaderGap = 12.0;
   static const sheetMaxHeightFraction = 0.9;
   static const sheetOptionHeight = 56.0;
+  static const sheetIconSize = 24.0;
+  static const sheetIconGap = 16.0;
 
-  // 하단 고정 CTA 바
+  // 바텀시트 끌기 (토스식, Figma에 없어 추정): 시트 높이의 25% 넘게 내리거나 초당 700 넘게 아래로 튕기면 닫히고,
+  // 위로는 저항이 붙어 최대 24까지만 늘어난다.
+  static const sheetDismissFraction = 0.25;
+  static const sheetDismissVelocity = 700.0;
+  static const sheetOverDrag = 24.0;
+
+  /// 카드 아래 여백의 최솟값. Figma는 카드 아래가 홈 인디케이터 영역(34) 바로 위라 안전 영역만큼 띄우고,
+  /// 안전 영역이 없는 기기(안드로이드 버튼 내비 등)는 좌우와 같은 24를 띄운다.
+  static const sheetMinBottomGap = 24.0;
+
+  // 하단 고정 CTA 바 (Figma CTA `862:2951`: 높이 60 알약).
   static const ctaBarTop = 12.0;
   static const ctaBarBottom = 16.0;
-  static const ctaButtonHeight = 52.0;
+  static const ctaButtonHeight = 60.0;
+
+  /// 이 높이 이상인 CTA(하단 고정 버튼)는 Figma CTA 글자 18을 쓴다.
+  /// 카드 안 버튼은 각자 Figma 값을 유지한다: 52 이상은 16(기록 카드 "감정 기록하기"), 그보다 낮으면 14.
+  static const ctaLargeTextMinHeight = 60.0;
+  static const ctaMediumTextMinHeight = 52.0;
+
+  // 알림 종 버튼 (Figma `828:955`): 44 원, 종 24.
+  static const bellButtonSize = 44.0;
+  static const bellIconSize = 24.0;
+
+  // 스켈레톤: 깜빡임(불투명도 1 ↔ 0.5) 한 번 왕복 시간. Figma에 없어 추정.
+  static const skeletonPulse = Duration(milliseconds: 1200);
+  static const skeletonMinOpacity = 0.5;
+
+  // 가운데 제목 상단 바 (Figma 알림 `834:1149`): 높이 44, 아이콘 24.
+  static const centerTitleBarHeight = 44.0;
+  static const topBarIconSize = 24.0;
 
   // 체크 행 · 프로필 행 · 뱃지
   static const checkSize = 24.0;
@@ -211,6 +280,15 @@ abstract final class ComponentLayout {
 
   // 빈·오류 상태
   static const stateMascotSize = 120.0;
+
+  /// 알림 빈 화면 마스코트 (Figma `875:2965`, 151×151).
+  static const emptyMascotLarge = 151.0;
+
+  /// 조용한 빈 화면의 세로 위치: 남는 영역에서 가운데보다 조금 위(Figma 마스코트 top 346을 맞춘 값).
+  static const quietEmptyAlignment = Alignment(0, -0.3);
+
+  /// 가운데 제목 바 아래에서 세그먼트까지 (Figma 알림: 바 아래 106 → 세그먼트 139).
+  static const centerTitleToSegment = 33.0;
   static const stateButtonWidth = 200.0;
 
   // 설정 목록

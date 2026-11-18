@@ -9,6 +9,7 @@ import '../../../app/theme/app_text_styles.dart';
 import '../../../core/providers/clock_provider.dart';
 import '../../../core/utils/dates.dart';
 import '../../../core/utils/korean_date.dart';
+import '../../../shared/widgets/skeleton.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/app_dialogs.dart';
 import '../../../shared/widgets/app_fab.dart';
@@ -40,6 +41,10 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
   DateTime? _month;
   DateTime? _selected;
 
+  /// 밀어서 지운 기록. 다시 불러오는 동안에도 이전 목록을 보여 주므로(`skipLoadingOnReload`),
+  /// 지운 카드는 여기서 바로 뺀다(Dismissible은 닫히자마자 화면에서 사라져야 한다).
+  final _removed = <String>{};
+
   Future<bool> _confirmDelete() => showAppConfirmDialog(
     context,
     title: '기록을 삭제할까요?',
@@ -64,7 +69,10 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
       child: SwipeToDelete(
         dismissKey: Key('entry-${entry.id}'),
         confirm: _confirmDelete,
-        onDelete: () => ref.read(recordActionsProvider).delete(entry.id),
+        onDelete: () {
+          setState(() => _removed.add(entry.id));
+          ref.read(recordActionsProvider).delete(entry.id);
+        },
         child: EntryCard(
           entry: entry,
           personName: names[entry.personId],
@@ -97,7 +105,12 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
               ),
               const SizedBox(height: AppSpacing.space16),
               entries.when(
-                data: (list) {
+                skipLoadingOnReload: true,
+                data: (all) {
+                  final list = [
+                    for (final e in all)
+                      if (!_removed.contains(e.id)) e,
+                  ];
                   if (list.isEmpty) {
                     return EmptyState(
                       message: '아직 기록이 없어요',
@@ -227,7 +240,7 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
                     ],
                   );
                 },
-                loading: () => const SizedBox(height: 200),
+                loading: () => const SkeletonList(count: 4),
                 error: (e, st) =>
                     ErrorState(onRetry: () => ref.invalidate(entriesProvider)),
               ),

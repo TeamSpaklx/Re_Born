@@ -106,7 +106,7 @@ class _AccountDeleteScreenState extends ConsumerState<AccountDeleteScreen> {
             hint: '그동안 리본과 함께해 주셔서 고마워요.',
             showMascot: true,
             actionLabel: '처음으로',
-            onAction: () => context.go(AppRoutes.login),
+            onAction: () => context.go(AppRoutes.today),
           ),
         ),
       );
