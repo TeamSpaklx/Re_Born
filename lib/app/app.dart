@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../features/security/presentation/app_lock_gate.dart';
 import 'router.dart';
 import 'theme/app_theme.dart';
 
@@ -22,7 +23,8 @@ class RebornApp extends ConsumerWidget {
           data: MediaQuery.of(
             context,
           ).copyWith(textScaler: TextScaler.noScaling),
-          child: child ?? const SizedBox.shrink(),
+          // 앱 잠금이 켜져 있으면 모든 화면 위에 잠금 화면을 덮는다.
+          child: AppLockGate(child: child ?? const SizedBox.shrink()),
         );
       },
     );

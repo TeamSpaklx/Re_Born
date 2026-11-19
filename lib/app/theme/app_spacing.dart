@@ -287,6 +287,14 @@ abstract final class ComponentLayout {
   /// 조용한 빈 화면의 세로 위치: 남는 영역에서 가운데보다 조금 위(Figma 마스코트 top 346을 맞춘 값).
   static const quietEmptyAlignment = Alignment(0, -0.3);
 
+  // 앱 잠금 화면 (Figma 834:2141). 로고는 스플래시와 같은 [SplashLayout] 값을 쓴다.
+  /// "인증에 실패하거나…" 버튼 314×45, 글자는 가운데.
+  static const lockHelpWidth = 314.0;
+  static const lockHelpHeight = 45.0;
+
+  /// 버튼 아래 여백: Figma에서 버튼 아래가 화면 아래에서 64px, 홈 인디케이터(34)를 빼면 안전 영역 위로 30px.
+  static const lockHelpBottom = 30.0;
+
   /// 가운데 제목 바 아래에서 세그먼트까지 (Figma 알림: 바 아래 106 → 세그먼트 139).
   static const centerTitleToSegment = 33.0;
   static const stateButtonWidth = 200.0;

@@ -15,6 +15,7 @@
 | 인증 | 메모리 구현 | 이메일·비밀번호와 구글·카카오 로그인 화면은 시연용이며 앱 재시작 시 초기화 |
 | 프로필 사진 | `image_picker` ^1.2.4 | 갤러리·카메라에서 사진 한 장(긴 변 1024로 축소). iOS `Info.plist`에 사진·카메라 사용 문구. 사진은 지금 메모리에만 저장 |
 | 알림 권한·리마인드 | `flutter_local_notifications` ^22.3.2, `timezone` ^0.11.2, `flutter_timezone` ^5.1.1 | iOS·Android 13+ OS 알림 권한 요청과 매일 정시 로컬 알림(기록 리마인드). 기기 시간대는 `flutter_timezone`, 예약은 `timezone`. 서버·FCM 푸시는 아님. Android는 desugaring·`POST_NOTIFICATIONS`·부팅 receiver 설정(`android/app`), iOS는 `AppDelegate`에서 알림 델리게이트 설정. 알림음은 커스텀 WAV 1개(`android/app/src/main/res/raw/reborn_notification.wav`, `ios/Runner/reborn_notification.wav`)이며 안드로이드 채널은 `daily_reminder_v2`. Android 상태바 알림 아이콘은 흰색 단색 로고(`drawable-*/ic_notification.png`)이고, 아이콘·소리가 릴리스 리소스 축소로 지워지지 않게 `res/raw/keep.xml`로 지킨다 |
+| 앱 잠금 | `local_auth` ^3.0.2, `shared_preferences` ^2.5.6 | 둘 다 flutter.dev 공식 패키지. 로그인 없이도 기록을 지키려고 기기 인증(Face ID·Touch ID·지문·기기 암호)으로 앱 진입을 막는다(`lib/core/platform/device_auth_service.dart`, `lib/features/security/`). `shared_preferences`는 잠금 켜짐 여부 하나만 저장한다(다른 설정은 아직 메모리라 재시작하면 사라지지만 잠금은 그러면 의미가 없음). iOS `Info.plist`에 `NSFaceIDUsageDescription`, Android는 `MainActivity`가 `FlutterFragmentActivity`이고 `LaunchTheme`이 `Theme.AppCompat` 계열(`androidx.appcompat` 의존성 추가, local_auth 요구 사항). Android 13+는 `reborn/app_lock` 채널로 최근 앱 미리보기를 끈다 |
 | 상태 관리 | `flutter_riverpod` ^3.4.3 | 앱 최상단 `ProviderScope`, 데이터는 Repository를 Provider로 주입 ([FRONTEND.md](./FRONTEND.md)) |
 | 라우팅 | `go_router` ^18.1.1 | `lib/app/router.dart`, 하단 탭은 `StatefulShellRoute.indexedStack`(탭마다 상태 유지) |
 | 화면 데이터 | 메모리 저장소와 샘플 데이터 | 앱 재시작 시 초기화 |

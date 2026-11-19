@@ -57,6 +57,8 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.scrim,
     required this.topBarTint,
     required this.splashBackground,
+    required this.lockHelpText,
+    required this.lockHelpPressed,
     required this.kakaoYellow,
     required this.onKakao,
     required this.emotionJoy,
@@ -164,6 +166,12 @@ class AppColors extends ThemeExtension<AppColors> {
   /// 스플래시 화면 배경: 흰색(Figma 805:953). 화면 배경(`#F2F2F4`)과 다르다. iOS·Android 시작 화면도 흰색이라 이어서 보인다.
   final Color splashBackground;
 
+  /// 잠금 화면 "인증에 실패하거나…" 글자 `rgba(76,83,95,0.8)` (Figma 860:2655).
+  final Color lockHelpText;
+
+  /// 그 버튼을 누르고 있을 때의 알약 배경 `rgba(160,167,180,0.2)` (Figma 860:2657).
+  final Color lockHelpPressed;
+
   /// 카카오 로그인 버튼 배경(브랜드 노랑)과 글자색.
   final Color kakaoYellow;
   final Color onKakao;
@@ -240,6 +248,8 @@ class AppColors extends ThemeExtension<AppColors> {
     scrim: Color(0x80000000),
     topBarTint: Color(0x1AFFFFFF),
     splashBackground: Color(0xFFFFFFFF),
+    lockHelpText: Color(0xCC4C535F),
+    lockHelpPressed: Color(0x33A0A7B4),
     kakaoYellow: Color(0xFFFEE500),
     onKakao: Color(0xFF191919),
     emotionJoy: Color(0xFFF4B1CB),
@@ -302,6 +312,8 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? scrim,
     Color? topBarTint,
     Color? splashBackground,
+    Color? lockHelpText,
+    Color? lockHelpPressed,
     Color? kakaoYellow,
     Color? onKakao,
     Color? emotionJoy,
@@ -362,6 +374,8 @@ class AppColors extends ThemeExtension<AppColors> {
       scrim: scrim ?? this.scrim,
       topBarTint: topBarTint ?? this.topBarTint,
       splashBackground: splashBackground ?? this.splashBackground,
+      lockHelpText: lockHelpText ?? this.lockHelpText,
+      lockHelpPressed: lockHelpPressed ?? this.lockHelpPressed,
       kakaoYellow: kakaoYellow ?? this.kakaoYellow,
       onKakao: onKakao ?? this.onKakao,
       emotionJoy: emotionJoy ?? this.emotionJoy,
@@ -428,6 +442,8 @@ class AppColors extends ThemeExtension<AppColors> {
       scrim: mix(scrim, other.scrim),
       topBarTint: mix(topBarTint, other.topBarTint),
       splashBackground: mix(splashBackground, other.splashBackground),
+      lockHelpText: mix(lockHelpText, other.lockHelpText),
+      lockHelpPressed: mix(lockHelpPressed, other.lockHelpPressed),
       kakaoYellow: mix(kakaoYellow, other.kakaoYellow),
       onKakao: mix(onKakao, other.onKakao),
       emotionJoy: mix(emotionJoy, other.emotionJoy),
