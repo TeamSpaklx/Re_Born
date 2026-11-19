@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/router.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_spacing.dart';
+import '../../../shared/widgets/skeleton.dart';
 import '../../../shared/widgets/app_text_button.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/summary_card.dart';
@@ -32,6 +33,7 @@ class RelationsScreen extends ConsumerWidget {
       children: [
         const SizedBox(height: AppSpacing.space8),
         summaries.when(
+          skipLoadingOnReload: true,
           data: (list) {
             if (list.isEmpty) {
               return EmptyState(
@@ -77,7 +79,10 @@ class RelationsScreen extends ConsumerWidget {
               ),
             );
           },
-          loading: () => const SizedBox(height: 200),
+          loading: () => const Padding(
+            padding: EdgeInsets.symmetric(horizontal: AppSpacing.pageMargin),
+            child: SkeletonList(avatar: true),
+          ),
           error: (e, st) => ErrorState(
             onRetry: () => ref.invalidate(personSummariesProvider),
           ),

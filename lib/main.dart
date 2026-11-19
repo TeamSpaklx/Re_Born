@@ -11,10 +11,12 @@ import 'app/router.dart';
 import 'core/config/supabase_config.dart';
 import 'core/errors/app_error_log.dart';
 import 'core/errors/error_handlers.dart';
+import 'features/security/data/app_lock_store.dart';
+import 'features/security/presentation/app_lock_back_guard.dart';
 
 const _initialRoute = String.fromEnvironment('INITIAL_ROUTE');
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // 처리되지 않은 오류를 앱 안 기록에 남긴다(본문·인물 이름 제외, SPEC F-12).
@@ -35,15 +37,21 @@ void main() {
     ),
   );
 
+  // 앱 잠금 켜짐 여부는 첫 프레임 전에 읽는다(켜져 있으면 첫 화면부터 잠금 화면이 덮여야 한다).
+  final appLockStore = await _loadAppLockStore(errorLog);
+  // 잠긴 동안 뒤로 버튼을 막는 관찰자는 라우터보다 먼저 등록해야 먼저 불린다.
+  AppLockBackGuard.instance.install();
+
   runApp(
     ProviderScope(
       overrides: [
         appErrorLogProvider.overrideWithValue(errorLog),
+        appLockStoreProvider.overrideWithValue(appLockStore),
         // 개발 중 특정 화면에서 바로 시작하려면: flutter run --dart-define=INITIAL_ROUTE=/dev/gallery
         initialLocationProvider.overrideWithValue(
           kDebugMode && _initialRoute.isNotEmpty
               ? _initialRoute
-              : AppRoutes.today,
+              : AppRoutes.splash,
         ),
       ],
       child: const RebornApp(),
@@ -54,6 +62,16 @@ void main() {
   WidgetsBinding.instance.addPostFrameCallback((_) {
     unawaited(_initSupabase(errorLog));
   });
+}
+
+/// 저장소를 못 읽으면 잠금 꺼짐으로 시작한다(앱이 못 켜지는 것보다 낫다). 오류는 기록에 남긴다.
+Future<AppLockStore> _loadAppLockStore(AppErrorLog errorLog) async {
+  try {
+    return await PrefsAppLockStore.create();
+  } catch (error, stack) {
+    errorLog.record(error, stack, where: 'app_lock_store');
+    return InMemoryAppLockStore();
+  }
 }
 
 Future<void> _initSupabase(AppErrorLog errorLog) async {

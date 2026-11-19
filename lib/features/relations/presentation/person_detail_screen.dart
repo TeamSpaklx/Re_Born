@@ -6,9 +6,11 @@ import 'package:go_router/go_router.dart';
 import '../../../app/router.dart';
 import '../../../app/theme/app_assets.dart';
 import '../../../app/theme/app_colors.dart';
+import '../../../app/theme/app_radii.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../app/theme/app_text_styles.dart';
 import '../../../core/providers/clock_provider.dart';
+import '../../../shared/widgets/skeleton.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/app_dialogs.dart';
 import '../../../shared/widgets/donut_chart.dart';
@@ -251,6 +253,7 @@ class _PersonDetailScreenState extends ConsumerState<PersonDetailScreen> {
             ),
             const SizedBox(height: AppSpacing.space12),
             history.when(
+              skipLoadingOnReload: true,
               data: (all) {
                 final points = _period.filter(all, now);
                 if (points.isEmpty) {
@@ -285,7 +288,12 @@ class _PersonDetailScreenState extends ConsumerState<PersonDetailScreen> {
                   ),
                 );
               },
-              loading: () => const SizedBox(height: IndexLineChart.height),
+              loading: () => const SkeletonPulse(
+                child: SkeletonBox(
+                  height: IndexLineChart.height,
+                  radius: AppRadii.card,
+                ),
+              ),
               error: (e, st) => ErrorState(
                 onRetry: () =>
                     ref.invalidate(indexHistoryProvider(widget.personId)),

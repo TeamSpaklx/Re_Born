@@ -107,3 +107,35 @@ class ErrorState extends StatelessWidget {
     );
   }
 }
+
+/// 마스코트를 크게 두고 회색 한 줄만 보여 주는 조용한 빈 화면 (Figma 알림 `834:1148`).
+/// 마스코트 151 아래에 "받은 알림이 없습니다"(20 Regular, #B3B3B3).
+/// Figma처럼 가운데보다 조금 위에 두려면 `Align(alignment: ComponentLayout.quietEmptyAlignment)` 안에 놓는다.
+class QuietEmptyState extends StatelessWidget {
+  const QuietEmptyState({super.key, required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Image.asset(
+          AppAssets.mascotLemur,
+          width: ComponentLayout.emptyMascotLarge,
+          height: ComponentLayout.emptyMascotLarge,
+          excludeFromSemantics: true,
+        ),
+        const SizedBox(height: AppSpacing.space12),
+        Text(
+          message,
+          textAlign: TextAlign.center,
+          style: AppTextStyles.emptyMessage.copyWith(
+            color: context.colors.emptyText,
+          ),
+        ),
+      ],
+    );
+  }
+}

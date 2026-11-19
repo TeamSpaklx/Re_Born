@@ -8,6 +8,7 @@ class FakeNotificationService implements NotificationService {
   int permissionRequests = 0;
   final scheduled = <(int, int)>[];
   int cancels = 0;
+  final testNotifications = <Duration>[];
 
   @override
   Future<bool> hasPermission() async => allowed && permissionRequests > 0;
@@ -26,4 +27,8 @@ class FakeNotificationService implements NotificationService {
 
   @override
   Future<void> cancelReminder() async => cancels++;
+
+  @override
+  Future<void> showTestNotification({Duration delay = Duration.zero}) async =>
+      testNotifications.add(delay);
 }

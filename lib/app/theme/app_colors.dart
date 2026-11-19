@@ -41,9 +41,24 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.toggleOff,
     required this.danger,
     required this.dangerTile,
-    required this.toastFill,
+    required this.ctaPrimary,
+    required this.toggleOn,
+    required this.segmentTrack,
+    required this.segmentSelected,
+    required this.sheetHandle,
+    required this.sheetTitle,
+    required this.sheetRowText,
+    required this.toastBorder,
+    required this.toastText,
+    required this.toastAccent,
+    required this.toastCheckFill,
+    required this.skeleton,
+    required this.emptyText,
     required this.scrim,
     required this.topBarTint,
+    required this.splashBackground,
+    required this.lockHelpText,
+    required this.lockHelpPressed,
     required this.kakaoYellow,
     required this.onKakao,
     required this.emotionJoy,
@@ -106,7 +121,7 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color barMid;
   final Color barLight;
 
-  /// 토글 꺼짐 배경.
+  /// 토글 꺼짐 배경 rgba(60,60,67,0.3) (Figma `834:1333`).
   final Color toggleOff;
 
   /// 삭제·로그아웃 같은 위험한 동작 글자 (Figma에 없음, 추정).
@@ -115,14 +130,47 @@ class AppColors extends ThemeExtension<AppColors> {
   /// 위험한 동작 버튼 배경 (추정).
   final Color dangerTile;
 
-  /// 토스트 배경: #1A1A1A 90% (추정).
-  final Color toastFill;
+  /// 주요 CTA 배경 #FF80A6 (Figma CTA `862:2951`). 글자는 [onCta].
+  final Color ctaPrimary;
+
+  /// 토글 켜짐 배경 #FFAFC7 (Figma `834:1302`).
+  final Color toggleOn;
+
+  /// 세그먼트 바깥 트랙(흰 알약)과 선택된 칸 #F2F2F4 (Figma `834:1248`).
+  final Color segmentTrack;
+  final Color segmentSelected;
+
+  /// 바텀시트 손잡이·제목·행 글자 (Figma `834:1374`).
+  final Color sheetHandle;
+  final Color sheetTitle;
+  final Color sheetRowText;
+
+  /// 토스트 테두리·문구·강조(체크·확인)·체크 원 배경 (Figma `834:2088`).
+  final Color toastBorder;
+  final Color toastText;
+  final Color toastAccent;
+  final Color toastCheckFill;
+
+  /// 로딩 스켈레톤 막대 #E4E4E4 (Figma `834:2351`).
+  final Color skeleton;
+
+  /// 빈 화면 안내 문구 #B3B3B3 (Figma 알림 `834:1161`).
+  final Color emptyText;
 
   /// 모달 뒤 가림막: 검정 50% (추정).
   final Color scrim;
 
   /// 홈 상단 바 위에 덮는 흰색 10% (수정안 `rgba(255,255,255,0.1)`).
   final Color topBarTint;
+
+  /// 스플래시 화면 배경: 흰색(Figma 805:953). 화면 배경(`#F2F2F4`)과 다르다. iOS·Android 시작 화면도 흰색이라 이어서 보인다.
+  final Color splashBackground;
+
+  /// 잠금 화면 "인증에 실패하거나…" 글자 `rgba(76,83,95,0.8)` (Figma 860:2655).
+  final Color lockHelpText;
+
+  /// 그 버튼을 누르고 있을 때의 알약 배경 `rgba(160,167,180,0.2)` (Figma 860:2657).
+  final Color lockHelpPressed;
 
   /// 카카오 로그인 버튼 배경(브랜드 노랑)과 글자색.
   final Color kakaoYellow;
@@ -181,12 +229,27 @@ class AppColors extends ThemeExtension<AppColors> {
     barStrong: Color(0xFFD94F79),
     barMid: Color(0xFFFF80A6),
     barLight: Color(0xFFFFB3CA),
-    toggleOff: Color(0xFFE8D5DA),
+    toggleOff: Color(0x4D3C3C43), // rgba(60,60,67,0.3)
     danger: Color(0xFFE5484D),
     dangerTile: Color(0xFFFDECEE),
-    toastFill: Color(0xE61A1A1A),
+    ctaPrimary: Color(0xFFFF80A6),
+    toggleOn: Color(0xFFFFAFC7),
+    segmentTrack: Color(0xFFFFFFFF),
+    segmentSelected: Color(0xFFF2F2F4),
+    sheetHandle: Color(0xFFE4E4E4),
+    sheetTitle: Color(0xFF22252C),
+    sheetRowText: Color(0xFF4B5260),
+    toastBorder: Color(0xFFE9E9EE),
+    toastText: Color(0xFF22232A),
+    toastAccent: Color(0xFFD94F79),
+    toastCheckFill: Color(0xFFFBE8EF),
+    skeleton: Color(0xFFE4E4E4),
+    emptyText: Color(0xFFB3B3B3),
     scrim: Color(0x80000000),
     topBarTint: Color(0x1AFFFFFF),
+    splashBackground: Color(0xFFFFFFFF),
+    lockHelpText: Color(0xCC4C535F),
+    lockHelpPressed: Color(0x33A0A7B4),
     kakaoYellow: Color(0xFFFEE500),
     onKakao: Color(0xFF191919),
     emotionJoy: Color(0xFFF4B1CB),
@@ -233,9 +296,24 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? toggleOff,
     Color? danger,
     Color? dangerTile,
-    Color? toastFill,
+    Color? ctaPrimary,
+    Color? toggleOn,
+    Color? segmentTrack,
+    Color? segmentSelected,
+    Color? sheetHandle,
+    Color? sheetTitle,
+    Color? sheetRowText,
+    Color? toastBorder,
+    Color? toastText,
+    Color? toastAccent,
+    Color? toastCheckFill,
+    Color? skeleton,
+    Color? emptyText,
     Color? scrim,
     Color? topBarTint,
+    Color? splashBackground,
+    Color? lockHelpText,
+    Color? lockHelpPressed,
     Color? kakaoYellow,
     Color? onKakao,
     Color? emotionJoy,
@@ -280,9 +358,24 @@ class AppColors extends ThemeExtension<AppColors> {
       toggleOff: toggleOff ?? this.toggleOff,
       danger: danger ?? this.danger,
       dangerTile: dangerTile ?? this.dangerTile,
-      toastFill: toastFill ?? this.toastFill,
+      ctaPrimary: ctaPrimary ?? this.ctaPrimary,
+      toggleOn: toggleOn ?? this.toggleOn,
+      segmentTrack: segmentTrack ?? this.segmentTrack,
+      segmentSelected: segmentSelected ?? this.segmentSelected,
+      sheetHandle: sheetHandle ?? this.sheetHandle,
+      sheetTitle: sheetTitle ?? this.sheetTitle,
+      sheetRowText: sheetRowText ?? this.sheetRowText,
+      toastBorder: toastBorder ?? this.toastBorder,
+      toastText: toastText ?? this.toastText,
+      toastAccent: toastAccent ?? this.toastAccent,
+      toastCheckFill: toastCheckFill ?? this.toastCheckFill,
+      skeleton: skeleton ?? this.skeleton,
+      emptyText: emptyText ?? this.emptyText,
       scrim: scrim ?? this.scrim,
       topBarTint: topBarTint ?? this.topBarTint,
+      splashBackground: splashBackground ?? this.splashBackground,
+      lockHelpText: lockHelpText ?? this.lockHelpText,
+      lockHelpPressed: lockHelpPressed ?? this.lockHelpPressed,
       kakaoYellow: kakaoYellow ?? this.kakaoYellow,
       onKakao: onKakao ?? this.onKakao,
       emotionJoy: emotionJoy ?? this.emotionJoy,
@@ -333,9 +426,24 @@ class AppColors extends ThemeExtension<AppColors> {
       toggleOff: mix(toggleOff, other.toggleOff),
       danger: mix(danger, other.danger),
       dangerTile: mix(dangerTile, other.dangerTile),
-      toastFill: mix(toastFill, other.toastFill),
+      ctaPrimary: mix(ctaPrimary, other.ctaPrimary),
+      toggleOn: mix(toggleOn, other.toggleOn),
+      segmentTrack: mix(segmentTrack, other.segmentTrack),
+      segmentSelected: mix(segmentSelected, other.segmentSelected),
+      sheetHandle: mix(sheetHandle, other.sheetHandle),
+      sheetTitle: mix(sheetTitle, other.sheetTitle),
+      sheetRowText: mix(sheetRowText, other.sheetRowText),
+      toastBorder: mix(toastBorder, other.toastBorder),
+      toastText: mix(toastText, other.toastText),
+      toastAccent: mix(toastAccent, other.toastAccent),
+      toastCheckFill: mix(toastCheckFill, other.toastCheckFill),
+      skeleton: mix(skeleton, other.skeleton),
+      emptyText: mix(emptyText, other.emptyText),
       scrim: mix(scrim, other.scrim),
       topBarTint: mix(topBarTint, other.topBarTint),
+      splashBackground: mix(splashBackground, other.splashBackground),
+      lockHelpText: mix(lockHelpText, other.lockHelpText),
+      lockHelpPressed: mix(lockHelpPressed, other.lockHelpPressed),
       kakaoYellow: mix(kakaoYellow, other.kakaoYellow),
       onKakao: mix(onKakao, other.onKakao),
       emotionJoy: mix(emotionJoy, other.emotionJoy),

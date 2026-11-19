@@ -68,7 +68,7 @@ void main() {
 
     testWidgets('변형마다 배경·글자 색이 다르다', (tester) async {
       final expected = {
-        CtaVariant.primary: (colors.cta, colors.onCta),
+        CtaVariant.primary: (colors.ctaPrimary, colors.onCta),
         CtaVariant.soft: (colors.ctaSoft, colors.onCtaSoft),
         CtaVariant.secondary: (colors.chip, colors.textStrong),
         CtaVariant.destructive: (colors.dangerTile, colors.danger),
@@ -92,11 +92,15 @@ void main() {
       }
     });
 
-    testWidgets('높이 52 이상은 글자 16, 그보다 낮으면 14', (tester) async {
+    testWidgets('알약 모양이고, 높이 60은 글자 18, 52는 16, 그보다 낮으면 14', (tester) async {
       await pump(
         tester,
         const Column(
           children: [
+            SizedBox(
+              width: 300,
+              child: CtaButton(label: '하단', height: 60, onPressed: null),
+            ),
             SizedBox(
               width: 300,
               child: CtaButton(label: '큰', height: 52, onPressed: null),
@@ -108,7 +112,13 @@ void main() {
           ],
         ),
       );
+      expect(tester.widget<Text>(find.text('하단')).style!.fontSize, 18);
       expect(tester.widget<Text>(find.text('큰')).style!.fontSize, 16);
+      final big = find.ancestor(
+        of: find.text('큰'),
+        matching: find.byType(Container),
+      );
+      expect(decorationOf(tester, big).borderRadius, AppRadii.pillBorderRadius);
       expect(tester.widget<Text>(find.text('작은')).style!.fontSize, 14);
     });
 
@@ -217,7 +227,7 @@ void main() {
       expect(tester.widget<AnimatedPositioned>(pill).left, 0);
       expect(
         tester.getSize(find.byType(SegmentedControl)).height,
-        ComponentLayout.segmentedHeight,
+        ComponentLayout.segmentHeight + ComponentLayout.segmentPaddingV * 2,
       );
 
       await tester.tap(find.text('월간'));
@@ -225,7 +235,7 @@ void main() {
       expect(index, 1);
       expect(
         tester.widget<AnimatedPositioned>(pill).left,
-        closeTo((300 - 8) / 3, 0.01),
+        closeTo((300 - 12 - 40) / 3 + 20, 0.01),
       );
 
       await tester.tap(find.text('월간')); // 이미 선택된 칸은 다시 알리지 않는다
@@ -426,9 +436,20 @@ void main() {
       );
       final deco = sheet.decoration! as BoxDecoration;
       expect(deco.color, colors.cardWhite);
+      expect(deco.borderRadius, AppRadii.sheetBorderRadius);
+      // 화면 좌우 24를 띄운 떠 있는 카드. 안전 영역이 없으면 아래도 24 띄운다.
+      final rect = tester.getRect(
+        find
+            .ancestor(
+              of: find.text('누구와의 기록인가요?'),
+              matching: find.byType(Container),
+            )
+            .first,
+      );
+      expect(rect.left, closeTo(ComponentLayout.sheetMargin, 0.5));
       expect(
-        deco.borderRadius,
-        const BorderRadius.vertical(top: Radius.circular(AppRadii.dialog)),
+        rect.bottom,
+        closeTo(874 - ComponentLayout.sheetMinBottomGap, 0.5),
       );
 
       await tester.tap(find.text('지민'));
@@ -476,7 +497,7 @@ void main() {
       expect(tester.widget<Text>(find.text('이름을 알려 주세요')).style!.fontSize, 26);
       expect(find.text('이름을 알려 주세요'), findsOneWidget);
       final button = tester.getRect(find.byType(CtaButton));
-      expect(button.height, 52);
+      expect(button.height, 60);
       expect(button.bottom, closeTo(874 - ComponentLayout.ctaBarBottom, 1));
       await tester.tap(find.text('다음'));
       expect(taps, 1);

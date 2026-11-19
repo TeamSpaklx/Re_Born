@@ -31,7 +31,19 @@ void main() {
       expect(c.barStrong, const Color(0xFFD94F79));
       expect(c.barMid, const Color(0xFFFF80A6));
       expect(c.barLight, const Color(0xFFFFB3CA));
-      expect(c.toggleOff, const Color(0xFFE8D5DA));
+      expect(c.ctaPrimary, const Color(0xFFFF80A6));
+      expect(c.toggleOn, const Color(0xFFFFAFC7));
+      expect(c.segmentTrack, const Color(0xFFFFFFFF));
+      expect(c.segmentSelected, const Color(0xFFF2F2F4));
+      expect(c.sheetHandle, const Color(0xFFE4E4E4));
+      expect(c.sheetTitle, const Color(0xFF22252C));
+      expect(c.sheetRowText, const Color(0xFF4B5260));
+      expect(c.toastBorder, const Color(0xFFE9E9EE));
+      expect(c.toastText, const Color(0xFF22232A));
+      expect(c.toastAccent, const Color(0xFFD94F79));
+      expect(c.toastCheckFill, const Color(0xFFFBE8EF));
+      expect(c.skeleton, const Color(0xFFE4E4E4));
+      expect(c.emptyText, const Color(0xFFB3B3B3));
       expect(c.danger, const Color(0xFFE5484D));
       expect(c.dangerTile, const Color(0xFFFDECEE));
     });
@@ -44,7 +56,7 @@ void main() {
         expect(color.a, closeTo(a, 0.005), reason: 'alpha of $color');
       }
 
-      expectRgba(c.toastFill, 26, 26, 26, 0.9);
+      expectRgba(c.toggleOff, 60, 60, 67, 0.3);
       expectRgba(c.scrim, 0, 0, 0, 0.5);
       expectRgba(c.topBarTint, 255, 255, 255, 0.1);
       expectRgba(c.textSecondary, 76, 83, 95, 0.8);
@@ -98,19 +110,22 @@ void main() {
       expect(AppMotion.pressedOpacity, 0.7);
     });
 
-    test('모서리: 카드 24, 모달·시트 28, 버튼·입력 12, 토스트 16', () {
+    test('모서리: 카드 24, 모달 28, 바텀시트 34, 버튼·입력 12, 스켈레톤 6', () {
       expect(AppRadii.card, 24);
       expect(AppRadii.dialog, 28);
       expect(AppRadii.button, 12);
-      expect(AppRadii.toast, 16);
+      expect(AppRadii.sheet, 34);
+      expect(AppRadii.skeletonBar, 6);
     });
 
     test('컴포넌트 치수', () {
-      expect(ComponentLayout.toggleWidth, 51);
-      expect(ComponentLayout.toggleHeight, 31);
-      expect(ComponentLayout.segmentedHeight, 44);
+      expect(ComponentLayout.toggleWidth, 64);
+      expect(ComponentLayout.toggleHeight, 28);
+      expect(ComponentLayout.toggleThumbWidth, 38);
+      expect(ComponentLayout.toggleThumbHeight, 24);
+      expect(ComponentLayout.segmentHeight, 36);
       expect(ComponentLayout.settingsRowHeight, 56);
-      expect(ComponentLayout.ctaButtonHeight, 52);
+      expect(ComponentLayout.ctaButtonHeight, 60);
       expect(ComponentLayout.dialogButtonHeight, 52);
       expect(ComponentLayout.sheetHandleWidth, 40);
       expect(ComponentLayout.checkSize, 24);

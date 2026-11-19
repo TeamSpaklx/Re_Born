@@ -18,8 +18,15 @@ abstract final class AppShadows {
     ),
   ];
 
-  /// 바텀시트처럼 가림막 위에 올라오는 큰 요소 (추정).
-  static const overlay = [
-    BoxShadow(color: Color(0x1F000000), blurRadius: 24, offset: Offset(0, -4)),
+  /// 바텀시트 카드 (Figma `834:1374`, 불투명도 0인 두 겹은 뺐다).
+  static const sheet = [
+    BoxShadow(color: Color(0x03000000), blurRadius: 55, offset: Offset(0, 92)),
+    BoxShadow(color: Color(0x05000000), blurRadius: 41, offset: Offset(0, 41)),
+    BoxShadow(color: Color(0x05000000), blurRadius: 22, offset: Offset(0, 10)),
+  ];
+
+  /// 토스트 (Figma `834:2088`: 0 6 20, 불투명도 6%).
+  static const toast = [
+    BoxShadow(color: Color(0x0F000000), blurRadius: 20, offset: Offset(0, 6)),
   ];
 }

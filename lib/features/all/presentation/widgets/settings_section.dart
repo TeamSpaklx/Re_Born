@@ -11,6 +11,7 @@ import '../../../../shared/widgets/app_dialogs.dart';
 import '../../../../shared/widgets/settings_group.dart';
 import '../../../auth/presentation/auth_providers.dart';
 import '../../../notifications/presentation/notifications_providers.dart';
+import '../../../security/presentation/app_lock_controller.dart';
 import '../../../settings/models/app_settings.dart';
 import '../../../settings/presentation/settings_providers.dart';
 
@@ -29,7 +30,7 @@ class SettingsSection extends ConsumerWidget {
     );
     if (!ok) return;
     await ref.read(settingsActionsProvider).deleteAllRecords();
-    if (context.mounted) showAppToast(context, '기록을 모두 삭제했어요');
+    if (context.mounted) showAppToast(context, '기록을 모두 삭제했어요', success: true);
   }
 
   Future<void> _logout(BuildContext context, WidgetRef ref) async {
@@ -41,7 +42,7 @@ class SettingsSection extends ConsumerWidget {
     );
     if (!ok) return;
     await ref.read(authActionsProvider).signOut();
-    if (context.mounted) context.go(AppRoutes.login);
+    if (context.mounted) context.go(AppRoutes.today);
   }
 
   @override
@@ -76,6 +77,8 @@ class SettingsSection extends ConsumerWidget {
             ),
           ],
         ),
+        const SizedBox(height: AppSpacing.space12),
+        const _SecurityGroup(),
         const SizedBox(height: AppSpacing.space12),
         SettingsGroup(
           title: '동의 관리',
@@ -140,6 +143,47 @@ class SettingsSection extends ConsumerWidget {
         Text(
           '리본은 의료·상담 서비스가 아니에요. 힘든 마음이 계속되면 가까운 사람이나 전문 기관의 도움을 받아 보세요.',
           style: AppTextStyles.caption.copyWith(color: colors.textSecondary),
+        ),
+      ],
+    );
+  }
+}
+
+/// 보안: 앱 잠금(Face ID·Touch ID·지문·기기 암호). 켤 때는 한 번 인증에 성공해야 켜진다.
+class _SecurityGroup extends ConsumerWidget {
+  const _SecurityGroup();
+
+  Future<void> _toggle(BuildContext context, WidgetRef ref, bool on) async {
+    final result = await ref
+        .read(appLockControllerProvider.notifier)
+        .setEnabled(on);
+    if (!context.mounted) return;
+    switch (result) {
+      case AppLockToggleResult.enabled:
+        showAppToast(context, '앱 잠금을 켰어요', success: true);
+      case AppLockToggleResult.disabled:
+        showAppToast(context, '앱 잠금을 껐어요', success: true);
+      case AppLockToggleResult.unavailable:
+        showAppToast(context, '휴대폰 화면 잠금을 먼저 설정해 주세요');
+      case AppLockToggleResult.failed:
+        showAppToast(context, '인증하지 못해 앱 잠금을 켜지 않았어요');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final enabled = ref.watch(
+      appLockControllerProvider.select((s) => s.enabled),
+    );
+    final label = ref.watch(deviceAuthKindProvider).value?.label ?? '';
+    return SettingsGroup(
+      title: '보안',
+      children: [
+        SettingsRow.toggle(
+          key: const Key('app-lock'),
+          title: label.isEmpty ? '앱 잠금' : '앱 잠금 ($label)',
+          value: enabled,
+          onChanged: (v) => _toggle(context, ref, v),
         ),
       ],
     );

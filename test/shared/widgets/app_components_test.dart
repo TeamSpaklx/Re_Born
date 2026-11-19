@@ -29,9 +29,7 @@ void main() {
   }
 
   group('AppToggle', () {
-    testWidgets('51×31 알약, 켜짐은 브랜드 핑크·꺼짐은 연한 회색 핑크, 누르는 영역은 44 이상', (
-      tester,
-    ) async {
+    testWidgets('64×28 알약, 켜짐은 연분홍·꺼짐은 회색 30%, 누르는 영역은 44 이상', (tester) async {
       var value = false;
       await pump(
         tester,
@@ -52,14 +50,14 @@ void main() {
       expect(track().color, colors.toggleOff);
       expect(
         tester.getSize(find.byType(AnimatedContainer)),
-        const Size(51, 31),
+        const Size(64, 28),
       );
       expect(tester.getSize(find.byType(AppToggle)).height, 44);
 
       await tester.tap(find.byType(AppToggle));
       await tester.pumpAndSettle();
       expect(value, isTrue);
-      expect(track().color, colors.brand);
+      expect(track().color, colors.toggleOn);
     });
 
     testWidgets('동그라미는 꺼짐이면 왼쪽, 켜짐이면 오른쪽에 있다', (tester) async {
@@ -284,8 +282,10 @@ void main() {
             .first,
       );
       final deco = box.decoration! as BoxDecoration;
-      expect(deco.color, colors.toastFill);
-      expect(deco.borderRadius, AppRadii.toastBorderRadius);
+      expect(deco.color, colors.cardWhite);
+      expect(deco.borderRadius, AppRadii.pillBorderRadius);
+      expect(find.text('확인'), findsOneWidget);
+      expect(find.text('✓'), findsNothing, reason: '성공 표시는 success일 때만');
       // 탭 바(아래 34 + 64) 위 16 → 화면 아래에서 114 이상 떨어진 곳
       expect(
         874 - tester.getRect(find.text('체크리스트에 담았어요')).bottom,

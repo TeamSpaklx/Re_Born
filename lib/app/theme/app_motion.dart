@@ -20,6 +20,19 @@ abstract final class AppMotion {
   static const exit = Curves.easeInCubic;
   static const move = Curves.easeInOutCubic;
 
+  /// 바텀시트를 끌다 놓았을 때 제자리로 돌아오는 스프링(살짝 덜 튕기는 정도, 추정).
+  static const sheetSpring = SpringDescription(
+    mass: 1,
+    stiffness: 400,
+    damping: 34, // 감쇠 비율 ≈ 0.85 (2·√(1·400) = 40의 0.85배)
+  );
+
+  /// 화면을 오른쪽으로 밀어 뒤로 갈 때: 이 속도(화면 폭/초) 이상으로 튕기면 위치와 상관없이 뒤로 간다(iOS 기본값).
+  static const swipeBackFlingVelocity = 1.0;
+
+  /// 뒤로 밀다 놓았을 때 남은 거리를 마저 가는 최소 시간.
+  static const swipeBackMinDuration = Duration(milliseconds: 100);
+
   /// 눌렸을 때 불투명도와 크기 배율.
   static const pressedOpacity = 0.7;
   static const pressedScale = 0.97;

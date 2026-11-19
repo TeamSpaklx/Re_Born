@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../app/data_providers.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../app/theme/app_text_styles.dart';
@@ -8,6 +10,7 @@ import '../../../shared/widgets/app_bottom_sheet.dart';
 import '../../../shared/widgets/app_dialogs.dart';
 import '../../../shared/widgets/page_scaffold.dart';
 import '../../../shared/widgets/settings_group.dart';
+import '../../security/presentation/app_lock_controller.dart';
 import '../../settings/models/app_settings.dart';
 import '../../settings/presentation/settings_providers.dart';
 
@@ -45,6 +48,28 @@ class NotificationSettingsScreen extends ConsumerWidget {
     );
     if (picked == null) return;
     await ref.read(settingsActionsProvider).setReminderTime(picked);
+  }
+
+  /// 디버그 전용: 알림음·배너를 바로 확인한다. 권한이 없으면 먼저 요청한다.
+  Future<void> _sendTest(
+    BuildContext context,
+    WidgetRef ref, {
+    Duration delay = Duration.zero,
+  }) async {
+    final service = ref.read(notificationServiceProvider);
+    final allowed = await ref
+        .read(appLockControllerProvider.notifier)
+        .suspendWhile(service.requestPermission);
+    if (!allowed) {
+      if (context.mounted) {
+        showAppToast(context, '알림 권한이 꺼져 있어요. 기기 설정에서 켜 주세요.');
+      }
+      return;
+    }
+    await service.showTestNotification(delay: delay);
+    if (context.mounted && delay > Duration.zero) {
+      showAppToast(context, '${delay.inSeconds}초 뒤에 알림이 와요. 홈 화면으로 나가 보세요.');
+    }
   }
 
   @override
@@ -98,6 +123,27 @@ class NotificationSettingsScreen extends ConsumerWidget {
                   ),
               ],
             ),
+            if (kDebugMode) ...[
+              const SizedBox(height: AppSpacing.space16),
+              SettingsGroup(
+                children: [
+                  SettingsRow.link(
+                    key: const Key('notify-test-now'),
+                    title: '테스트 알림 바로 보내기 (개발용)',
+                    onTap: () => _sendTest(context, ref),
+                  ),
+                  SettingsRow.link(
+                    key: const Key('notify-test-delayed'),
+                    title: '10초 뒤 테스트 알림 (개발용)',
+                    onTap: () => _sendTest(
+                      context,
+                      ref,
+                      delay: const Duration(seconds: 10),
+                    ),
+                  ),
+                ],
+              ),
+            ],
             const SizedBox(height: AppSpacing.space16),
             Text(
               '알림은 먼저 앱 안 알림 목록에 모여요. 기기로 오는 푸시 알림은 준비 중이에요.',

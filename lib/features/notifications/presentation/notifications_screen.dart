@@ -6,15 +6,18 @@ import '../../../app/router.dart';
 import '../../../app/theme/app_assets.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../core/providers/clock_provider.dart';
-import '../../../shared/widgets/app_tab_bar.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/list_section_header.dart';
 import '../../../shared/widgets/notification_row.dart';
 import '../../../shared/widgets/page_scaffold.dart';
+import '../../../shared/widgets/segmented_control.dart';
+import '../../../shared/widgets/skeleton.dart';
 import '../models/app_notification.dart';
 import 'notifications_providers.dart';
 
-/// 알림 목록: "전체 / 안 읽음" 탭, 읽지 않은 알림은 핑크 강조 + 점. 누르면 해당 인사이트로 간다.
+/// 알림 목록 (Figma 알림 `834:1148`): 가운데 제목 + 오른쪽 설정 톱니, "전체 / 안 읽음" 세그먼트.
+/// 읽지 않은 알림은 핑크 강조 + 점이고, 누르면 해당 인사이트로 간다. 비어 있으면 마스코트 + "받은 알림이 없습니다".
+/// 알림이 있을 때의 목록 디자인은 Figma에 아직 없어 기존 [NotificationRow]를 쓴다.
 class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
 
@@ -47,20 +50,23 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
 
     return PageScaffold(
       title: '알림',
-      largeTitle: true,
+      centerTitle: true,
       actions: [
-        PageAction(
+        PageIconAction(
+          key: const Key('notification-settings'),
+          iconAsset: AppAssets.ixSetting,
           label: '알림 설정',
           onTap: () => context.push(AppRoutes.notificationSettings),
         ),
       ],
       body: Column(
         children: [
+          const SizedBox(height: ComponentLayout.centerTitleToSegment),
           Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.pageMargin,
             ),
-            child: AppTabBar(
+            child: SegmentedControl(
               labels: const ['전체', '안 읽음'],
               selectedIndex: _tab,
               onChanged: (i) => setState(() => _tab = i),
@@ -68,17 +74,15 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
           ),
           Expanded(
             child: all.when(
+              skipLoadingOnReload: true,
               data: (list) {
                 final unread = list.where((n) => !n.read).toList();
                 final read = list.where((n) => n.read).toList();
                 final shown = _tab == 0 ? list : unread;
                 if (shown.isEmpty) {
-                  return Center(
-                    child: EmptyState(
-                      message: _tab == 0 ? '아직 알림이 없어요' : '읽지 않은 알림이 없어요',
-                      hint: '관계에 변화가 감지되면 여기서 알려 드릴게요.',
-                      showMascot: true,
-                    ),
+                  return const Align(
+                    alignment: ComponentLayout.quietEmptyAlignment,
+                    child: QuietEmptyState(message: '받은 알림이 없습니다'),
                   );
                 }
                 return ListView(
@@ -105,7 +109,15 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                         ],
                 );
               },
-              loading: () => const SizedBox.shrink(),
+              loading: () => const SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  AppSpacing.pageMargin,
+                  AppSpacing.space16,
+                  AppSpacing.pageMargin,
+                  0,
+                ),
+                child: SkeletonList(),
+              ),
               error: (e, st) => Center(
                 child: ErrorState(
                   onRetry: () => ref.invalidate(notificationsProvider),

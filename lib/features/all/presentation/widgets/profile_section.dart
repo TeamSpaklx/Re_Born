@@ -6,14 +6,12 @@ import '../../../../app/data_providers.dart';
 import '../../../../app/theme/app_assets.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
-import '../../../../app/theme/app_text_styles.dart';
 import '../../../../core/platform/image_picker_service.dart';
 import '../../../../shared/widgets/app_bottom_sheet.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_dialogs.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/cta_button.dart';
-import '../../../../shared/widgets/pressable.dart';
 import '../../../../shared/widgets/profile_row.dart';
 import '../../../../shared/widgets/summary_card.dart';
 import '../../../../shared/widgets/user_avatar.dart';
@@ -21,6 +19,7 @@ import '../../../auth/models/auth_validator.dart';
 import '../../../auth/presentation/auth_providers.dart';
 import '../../../entries/presentation/entries_providers.dart';
 import '../../../people/presentation/people_providers.dart';
+import '../../../security/presentation/app_lock_controller.dart';
 import '../../../settings/presentation/settings_providers.dart';
 import '../../../todos/presentation/todos_providers.dart';
 
@@ -48,9 +47,9 @@ class ProfileSection extends ConsumerWidget {
     }
     if (!context.mounted) return;
     if (result.profileChanged) {
-      showAppToast(context, '프로필이 변경되었어요');
+      showAppToast(context, '프로필이 변경되었어요', success: true);
     } else if (result.nicknameChanged) {
-      showAppToast(context, '닉네임을 바꿨어요');
+      showAppToast(context, '닉네임을 바꿨어요', success: true);
     }
   }
 
@@ -121,7 +120,12 @@ class _ProfileEditSheetState extends ConsumerState<_ProfileEditSheet> {
     if (_busy) return;
     setState(() => _busy = true);
     try {
-      final path = await ref.read(imagePickerServiceProvider).pick(source);
+      // 사진 앱·카메라에 다녀오는 동안은 앱 잠금이 걸리지 않게 한다.
+      final path = await ref
+          .read(appLockControllerProvider.notifier)
+          .suspendWhile(
+            () => ref.read(imagePickerServiceProvider).pick(source),
+          );
       if (path != null) {
         await ref.read(settingsActionsProvider).saveProfileImage(path);
       }
@@ -193,20 +197,20 @@ class _ProfileEditSheetState extends ConsumerState<_ProfileEditSheet> {
           ),
         ),
         const SizedBox(height: AppSpacing.space16),
-        _PhotoActionRow(
+        SheetActionRow(
           key: const Key('profile-camera'),
           iconAsset: AppAssets.ixCamera,
           label: '사진 찍기',
           onTap: () => _pick(PhotoSource.camera),
         ),
-        _PhotoActionRow(
+        SheetActionRow(
           key: const Key('profile-gallery'),
           iconAsset: AppAssets.ixGallery,
           label: '앨범에서 선택',
           onTap: () => _pick(PhotoSource.gallery),
         ),
         if (photo != null)
-          _PhotoActionRow(
+          SheetActionRow(
             key: const Key('profile-reset'),
             iconAsset: AppAssets.trash,
             label: '기본 캐릭터로 되돌리기',
@@ -244,49 +248,4 @@ class _ProfileEditResult {
   final String nickname;
   final bool nicknameChanged;
   final bool profileChanged;
-}
-
-class _PhotoActionRow extends StatelessWidget {
-  const _PhotoActionRow({
-    super.key,
-    required this.iconAsset,
-    required this.label,
-    required this.onTap,
-    this.destructive = false,
-  });
-
-  final String iconAsset;
-  final String label;
-  final VoidCallback onTap;
-  final bool destructive;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    final color = destructive ? colors.danger : colors.textBlack;
-    return Semantics(
-      button: true,
-      label: label,
-      excludeSemantics: true,
-      onTap: onTap,
-      child: Pressable(
-        onTap: onTap,
-        child: SizedBox(
-          height: 52,
-          child: Row(
-            children: [
-              SvgPicture.asset(
-                iconAsset,
-                width: 24,
-                height: 24,
-                colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-              ),
-              const SizedBox(width: AppSpacing.space12),
-              Text(label, style: AppTextStyles.rowTitle.copyWith(color: color)),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }

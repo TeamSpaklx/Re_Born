@@ -27,9 +27,9 @@ test/features/<기능>/   lib과 같은 구조
 | 기록 | 달력/목록, 감정 선택·강도·본문·인물 작성, 상세, 밀어서 삭제 (F-03) | 레퍼런스 해석 | 구현됨 |
 | 전체 | 프로필·요약, 체크리스트, 알림, 동의 관리, 로그아웃, 계정 삭제 (F-04, F-10, F-11) | 레퍼런스 해석 | 구현됨 |
 
-탭 위로 쌓이는 화면: 로그인, 회원가입 4단계(정보 → 약관 동의 → 첫 인물 → 알림 안내), 알림 목록·설정, 계정 삭제(재인증), 인사이트 상세, 위기 안내(시트).
+탭 위로 쌓이는 화면: 스플래시, 회원가입 4단계(정보 → 약관 동의 → 첫 인물 → 알림 안내), 알림 목록·설정, 계정 삭제(재인증), 인사이트 상세, 위기 안내(시트).
 
-**소셜 로그인:** 로그인·가입 화면의 카카오/Google 버튼 → `AuthRepository.signInWithSocial`(메모리 구현은 즉시 성공). 처음 온 사용자는 약관 동의 → 첫 인물 → 알림 안내로 이어지고(닉네임은 "카카오 사용자" 같은 임시값, 프로필에서 변경), 기존 사용자는 바로 홈입니다. 소셜 계정 삭제는 비밀번호 없이 확인 체크만 합니다. 실제 연결은 백엔드가 Supabase OAuth(Google·Kakao)를 켠 뒤 provider 한 줄 교체.
+**소셜 로그인:** 가입 화면의 카카오/Google 버튼 → `AuthRepository.signInWithSocial`(메모리 구현은 즉시 성공). 처음 온 사용자는 약관 동의 → 첫 인물 → 알림 안내로 이어지고(닉네임은 "카카오 사용자" 같은 임시값, 프로필에서 변경), 기존 사용자는 바로 홈입니다. 소셜 계정 삭제는 비밀번호 없이 확인 체크만 합니다. 실제 연결은 백엔드가 Supabase OAuth(Google·Kakao)를 켠 뒤 provider 한 줄 교체.
 
 **프로필 사진:** 전체 탭 프로필 행 → 프로필 편집 시트(사진 찍기·앨범에서 선택·기본 캐릭터로 되돌리기·닉네임). 사진 경로는 `AppSettings.profileImagePath`에 메모리로만 저장되어 앱을 다시 켜면 기본 캐릭터로 돌아갑니다(백엔드가 스토리지 연결 시 교체). 사진이 없으면 인물·사용자 모두 감정 캐릭터 7종 중 고정 배정된 하나가 임시 프로필입니다.
 
@@ -37,7 +37,9 @@ test/features/<기능>/   lib과 같은 구조
 
 **홈 인사말:** `GreetingPool`(8개 문구)에서 앱을 켤 때 한 번 뽑습니다(`greetingIndexProvider`). 출석 체크 패널은 `HomeLayout.showAttendance`(false)로 숨겨 둡니다. "오늘 해볼까요?"는 이미 체크리스트에 있는 제안(완료 포함)을 빼고 두 장을 보여 주고, 담으면 원이 채워졌다가 0.7초 뒤 다음 제안이 옵니다.
 
-**인증 흐름(F-01):** 앱은 스플래시 화면을 제거해 투데이(`/today`)에서 시작합니다. 로그인·가입 화면은 로그아웃 등 인증 흐름에서 계속 사용할 수 있습니다. 인증 저장소는 `authRepositoryProvider`(`app/data_providers.dart`)이고 지금은 메모리 구현이라 **앱을 다시 켜면 로그인이 풀립니다**. 시연용 계정은 `demo@reborn.app` / `reborn1234`이고 가입도 됩니다(메모리에만 저장). 백엔드가 Supabase Auth 구현을 만들면 provider 한 줄만 바꿉니다. 알림은 앱 안 목록(인사이트에서 생성)만 구현했고 기기 푸시(F-10 확장)는 없습니다.
+**시작 화면:** 앱은 스플래시(`/splash`, Figma `805:953`: 흰 배경, 가운데 로고 160, 아래 "TeamSpaklx")로 시작해 최소 1초(홈 데이터가 준비될 때까지, 최대 3초) 보여 준 뒤 투데이(`/today`)로 서서히 넘어갑니다. 시간 값은 Figma에 없는 추정값입니다. 스플래시 뒤의 이동은 `splash_screen.dart`의 `_goNext()` 한 곳에서 정하며, 로그인·온보딩 분기는 아직 정하지 않았습니다. 시작할 때 저장된 설정대로 기록 리마인드 예약도 맞춥니다(`syncReminder`).
+
+**인증 흐름(F-01):** 로그인 화면은 MVP와 맞지 않아 지웠고(새 Figma 디자인 예정), 로그아웃·계정 삭제 뒤에는 임시로 투데이로 갑니다. 가입 화면(`/signup`)은 남아 있지만 앱 안에서 가는 길은 아직 없습니다. 인증 저장소는 `authRepositoryProvider`(`app/data_providers.dart`)이고 지금은 메모리 구현이라 **앱을 다시 켜면 로그인이 풀립니다**. 시연용 계정은 `demo@reborn.app` / `reborn1234`이고 가입도 됩니다(메모리에만 저장). 백엔드가 Supabase Auth 구현을 만들면 provider 한 줄만 바꿉니다. 알림은 앱 안 목록(인사이트에서 생성)만 구현했고 기기 푸시(F-10 확장)는 없습니다.
 
 ## 3. 홈 화면 데이터 모양
 
@@ -156,9 +158,23 @@ MVP 데이터 처리는 SPEC 6.4대로 **분석·지수·인사이트 계산은 
 - 저장·분석·체크리스트 저장이 실패하면 오류를 기록하고 화면에는 안내와 재시도를 보여 줍니다(`AnalysisService.onError`, 작성 화면, 체크리스트).
 - 외부 분석 도구로는 보내지 않습니다(확장 기능). 나중에 보낸다면 이 기록만 보냅니다.
 
+## 4-3. 앱 잠금 (로그인 없이 기기 인증)
+
+- 설정 > 보안 > '앱 잠금'으로 켭니다(기본 꺼짐, 켤 때 한 번 인증 성공해야 켜짐). 켜짐 여부만 `shared_preferences`에 저장하고 `main.dart`가 첫 프레임 전에 읽습니다.
+- `AppLockGate`(`lib/features/security/presentation/app_lock_gate.dart`)가 `MaterialApp.builder`에서 모든 화면을 감싸고, 잠긴 동안 `LockScreen`을 **덮기만** 합니다. 라우트를 바꾸지 않으므로 잠금을 풀면 보던 화면 그대로입니다. 잠긴 동안 뒤 화면은 그리지 않고(`Offstage`, 상태는 유지) 터치·스크린 리더에서도 빠지고, Android 뒤로 버튼도 막습니다(`AppLockBackGuard`, 라우터보다 먼저 불리도록 `main.dart`에서 `runApp` 전에 등록). 단, 탭 첫 화면처럼 닫을 화면이 없으면 Android가 뒤로 버튼을 직접 처리해 앱이 백그라운드로 나가고, 다시 열면 또 인증합니다.
+- 언제 잠그나: 앱을 처음 열 때, 백그라운드(홈 화면·다른 앱)에 다녀올 때. 앱 전환 화면(inactive)에서는 로고로 덮기만 하고 바로 돌아오면 인증 없이 풀립니다. 시스템 인증 창이 떠 있는 동안(iOS는 이때 inactive가 됨)은 생명주기를 무시합니다.
+- 인증 실패·취소·생체 인증 잠김이면 "인증에 실패하거나 비밀번호를 잊으셨나요?" 버튼이 나오고, 누르면 기기 암호(PIN)도 허용하는 시스템 인증 창을 다시 띄웁니다. 자동으로 반복해서 띄우지는 않습니다.
+- 기기 화면 잠금이 없어져 인증 자체가 불가능하면(`noCredentialsSet`) 잠금을 끄고 들여보냅니다(영영 못 들어가는 일 방지).
+- **앱이 일부러 다른 화면을 띄울 때**(사진·카메라, OS 권한 창)는 `ref.read(appLockControllerProvider.notifier).suspendWhile(() => ...)`로 감쌉니다. 안 감싸면 돌아올 때 잠금이 걸리거나 권한 창 뒤가 로고로 가려집니다.
+- 인증 수단 호출은 `DeviceAuthService`(`lib/core/platform/device_auth_service.dart`) 한 곳에서만 하고, 테스트는 `deviceAuthServiceProvider`·`appLockStoreProvider`를 가짜로 바꿉니다(`test/features/security/app_lock_test.dart`).
+- **TODO (로그인·인증 기능이 들어오면):** 실패 버튼에 "계정으로 잠금 풀기"(재로그인)를 추가하고, 로그아웃·계정 삭제 시 잠금 설정을 지웁니다.
+
 ## 5. 화면 공통 규칙
 
 - 글자 크기 배율 1.0 고정, 라이트 모드만, 세로 방향만. 다크 모드는 나중에 추가하므로 색은 `context.colors`로만 읽습니다.
+- **쌓이는 화면 등록:** 탭 위로 쌓이는 새 화면은 `lib/app/router.dart`에서 `pageBuilder: (context, state) => _swipe(state, 화면)`으로 등록합니다(`SwipeBackPage`). 그래야 iOS·Android 모두 화면 어디서나 오른쪽으로 밀어 뒤로 갈 수 있습니다. 밀어서 나가면 안 되는 화면(저장 중 등)은 `PopScope(canPop: false)`로 막습니다.
+- **로딩 상태:** 데이터를 불러오는 동안 빈 화면을 두지 않고 스켈레톤(`lib/shared/widgets/skeleton.dart`)으로 내용 자리를 보여 줍니다. 홈은 Figma 홈 스켈레톤(`834:2351`)을 그대로 옮긴 `HomeSkeleton`, 목록은 `SkeletonList`(아이콘형·아바타형 카드)를 씁니다. 한 화면에 `SkeletonPulse`는 하나만 둡니다.
+- **토스트:** 저장·완료 같은 성공 알림은 `showAppToast(context, 문구, success: true)`(체크 표시), 오류·권한·안내 문구는 `success` 없이 씁니다.
 - 디자인(Figma)이 없는 화면은 `docs/design/references/INDEX.md`의 레퍼런스를 해석해 `docs/DESIGN_SYSTEM.md`의 컴포넌트로 만들고, Figma가 나오면 Figma 기준으로 고칩니다.
 - **햅틱 피드백:** `lib/core/utils/app_haptics.dart`만 씁니다(`HapticFeedback`을 화면에서 직접 부르지 않음). 탭이 다른 탭으로 바뀔 때 `selection()`, 버튼·링크를 누를 때 `tap()`(가벼운 톡). 같은 탭 다시 누르기, 동작 없는 요소(알림, 카드 등)에는 울리지 않습니다.
 - iOS와 Android 둘 다 잘 동작해야 합니다. 플랫폼 전용 설정은 항상 양쪽을 같이 처리합니다.

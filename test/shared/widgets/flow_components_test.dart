@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reborn_app/app/theme/app_assets.dart';
 import 'package:reborn_app/app/theme/app_theme.dart';
@@ -6,11 +7,11 @@ import 'package:reborn_app/features/entries/models/emotion.dart';
 import 'package:reborn_app/features/entries/presentation/widgets/emotion_face.dart';
 import 'package:reborn_app/features/entries/presentation/widgets/emotion_picker.dart';
 import 'package:reborn_app/shared/widgets/app_fab.dart';
-import 'package:reborn_app/shared/widgets/app_tab_bar.dart';
 import 'package:reborn_app/shared/widgets/consent_row.dart';
 import 'package:reborn_app/shared/widgets/donut_chart.dart';
 import 'package:reborn_app/shared/widgets/month_calendar.dart';
 import 'package:reborn_app/shared/widgets/notification_row.dart';
+import 'package:reborn_app/shared/widgets/segmented_control.dart';
 import 'package:reborn_app/shared/widgets/select_card.dart';
 import 'package:reborn_app/shared/widgets/step_progress_bar.dart';
 import 'package:reborn_app/shared/widgets/summary_card.dart';
@@ -199,21 +200,31 @@ void main() {
     expect(find.text('인물'), findsOneWidget);
   });
 
-  testWidgets('밑줄 탭: 누르면 인덱스가 바뀐다', (tester) async {
+  testWidgets('아이콘 세그먼트: 아이콘을 누르면 인덱스가 바뀌고 이름으로 읽힌다', (tester) async {
+    final handle = tester.ensureSemantics();
     var index = 0;
     await pump(
       tester,
       StatefulBuilder(
-        builder: (context, setState) => AppTabBar(
-          labels: const ['전체', '안 읽음'],
-          selectedIndex: index,
-          onChanged: (i) => setState(() => index = i),
+        builder: (context, setState) => SizedBox(
+          width: 354,
+          child: SegmentedControl.icons(
+            iconAssets: const [
+              AppAssets.segmentRabbit,
+              AppAssets.segmentSmiley,
+            ],
+            labels: const ['토끼', '웃는 얼굴'],
+            selectedIndex: index,
+            onChanged: (i) => setState(() => index = i),
+          ),
         ),
       ),
     );
-    await tester.tap(find.text('안 읽음'));
+    expect(find.byType(SvgPicture), findsNWidgets(2));
+    await tester.tap(find.bySemanticsLabel('웃는 얼굴'));
     await tester.pumpAndSettle();
     expect(index, 1);
+    handle.dispose();
   });
 
   testWidgets('알림 행: 읽지 않음은 의미 문구에 포함된다', (tester) async {

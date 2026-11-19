@@ -19,6 +19,10 @@ abstract interface class NotificationService {
   Future<void> scheduleDailyReminder({required int hour, required int minute});
 
   Future<void> cancelReminder();
+
+  /// 개발 확인용 테스트 알림. [delay]가 0이면 바로, 아니면 그만큼 뒤에 한 번만 울린다.
+  /// 소리·배너를 직접 확인하는 용도라 알림 설정 화면의 디버그 항목에서만 부른다.
+  Future<void> showTestNotification({Duration delay = Duration.zero});
 }
 
 /// `flutter_local_notifications` 구현. 알림 문구에는 기록 내용이 들어가지 않는다.
@@ -30,8 +34,15 @@ class LocalNotificationService implements NotificationService {
   bool _ready = false;
 
   static const _reminderId = 1;
-  static const _channelId = 'daily_reminder';
+  static const _testId = 99;
+  // 안드로이드 알림 채널의 소리는 한 번 만들면 바꿀 수 없어서, 소리를 넣을 때 채널 ID를 새로 만들었다.
+  static const _legacyChannelId = 'daily_reminder';
+  static const _channelId = 'daily_reminder_v2';
   static const _channelName = '기록 리마인드';
+
+  /// 알림음 파일 이름. 안드로이드는 `android/app/src/main/res/raw/reborn_notification.wav`,
+  /// iOS는 `ios/Runner/reborn_notification.wav`에 있다(소문자·밑줄만 쓴다).
+  static const _soundName = 'reborn_notification';
 
   Future<void> _init() async {
     if (_ready) return;
@@ -45,7 +56,8 @@ class LocalNotificationService implements NotificationService {
     }
     await _plugin.initialize(
       settings: const InitializationSettings(
-        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+        // 상태바 작은 아이콘은 흰색 단색이어야 한다(컬러 앱 아이콘은 사각형으로 보인다).
+        android: AndroidInitializationSettings('@drawable/ic_notification'),
         // 권한은 "알림 켜기"를 눌렀을 때 요청하므로 초기화 때는 묻지 않는다.
         iOS: DarwinInitializationSettings(
           requestAlertPermission: false,
@@ -54,7 +66,22 @@ class LocalNotificationService implements NotificationService {
         ),
       ),
     );
+    await _removeLegacyChannel();
     _ready = true;
+  }
+
+  /// 소리 없는 예전 채널이 설정 화면에 남지 않도록 지운다. 실패해도 알림 예약에는 영향이 없다.
+  Future<void> _removeLegacyChannel() async {
+    if (kIsWeb || !Platform.isAndroid) return;
+    try {
+      await _plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >()
+          ?.deleteNotificationChannel(channelId: _legacyChannelId);
+    } catch (error) {
+      debugPrint('예전 알림 채널 삭제 실패: $error');
+    }
   }
 
   /// 알림 기능이 안 되는 환경(권한 거부, 플러그인 없음 등)에서도 앱이 멈추지 않도록 실패는 false/무시로 바꾼다.
@@ -128,6 +155,45 @@ class LocalNotificationService implements NotificationService {
     return false;
   }
 
+  static const _notificationDetails = NotificationDetails(
+    android: AndroidNotificationDetails(
+      _channelId,
+      _channelName,
+      channelDescription: '정해 둔 시간에 기록을 남기도록 알려 줘요.',
+      playSound: true,
+      sound: RawResourceAndroidNotificationSound(_soundName),
+    ),
+    iOS: DarwinNotificationDetails(
+      presentSound: true,
+      sound: '$_soundName.wav',
+    ),
+  );
+
+  @override
+  Future<void> showTestNotification({Duration delay = Duration.zero}) =>
+      _safe(() async {
+        await _init();
+        const title = '테스트 알림';
+        const body = '알림음이 잘 들리나요?';
+        if (delay <= Duration.zero) {
+          await _plugin.show(
+            id: _testId,
+            title: title,
+            body: body,
+            notificationDetails: _notificationDetails,
+          );
+          return;
+        }
+        await _plugin.zonedSchedule(
+          id: _testId,
+          title: title,
+          body: body,
+          scheduledDate: tz.TZDateTime.now(tz.local).add(delay),
+          notificationDetails: _notificationDetails,
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        );
+      }, null);
+
   Future<void> _schedule(int hour, int minute) async {
     await _init();
     final now = tz.TZDateTime.now(tz.local);
@@ -145,14 +211,7 @@ class LocalNotificationService implements NotificationService {
       title: '오늘의 마음을 남겨 볼까요?',
       body: '1분만 천천히 돌아봐요.',
       scheduledDate: first,
-      notificationDetails: const NotificationDetails(
-        android: AndroidNotificationDetails(
-          _channelId,
-          _channelName,
-          channelDescription: '정해 둔 시간에 기록을 남기도록 알려 줘요.',
-        ),
-        iOS: DarwinNotificationDetails(),
-      ),
+      notificationDetails: _notificationDetails,
       // 정확한 알람 권한 없이 대략적인 시각에 울린다(배터리 최적화에 맞춤).
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       matchDateTimeComponents: DateTimeComponents.time,

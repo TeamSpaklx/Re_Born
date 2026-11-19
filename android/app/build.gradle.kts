@@ -44,6 +44,8 @@ kotlin {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    // local_auth: LaunchTheme이 Theme.AppCompat이어야 Android 8 이하에서 인증 창이 죽지 않는다.
+    implementation("androidx.appcompat:appcompat:1.7.1")
 }
 
 flutter {

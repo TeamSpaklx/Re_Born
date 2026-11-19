@@ -12,9 +12,10 @@ import '../../features/entries/presentation/widgets/emotion_picker.dart';
 import '../widgets/app_badge.dart';
 import '../widgets/app_bottom_sheet.dart';
 import '../widgets/app_card.dart';
+import '../widgets/skeleton.dart';
+import '../widgets/notification_bell_button.dart';
 import '../widgets/app_dialogs.dart';
 import '../widgets/app_fab.dart';
-import '../widgets/app_tab_bar.dart';
 import '../widgets/app_text_button.dart';
 import '../widgets/app_text_field.dart';
 import '../widgets/bottom_cta_bar.dart';
@@ -97,6 +98,10 @@ class _DesignGalleryScreenState extends State<DesignGalleryScreen> {
               runSpacing: AppSpacing.space8,
               children: [
                 _swatch('brand', colors.brand),
+                _swatch('ctaPrimary', colors.ctaPrimary),
+                _swatch('toggleOn', colors.toggleOn),
+                _swatch('skeleton', colors.skeleton),
+                _swatch('toastAccent', colors.toastAccent),
                 _swatch('ctaSoft', colors.ctaSoft),
                 _swatch('cardPink', colors.cardPink),
                 _swatch('background', colors.background),
@@ -347,6 +352,11 @@ class _DesignGalleryScreenState extends State<DesignGalleryScreen> {
                 title: '누구와의 기록인가요?',
                 builder: (context) => Column(
                   children: [
+                    SheetActionRow(
+                      iconAsset: AppAssets.ixCamera,
+                      label: '사진 찍기',
+                      onTap: () => Navigator.of(context).pop(),
+                    ),
                     SheetOptionRow(
                       title: '인물 없음',
                       onTap: () => Navigator.of(context).pop(),
@@ -366,7 +376,15 @@ class _DesignGalleryScreenState extends State<DesignGalleryScreen> {
               label: '토스트',
               height: 48,
               variant: CtaVariant.secondary,
-              onPressed: () => showAppToast(context, '체크리스트에 담았어요'),
+              onPressed: () =>
+                  showAppToast(context, '체크리스트에 담았어요', success: true),
+            ),
+            gap(),
+            CtaButton(
+              label: '토스트 (안내)',
+              height: 48,
+              variant: CtaVariant.secondary,
+              onPressed: () => showAppToast(context, '알림 권한이 꺼져 있어요.'),
             ),
           ]),
           section('감정 · 기록', [
@@ -452,11 +470,31 @@ class _DesignGalleryScreenState extends State<DesignGalleryScreen> {
               ],
             ),
             gap(),
-            AppTabBar(
+            SegmentedControl(
               labels: const ['전체', '안 읽음'],
               selectedIndex: _tab,
               onChanged: (i) => setState(() => _tab = i),
             ),
+            gap(),
+            SegmentedControl.icons(
+              iconAssets: const [
+                AppAssets.segmentRabbit,
+                AppAssets.segmentSmiley,
+              ],
+              labels: const ['토끼', '웃는 얼굴'],
+              selectedIndex: _tab,
+              onChanged: (i) => setState(() => _tab = i),
+            ),
+            gap(),
+            Row(
+              children: [
+                NotificationBellButton(onTap: _noop),
+                const SizedBox(width: AppSpacing.space12),
+                NotificationBellButton(onTap: _noop, unreadCount: 2),
+              ],
+            ),
+            gap(),
+            const SkeletonList(count: 2),
             gap(),
             NotificationRow(
               iconAsset: AppAssets.forum,
@@ -485,14 +523,14 @@ class _DesignGalleryScreenState extends State<DesignGalleryScreen> {
               ),
             ),
             gap(AppSpacing.space16),
-            const Center(
+            Center(
               child: DonutChart(
                 segments: [
-                  DonutSegment(value: 5, color: Color(0xFFFF80A6)),
-                  DonutSegment(value: 3, color: Color(0xFFFFB3CA)),
-                  DonutSegment(value: 2, color: Color(0xFFD94F79)),
+                  DonutSegment(value: 5, color: colors.barMid),
+                  DonutSegment(value: 3, color: colors.barLight),
+                  DonutSegment(value: 2, color: colors.barStrong),
                 ],
-                center: Text('10건'),
+                center: const Text('10건'),
               ),
             ),
             gap(AppSpacing.space16),

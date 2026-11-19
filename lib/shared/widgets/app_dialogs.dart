@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_radii.dart';
+import '../../app/theme/app_shadows.dart';
 import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_text_styles.dart';
 import '../../app/theme/bottom_nav_tokens.dart';
@@ -225,10 +226,17 @@ Future<bool> showAppConfirmDialog(
 
 OverlayEntry? _activeToast;
 
-/// 화면 아래(탭 바 위)에 잠깐 떴다 사라지는 안내. Reborn 토스트: 어두운 둥근 상자 + 흰 글자,
-/// 아래에서 올라오며 나타나고 약 3초 뒤 사라진다(새 토스트가 오면 이전 것은 바로 바뀐다).
-/// 머티리얼 `SnackBar`를 대신한다. 터치는 아래 화면으로 그대로 통과한다.
-void showAppToast(BuildContext context, String message) {
+/// 화면 아래(탭 바 위)에 잠깐 떴다 사라지는 안내 (Figma 토스트 `834:2088`).
+///
+/// 흰 알약에 문구와 오른쪽 '확인'. [success]가 true면(저장·완료 같은 성공 알림) 왼쪽에 분홍 체크 원을 붙이고,
+/// 오류·권한·안내 문구는 체크 없이 띄운다. 아래에서 올라오며 나타나고 약 3초 뒤 사라지며,
+/// '확인'을 누르면 바로 사라진다. 새 토스트가 오면 이전 것은 바로 바뀐다.
+/// 머티리얼 `SnackBar`를 대신한다. 토스트 바깥 터치는 아래 화면으로 그대로 통과한다.
+void showAppToast(
+  BuildContext context,
+  String message, {
+  bool success = false,
+}) {
   final overlay = Overlay.maybeOf(context, rootOverlay: true);
   if (overlay == null) return;
   _activeToast?.remove();
@@ -236,6 +244,7 @@ void showAppToast(BuildContext context, String message) {
   entry = OverlayEntry(
     builder: (context) => _AppToast(
       message: message,
+      success: success,
       onDone: () {
         if (_activeToast == entry) _activeToast = null;
         entry.remove();
@@ -247,9 +256,14 @@ void showAppToast(BuildContext context, String message) {
 }
 
 class _AppToast extends StatefulWidget {
-  const _AppToast({required this.message, required this.onDone});
+  const _AppToast({
+    required this.message,
+    required this.success,
+    required this.onDone,
+  });
 
   final String message;
+  final bool success;
   final VoidCallback onDone;
 
   @override
@@ -259,6 +273,9 @@ class _AppToast extends StatefulWidget {
 class _AppToastState extends State<_AppToast>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
+
+  static final _totalMs = ComponentLayout.toastTotal.inMilliseconds;
+  static final _fadeMs = ComponentLayout.toastFade.inMilliseconds;
 
   @override
   void initState() {
@@ -271,6 +288,16 @@ class _AppToastState extends State<_AppToast>
             if (status == AnimationStatus.completed) widget.onDone();
           })
           ..forward();
+  }
+
+  /// '확인': 머무는 시간을 건너뛰고 사라지는 구간부터 이어서 재생한다.
+  void _dismiss() {
+    final exitStart = (_totalMs - _fadeMs) / _totalMs;
+    if (_controller.value < exitStart) {
+      _controller
+        ..value = exitStart
+        ..forward();
+    }
   }
 
   @override
@@ -293,47 +320,103 @@ class _AppToastState extends State<_AppToast>
       left: AppSpacing.pageMargin,
       right: AppSpacing.pageMargin,
       bottom: bottom,
-      child: IgnorePointer(
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            final ms =
-                _controller.value * ComponentLayout.toastTotal.inMilliseconds;
-            final fade = ComponentLayout.toastFade.inMilliseconds;
-            final total = ComponentLayout.toastTotal.inMilliseconds;
-            final enter = (ms / fade).clamp(0.0, 1.0);
-            final exit = ((total - ms) / fade).clamp(0.0, 1.0);
-            return Opacity(
-              opacity: enter < exit ? enter : exit,
-              child: Transform.translate(
-                offset: Offset(
-                  0,
-                  (1 - enter) * ComponentLayout.toastRiseOffset,
-                ),
-                child: child,
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          final ms = _controller.value * _totalMs;
+          final enter = (ms / _fadeMs).clamp(0.0, 1.0);
+          final exit = ((_totalMs - ms) / _fadeMs).clamp(0.0, 1.0);
+          return Opacity(
+            opacity: enter < exit ? enter : exit,
+            child: Transform.translate(
+              offset: Offset(0, (1 - enter) * ComponentLayout.toastRiseOffset),
+              child: child,
+            ),
+          );
+        },
+        child: Semantics(
+          liveRegion: true,
+          container: true,
+          child: DefaultTextStyle.merge(
+            style: const TextStyle(decoration: TextDecoration.none),
+            child: Container(
+              constraints: const BoxConstraints(
+                minHeight: ComponentLayout.toastHeight,
               ),
-            );
-          },
-          child: Align(
-            child: Semantics(
-              liveRegion: true,
-              child: DefaultTextStyle.merge(
-                style: const TextStyle(decoration: TextDecoration.none),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: ComponentLayout.toastPaddingH,
-                    vertical: ComponentLayout.toastPaddingV,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colors.toastFill,
-                    borderRadius: AppRadii.toastBorderRadius,
-                  ),
-                  child: Text(
-                    widget.message,
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.body.copyWith(color: colors.onCta),
-                  ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: ComponentLayout.toastPaddingH,
+              ),
+              decoration: BoxDecoration(
+                color: colors.cardWhite,
+                borderRadius: AppRadii.pillBorderRadius,
+                border: Border.all(
+                  color: colors.toastBorder,
+                  width: ComponentLayout.toastBorderWidth,
                 ),
+                boxShadow: AppShadows.toast,
+              ),
+              child: Row(
+                children: [
+                  if (widget.success) ...[
+                    ExcludeSemantics(
+                      child: Container(
+                        width: ComponentLayout.toastCheckSize,
+                        height: ComponentLayout.toastCheckSize,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: colors.toastCheckFill,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          '✓',
+                          style: AppTextStyles.toastCheck.copyWith(
+                            color: colors.toastAccent,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: ComponentLayout.toastGap),
+                  ],
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppSpacing.space8,
+                      ),
+                      child: Text(
+                        widget.message,
+                        style: AppTextStyles.toastMessage.copyWith(
+                          color: colors.toastText,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: ComponentLayout.toastGap),
+                  Semantics(
+                    container: true,
+                    button: true,
+                    label: '확인',
+                    excludeSemantics: true,
+                    onTap: _dismiss,
+                    child: Pressable(
+                      onTap: _dismiss,
+                      child: SizedBox(
+                        width: ComponentLayout.toastActionWidth,
+                        height: AppSpacing.minTouchTarget,
+                        child: Center(
+                          child: Text(
+                            '확인',
+                            maxLines: 1,
+                            softWrap: false,
+                            overflow: TextOverflow.visible,
+                            style: AppTextStyles.toastAction.copyWith(
+                              color: colors.toastAccent,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

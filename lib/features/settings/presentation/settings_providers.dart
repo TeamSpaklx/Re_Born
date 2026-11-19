@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/data_providers.dart';
 import '../../../app/data_revision.dart';
+import '../../security/presentation/app_lock_controller.dart';
 import '../models/app_settings.dart';
 
 /// 닉네임·동의 설정.
@@ -74,7 +75,10 @@ class SettingsActions {
     final prefs = (await repo.get()).notifications;
     if (on) {
       final allowed =
-          await service.hasPermission() || await service.requestPermission();
+          await service.hasPermission() ||
+          await _ref
+              .read(appLockControllerProvider.notifier)
+              .suspendWhile(service.requestPermission);
       if (!allowed) return false;
       final (h, m) = _parse(prefs.reminderTime);
       await service.scheduleDailyReminder(hour: h, minute: m);
@@ -102,8 +106,8 @@ class SettingsActions {
   /// 거부되면 인사이트 알림(앱 안 목록)만 켜고 false를 돌려준다.
   Future<bool> enableNotifications() async {
     final allowed = await _ref
-        .read(notificationServiceProvider)
-        .requestPermission();
+        .read(appLockControllerProvider.notifier)
+        .suspendWhile(_ref.read(notificationServiceProvider).requestPermission);
     final repo = _ref.read(settingsRepositoryProvider);
     final prefs = (await repo.get()).notifications;
     await saveNotifications(prefs.copyWith(insight: true));
