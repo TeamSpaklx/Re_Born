@@ -3,6 +3,8 @@
     <!-- 알림 권한(안드로이드 13+ 런타임 요청)과 기록 리마인드 예약·재부팅 후 재예약 -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <!-- 햅틱(버튼·선택 진동). 일반 권한이라 사용자에게 묻지 않는다. -->
+    <uses-permission android:name="android.permission.VIBRATE"/>
 
     <application
         android:label="Re:Born"
