@@ -155,4 +155,36 @@ void main() {
     expect(find.text('A 화면'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('PopScope가 막은 화면을 충분히 밀면 그 화면의 확인 처리(maybePop)를 부른다', (
+    tester,
+  ) async {
+    var asked = 0;
+    final router = await pumpRouter(
+      tester,
+      second: PopScope<Object?>(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) asked++;
+        },
+        child: const Scaffold(body: Center(child: Text('B 화면'))),
+      ),
+    );
+    await openB(tester, router);
+
+    // 조금만 천천히 밀면 묻지 않는다.
+    final gesture = await tester.startGesture(middle());
+    for (var i = 0; i < 10; i++) {
+      await gesture.moveBy(const Offset(6, 0));
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+    await gesture.up();
+    await tester.pumpAndSettle();
+    expect(asked, 0);
+
+    await tester.dragFrom(middle(), const Offset(width * 0.8, 0));
+    await tester.pumpAndSettle();
+    expect(asked, 1);
+    expect(find.text('B 화면'), findsOneWidget);
+  });
 }
