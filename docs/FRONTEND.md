@@ -158,6 +158,17 @@ MVP 데이터 처리는 SPEC 6.4대로 **분석·지수·인사이트 계산은 
 - 저장·분석·체크리스트 저장이 실패하면 오류를 기록하고 화면에는 안내와 재시도를 보여 줍니다(`AnalysisService.onError`, 작성 화면, 체크리스트).
 - 외부 분석 도구로는 보내지 않습니다(확장 기능). 나중에 보낸다면 이 기록만 보냅니다.
 
+## 4-3. 앱 잠금 (로그인 없이 기기 인증)
+
+- 설정 > 보안 > '앱 잠금'으로 켭니다(기본 꺼짐, 켤 때 한 번 인증 성공해야 켜짐). 켜짐 여부만 `shared_preferences`에 저장하고 `main.dart`가 첫 프레임 전에 읽습니다.
+- `AppLockGate`(`lib/features/security/presentation/app_lock_gate.dart`)가 `MaterialApp.builder`에서 모든 화면을 감싸고, 잠긴 동안 `LockScreen`을 **덮기만** 합니다. 라우트를 바꾸지 않으므로 잠금을 풀면 보던 화면 그대로입니다. 잠긴 동안 뒤 화면은 그리지 않고(`Offstage`, 상태는 유지) 터치·스크린 리더에서도 빠지고, Android 뒤로 버튼도 막습니다(`AppLockBackGuard`, 라우터보다 먼저 불리도록 `main.dart`에서 `runApp` 전에 등록). 단, 탭 첫 화면처럼 닫을 화면이 없으면 Android가 뒤로 버튼을 직접 처리해 앱이 백그라운드로 나가고, 다시 열면 또 인증합니다.
+- 언제 잠그나: 앱을 처음 열 때, 백그라운드(홈 화면·다른 앱)에 다녀올 때. 앱 전환 화면(inactive)에서는 로고로 덮기만 하고 바로 돌아오면 인증 없이 풀립니다. 시스템 인증 창이 떠 있는 동안(iOS는 이때 inactive가 됨)은 생명주기를 무시합니다.
+- 인증 실패·취소·생체 인증 잠김이면 "인증에 실패하거나 비밀번호를 잊으셨나요?" 버튼이 나오고, 누르면 기기 암호(PIN)도 허용하는 시스템 인증 창을 다시 띄웁니다. 자동으로 반복해서 띄우지는 않습니다.
+- 기기 화면 잠금이 없어져 인증 자체가 불가능하면(`noCredentialsSet`) 잠금을 끄고 들여보냅니다(영영 못 들어가는 일 방지).
+- **앱이 일부러 다른 화면을 띄울 때**(사진·카메라, OS 권한 창)는 `ref.read(appLockControllerProvider.notifier).suspendWhile(() => ...)`로 감쌉니다. 안 감싸면 돌아올 때 잠금이 걸리거나 권한 창 뒤가 로고로 가려집니다.
+- 인증 수단 호출은 `DeviceAuthService`(`lib/core/platform/device_auth_service.dart`) 한 곳에서만 하고, 테스트는 `deviceAuthServiceProvider`·`appLockStoreProvider`를 가짜로 바꿉니다(`test/features/security/app_lock_test.dart`).
+- **TODO (로그인·인증 기능이 들어오면):** 실패 버튼에 "계정으로 잠금 풀기"(재로그인)를 추가하고, 로그아웃·계정 삭제 시 잠금 설정을 지웁니다.
+
 ## 5. 화면 공통 규칙
 
 - 글자 크기 배율 1.0 고정, 라이트 모드만, 세로 방향만. 다크 모드는 나중에 추가하므로 색은 `context.colors`로만 읽습니다.

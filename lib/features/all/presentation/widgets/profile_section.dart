@@ -19,6 +19,7 @@ import '../../../auth/models/auth_validator.dart';
 import '../../../auth/presentation/auth_providers.dart';
 import '../../../entries/presentation/entries_providers.dart';
 import '../../../people/presentation/people_providers.dart';
+import '../../../security/presentation/app_lock_controller.dart';
 import '../../../settings/presentation/settings_providers.dart';
 import '../../../todos/presentation/todos_providers.dart';
 
@@ -119,7 +120,12 @@ class _ProfileEditSheetState extends ConsumerState<_ProfileEditSheet> {
     if (_busy) return;
     setState(() => _busy = true);
     try {
-      final path = await ref.read(imagePickerServiceProvider).pick(source);
+      // 사진 앱·카메라에 다녀오는 동안은 앱 잠금이 걸리지 않게 한다.
+      final path = await ref
+          .read(appLockControllerProvider.notifier)
+          .suspendWhile(
+            () => ref.read(imagePickerServiceProvider).pick(source),
+          );
       if (path != null) {
         await ref.read(settingsActionsProvider).saveProfileImage(path);
       }

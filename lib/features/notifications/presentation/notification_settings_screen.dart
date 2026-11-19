@@ -10,6 +10,7 @@ import '../../../shared/widgets/app_bottom_sheet.dart';
 import '../../../shared/widgets/app_dialogs.dart';
 import '../../../shared/widgets/page_scaffold.dart';
 import '../../../shared/widgets/settings_group.dart';
+import '../../security/presentation/app_lock_controller.dart';
 import '../../settings/models/app_settings.dart';
 import '../../settings/presentation/settings_providers.dart';
 
@@ -56,7 +57,9 @@ class NotificationSettingsScreen extends ConsumerWidget {
     Duration delay = Duration.zero,
   }) async {
     final service = ref.read(notificationServiceProvider);
-    final allowed = await service.requestPermission();
+    final allowed = await ref
+        .read(appLockControllerProvider.notifier)
+        .suspendWhile(service.requestPermission);
     if (!allowed) {
       if (context.mounted) {
         showAppToast(context, '알림 권한이 꺼져 있어요. 기기 설정에서 켜 주세요.');
