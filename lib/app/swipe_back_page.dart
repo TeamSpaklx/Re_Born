@@ -11,7 +11,9 @@ import 'theme/app_motion.dart';
 ///
 /// - 놓았을 때 절반 넘게 밀었거나 오른쪽으로 빠르게 튕기면 뒤로 가고, 아니면 제자리로 돌아온다(iOS 기본 규칙).
 /// - 가로로 미는 안쪽 요소(입력창 글자 선택, 가로 목록, 밀어서 삭제)가 있으면 그 요소가 먼저다.
-/// - 첫 화면, `PopScope(canPop: false)`로 막은 화면은 밀리지 않는다.
+/// - 첫 화면은 밀리지 않는다.
+/// - `PopScope(canPop: false)`로 막은 화면(예: 입력 중인 폼)은 밀리지 않고, 오른쪽으로 밀면
+///   뒤로 버튼처럼 `maybePop`을 불러 그 화면의 확인 창을 띄운다.
 ///
 /// Flutter의 iOS 뒤로 끌기는 화면 왼쪽 20pt에서만 되고 안쪽 제스처보다 먼저 이기므로, 같은 규칙을 직접 구현했다.
 class SwipeBackPage<T> extends Page<T> {
@@ -151,6 +153,18 @@ class _SwipeBackDetectorState<T> extends State<_SwipeBackDetector<T>> {
         ..onCancel = _onCancel;
   bool _dragging = false;
 
+  /// 막힌 화면에서 오른쪽으로 민 거리(화면 폭 대비). 화면은 움직이지 않는다.
+  double? _blockedDrag;
+
+  /// 이 화면이 맨 위에 다 떠 있고 이전 화면도 있는데 `PopScope`가 막고 있는지.
+  bool get _popBlocked {
+    final route = widget.route;
+    return route.isCurrent &&
+        !route.isFirst &&
+        route.animation?.status == AnimationStatus.completed &&
+        route.popDisposition == RoutePopDisposition.doNotPop;
+  }
+
   @override
   void dispose() {
     _recognizer.dispose();
@@ -165,20 +179,43 @@ class _SwipeBackDetectorState<T> extends State<_SwipeBackDetector<T>> {
   }
 
   void _onPointerDown(PointerDownEvent event) {
-    if (widget.route.popGestureEnabled) _recognizer.addPointer(event);
+    if (widget.route.popGestureEnabled || _popBlocked) {
+      _recognizer.addPointer(event);
+    }
   }
 
   void _onStart(DragStartDetails details) {
+    if (!widget.route.popGestureEnabled) {
+      _blockedDrag = 0;
+      return;
+    }
     _dragging = true;
     widget.route._dragStart();
   }
 
   void _onUpdate(DragUpdateDetails details) {
+    final blocked = _blockedDrag;
+    if (blocked != null) {
+      _blockedDrag = blocked + details.primaryDelta! / context.size!.width;
+      return;
+    }
     if (!_dragging) return;
     widget.route._dragUpdate(details.primaryDelta! / context.size!.width);
   }
 
   void _onEnd(DragEndDetails details) {
+    final blocked = _blockedDrag;
+    if (blocked != null) {
+      _blockedDrag = null;
+      final velocity =
+          details.velocity.pixelsPerSecond.dx / context.size!.width;
+      // 실제로 밀었다면 돌아갔을 만큼 밀었을 때만 묻는다(iOS 기본 규칙과 같은 문턱).
+      final wantsBack = velocity.abs() >= AppMotion.swipeBackFlingVelocity
+          ? velocity > 0
+          : blocked > 0.5;
+      if (wantsBack) widget.route.navigator?.maybePop();
+      return;
+    }
     if (!_dragging) return;
     _dragging = false;
     widget.route._dragEnd(
@@ -187,6 +224,7 @@ class _SwipeBackDetectorState<T> extends State<_SwipeBackDetector<T>> {
   }
 
   void _onCancel() {
+    _blockedDrag = null;
     if (!_dragging) return;
     _dragging = false;
     widget.route._dragEnd(0);

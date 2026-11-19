@@ -8,6 +8,7 @@ import 'package:reborn_app/core/providers/clock_provider.dart';
 import 'package:reborn_app/features/entries/models/emotion.dart';
 import 'package:reborn_app/features/people/data/in_memory_people_repository.dart';
 import 'package:reborn_app/features/record/presentation/record_form_screen.dart';
+import 'package:reborn_app/shared/widgets/page_scaffold.dart';
 
 final fixedNow = DateTime(2026, 10, 22, 12);
 
@@ -242,5 +243,73 @@ void main() {
       (p) => p.date.day == fixedNow.day && p.date.month == fixedNow.month,
     );
     expect(today, isNotEmpty, reason: '남은 기록으로 오늘 지수가 다시 저장됨');
+  });
+
+  group('작성 중 나가기 확인', () {
+    const ask = '작성 중인 기록을 버릴까요?';
+
+    Future<void> tapBack(WidgetTester tester) async {
+      await tester.tap(find.byType(PageBackButton));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('아무것도 안 고르고 뒤로 가면 묻지 않고 닫힌다', (tester) async {
+      await pumpApp(tester);
+      await openRecordForm(tester);
+
+      await tapBack(tester);
+      expect(find.text(ask), findsNothing);
+      expect(find.byType(RecordFormScreen), findsNothing);
+    });
+
+    testWidgets('본문을 쓰고 뒤로 가면 묻고, "계속 쓰기"면 남고 "나가기"면 저장 없이 닫힌다', (
+      tester,
+    ) async {
+      final container = await pumpApp(tester);
+      final before =
+          (await container.read(entriesRepositoryProvider).list()).length;
+      await openRecordForm(tester);
+      await tester.enterText(find.byKey(const Key('record-body')), '쓰다 만 기록');
+      await tester.pump();
+
+      await tapBack(tester);
+      expect(find.text(ask), findsOneWidget);
+      await tester.tap(find.text('계속 쓰기'));
+      await tester.pumpAndSettle();
+      expect(find.byType(RecordFormScreen), findsOneWidget);
+      expect(find.text('쓰다 만 기록'), findsOneWidget);
+
+      await tapBack(tester);
+      await tester.tap(find.text('나가기'));
+      await tester.pumpAndSettle();
+      expect(find.byType(RecordFormScreen), findsNothing);
+      expect(
+        (await container.read(entriesRepositoryProvider).list()).length,
+        before,
+      );
+    });
+
+    testWidgets('감정만 골라도 화면을 오른쪽으로 밀면 닫지 않고 묻는다', (tester) async {
+      await pumpApp(tester);
+      await openRecordForm(tester);
+      await tester.tap(find.byKey(const Key('emotion-sadness')));
+      await tester.pump();
+
+      await tester.dragFrom(const Offset(201, 600), const Offset(320, 0));
+      await tester.pumpAndSettle();
+      expect(find.text(ask), findsOneWidget);
+      expect(find.byType(RecordFormScreen), findsOneWidget);
+    });
+
+    testWidgets('저장하면 묻지 않고 닫힌다', (tester) async {
+      await pumpApp(tester);
+      await openRecordForm(tester);
+      await pickEmotionAndIntensity(tester);
+      await tester.enterText(find.byKey(const Key('record-body')), '저장할 기록');
+      await tapSave(tester);
+
+      expect(find.text(ask), findsNothing);
+      expect(find.byType(RecordFormScreen), findsNothing);
+    });
   });
 }

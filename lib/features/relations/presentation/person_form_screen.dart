@@ -8,6 +8,7 @@ import '../../../app/theme/app_text_styles.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/choice_chip_button.dart';
 import '../../../shared/widgets/bottom_cta_bar.dart';
+import '../../../shared/widgets/leave_confirm_scope.dart';
 import '../../../shared/widgets/page_scaffold.dart';
 import '../../people/models/person.dart';
 import '../../people/models/person_validator.dart';
@@ -28,6 +29,7 @@ class PersonFormScreen extends ConsumerStatefulWidget {
 class _PersonFormScreenState extends ConsumerState<PersonFormScreen> {
   final _name = TextEditingController();
   final _memo = TextEditingController();
+  late final _fields = Listenable.merge([_name, _memo]);
   RelationType _type = RelationType.friend;
   Person? _editing;
   String? _nameError;
@@ -48,6 +50,20 @@ class _PersonFormScreenState extends ConsumerState<PersonFormScreen> {
     _name.text = person.name;
     _memo.text = person.memo ?? '';
     _type = person.relationType;
+  }
+
+  /// 처음(새 인물이면 빈 값, 수정이면 불러온 값)과 달라졌는지. 달라졌으면 나갈 때 묻는다.
+  bool get _dirty {
+    final editing = _editing;
+    if (editing == null) {
+      if (widget.personId != null) return false; // 수정할 인물을 아직 불러오는 중
+      return _name.text.trim().isNotEmpty ||
+          _memo.text.trim().isNotEmpty ||
+          _type != RelationType.friend;
+    }
+    return _name.text.trim() != editing.name.trim() ||
+        _memo.text.trim() != (editing.memo ?? '').trim() ||
+        _type != editing.relationType;
   }
 
   Future<void> _save() async {
@@ -105,6 +121,16 @@ class _PersonFormScreenState extends ConsumerState<PersonFormScreen> {
       ),
     );
 
+    // 입력은 글자마다 화면 전체를 다시 그리지 않도록 확인 범위만 다시 계산한다.
+    return ListenableBuilder(
+      listenable: _fields,
+      builder: (context, child) =>
+          LeaveConfirmScope(dirty: _dirty, child: child!),
+      child: _form(colors, label),
+    );
+  }
+
+  Widget _form(AppColors colors, Widget Function(String) label) {
     return PageScaffold(
       title: _editing == null ? '인물 추가' : '인물 수정',
       subtitle: _editing == null ? '기록을 남길 사람을 등록해요.' : null,
