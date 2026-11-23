@@ -9,6 +9,7 @@ import 'package:reborn_app/features/analysis/data/sample_data.dart';
 import 'package:reborn_app/features/insights/data/in_memory_insights_repository.dart';
 import 'package:reborn_app/features/people/data/in_memory_people_repository.dart';
 import 'package:reborn_app/features/relations/presentation/person_form_screen.dart';
+import 'package:reborn_app/shared/widgets/page_scaffold.dart';
 
 final fixedNow = DateTime(2026, 10, 22, 12);
 
@@ -175,5 +176,26 @@ void main() {
     for (final id in ['p1', 'p2']) {
       expect(data.indexPoints.where((p) => p.personId == id), isNotEmpty);
     }
+  });
+
+  testWidgets('이름을 쓰다 뒤로 가면 묻고, "나가기"를 고르면 추가되지 않는다', (tester) async {
+    final container = await pumpApp(tester);
+    await openAddForm(tester);
+    await tester.enterText(find.byKey(const Key('person-name')), '쓰다만');
+    await tester.pump();
+
+    await tester.tap(find.byType(PageBackButton));
+    await tester.pumpAndSettle();
+    expect(find.text('작성 중인 내용을 버릴까요?'), findsOneWidget);
+    await tester.tap(find.text('나가기'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(PersonFormScreen), findsNothing);
+    expect(
+      (await container.read(peopleRepositoryProvider).list()).map(
+        (p) => p.name,
+      ),
+      isNot(contains('쓰다만')),
+    );
   });
 }

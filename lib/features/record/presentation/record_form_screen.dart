@@ -15,6 +15,7 @@ import '../../../shared/widgets/app_dialogs.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/bottom_cta_bar.dart';
+import '../../../shared/widgets/leave_confirm_scope.dart';
 import '../../../shared/widgets/pressable.dart';
 import '../../../shared/widgets/page_scaffold.dart';
 import '../../analysis/crisis_checker.dart';
@@ -74,6 +75,22 @@ class _RecordFormScreenState extends ConsumerState<RecordFormScreen> {
   void dispose() {
     _body.dispose();
     super.dispose();
+  }
+
+  /// 처음(새 기록이면 빈 값, 수정이면 불러온 값)과 달라졌는지. 달라졌으면 나갈 때 묻는다.
+  bool get _dirty {
+    final editing = _editing;
+    if (editing == null) {
+      if (widget.entryId != null) return false; // 수정할 기록을 아직 불러오는 중
+      return _body.text.trim().isNotEmpty ||
+          _emotion != null ||
+          _intensity != null ||
+          _personId != null;
+    }
+    return _body.text.trim() != editing.body.trim() ||
+        _emotion != editing.emotion ||
+        _intensity != editing.intensity ||
+        _personId != editing.personId;
   }
 
   Future<void> _save() async {
@@ -183,6 +200,25 @@ class _RecordFormScreenState extends ConsumerState<RecordFormScreen> {
       ),
     );
 
+    // 본문은 글자마다 화면 전체를 다시 그리지 않도록 확인 범위만 다시 계산한다.
+    return ListenableBuilder(
+      listenable: _body,
+      builder: (context, child) => LeaveConfirmScope(
+        dirty: !_saving && _dirty,
+        title: _editing == null ? '작성 중인 기록을 버릴까요?' : '수정한 내용을 버릴까요?',
+        child: child!,
+      ),
+      child: _form(context, colors, label, personName, now),
+    );
+  }
+
+  Widget _form(
+    BuildContext context,
+    AppColors colors,
+    Widget Function(String, {bool first}) label,
+    String? personName,
+    DateTime now,
+  ) {
     return PageScaffold(
       title: _editing == null ? '지금 마음은\n어떤가요?' : '기록 수정',
       subtitle: _editing == null ? formatKoreanDate(now) : null,
