@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart' show CupertinoActivityIndicator;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
@@ -9,6 +10,8 @@ import 'package:reborn_app/app/data_providers.dart';
 import 'package:reborn_app/app/main_shell.dart';
 import 'package:reborn_app/app/theme/app_assets.dart';
 import 'package:reborn_app/app/theme/app_colors.dart';
+import 'package:reborn_app/app/theme/app_motion.dart';
+import 'package:reborn_app/core/errors/app_error_log.dart';
 import 'package:reborn_app/app/theme/app_radii.dart';
 import 'package:reborn_app/app/theme/app_spacing.dart';
 import 'package:reborn_app/app/theme/app_theme.dart';
@@ -48,6 +51,21 @@ class _FlakyEntries extends InMemoryEntriesRepository {
   Future<List<Entry>> list({String? personId}) async {
     calls.add(1);
     if (calls.length == 1) throw StateError('network');
+    return super.list(personId: personId);
+  }
+}
+
+/// 기록 목록 호출 수를 세고, [failFrom]번째 호출부터 실패하는 저장소 (새로고침 확인).
+class _CountingEntries extends InMemoryEntriesRepository {
+  _CountingEntries({this.failFrom});
+
+  final int? failFrom;
+  int calls = 0;
+
+  @override
+  Future<List<Entry>> list({String? personId}) async {
+    calls++;
+    if (failFrom != null && calls >= failFrom!) throw StateError('network');
     return super.list(personId: personId);
   }
 }
@@ -365,7 +383,12 @@ void main() {
     final recordCardY = tester.getTopLeft(find.byType(RecordCardBefore)).dy;
 
     // 글자 위(눌리는 위젯이 없는 곳)에서 끈다. 버튼 위에서 끌면 탭 인식기 때문에 시작 거리가 달라진다.
-    await tester.dragFrom(const Offset(300, 180), const Offset(0, -200));
+    // 투데이는 튀는 스크롤이라 끌기 시작 문턱(touch slop) 없이 정확히 200만큼 끈다.
+    await tester.dragFrom(
+      const Offset(300, 180),
+      const Offset(0, -200),
+      touchSlopY: 0,
+    );
     await tester.pumpAndSettle();
 
     expect(tester.getTopLeft(find.byType(HomeHeader)).dy, headerY);
@@ -381,7 +404,11 @@ void main() {
     await pumpHome(tester);
 
     final scrollable = tester.state<ScrollableState>(find.byType(Scrollable));
-    await tester.dragFrom(const Offset(300, 180), const Offset(0, -300));
+    await tester.dragFrom(
+      const Offset(300, 180),
+      const Offset(0, -300),
+      touchSlopY: 0,
+    );
     await tester.pumpAndSettle();
     expect(scrollable.position.pixels, closeTo(300, 1));
 
@@ -393,6 +420,74 @@ void main() {
 
     await tester.pumpAndSettle();
     expect(scrollable.position.pixels, 0);
+  });
+
+  group('당겨서 새로고침', () {
+    /// 화면을 아래로 당겼다 놓는다(트리거 거리 100보다 충분히).
+    Future<void> pullDown(WidgetTester tester) async {
+      await tester.dragFrom(
+        const Offset(300, 300),
+        const Offset(0, 250),
+        touchSlopY: 0,
+      );
+      await tester.pump();
+    }
+
+    testWidgets('당기면 상단 바 아래에 스피너가 돌고 홈 데이터를 다시 불러온다', (tester) async {
+      useDesignScreen(tester);
+      final entries = _CountingEntries();
+      await pumpHome(
+        tester,
+        overrides: [entriesRepositoryProvider.overrideWithValue(entries)],
+      );
+      final before = entries.calls;
+
+      await pullDown(tester);
+      await tester.pump(const Duration(milliseconds: 50));
+
+      final spinner = find.byType(CupertinoActivityIndicator);
+      expect(spinner, findsOneWidget);
+      final barBottom = tester.getBottomLeft(find.byType(HomeTopBar)).dy;
+      expect(tester.getTopLeft(spinner).dy, greaterThan(barBottom));
+      expect(entries.calls, before + 1);
+      // 새로고침 중에도 내용은 그대로 보인다.
+      expect(find.byType(RecordCardBefore), findsOneWidget);
+      expect(find.byType(HomeSkeleton), findsNothing);
+
+      // 데이터는 즉시 오지만 스피너는 최소 시간만큼 보인다.
+      await tester.pump(AppMotion.refreshMinDuration ~/ 2);
+      expect(find.byType(CupertinoActivityIndicator), findsOneWidget);
+      await tester.pumpAndSettle();
+      expect(find.byType(CupertinoActivityIndicator), findsNothing);
+      expect(
+        tester.state<ScrollableState>(find.byType(Scrollable)).position.pixels,
+        0,
+      );
+    });
+
+    testWidgets('새로고침이 실패하면 내용을 유지하고 토스트로 알리며 오류를 기록한다', (tester) async {
+      useDesignScreen(tester);
+      final errorLog = AppErrorLog();
+      await pumpHome(
+        tester,
+        overrides: [
+          entriesRepositoryProvider.overrideWithValue(
+            _CountingEntries(failFrom: 2),
+          ),
+          appErrorLogProvider.overrideWithValue(errorLog),
+        ],
+      );
+
+      await pullDown(tester);
+      await tester.pump(AppMotion.refreshMinDuration);
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(find.text('새로고침하지 못했어요'), findsOneWidget);
+      expect(find.byType(RecordCardBefore), findsOneWidget);
+      expect(find.text('다시 시도'), findsNothing);
+      expect(errorLog.entries.single.where, 'home-refresh');
+      await tester.pumpAndSettle(const Duration(seconds: 4));
+    });
   });
 
   testWidgets('이미 맨 위일 때 로고를 눌러도 오류가 없다', (tester) async {

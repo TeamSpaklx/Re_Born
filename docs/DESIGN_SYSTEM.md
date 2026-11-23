@@ -172,6 +172,7 @@
 | `fast` | 200ms | 토글·체크·세그먼트·칩 상태 변화, 버튼 비활성 전환 |
 | `normal` | 300ms | 바텀시트·모달·화면 전환 |
 | `slow` | 500ms | 맨 위로 스크롤처럼 긴 이동 |
+| `refreshMinDuration` | 600ms | 당겨서 새로고침 스피너 최소 표시 시간(데이터가 즉시 와도 번쩍 사라지지 않게) |
 | `enter` / `exit` / `move` | easeOutCubic / easeInCubic / easeInOutCubic | 나타남 / 사라짐 / 위치 이동 |
 
 - **햅틱(`AppHaptics`):** 버튼·링크 `tap`(가벼운 톡), 토글·칩·체크·세그먼트·탭 바 `selection`. 오류·완료 같은 큰 사건에는 쓰지 않습니다.
@@ -237,6 +238,7 @@
 | 조용한 빈 상태 `QuietEmptyState` | `empty_state.dart` | Figma 알림 `834:1148`: 마스코트 151 + 한 줄(20 Regular `emptyText`). `ComponentLayout.quietEmptyAlignment`로 가운데보다 조금 위 | ✅ (Figma) |
 | 스켈레톤 `SkeletonPulse` · `SkeletonBox` · `SkeletonCard` · `SkeletonListCard` · `SkeletonList` | `skeleton.dart` | Figma 홈 스켈레톤 `834:2351`: 흰 카드(24) 위 `#E4E4E4` 막대(6). 한 화면을 `SkeletonPulse`로 감싸 1.2초 왕복으로 깜빡임(불투명도 1↔0.5, 추정), '동작 줄이기'면 정지, "불러오는 중"으로 한 번 읽힘. 홈은 `HomeSkeleton`(Figma 좌표 그대로), 기록·관계·알림 목록과 인물 그래프는 같은 조각으로 만든 추정 배치 | ✅ |
 | 앱 잠금 화면 `LockScreen` | `lib/features/security/presentation/lock_screen.dart` | Figma `834:1480`·`834:2141`: 흰 배경(`splashBackground`) 가운데 로고 160(스플래시와 같은 `SplashLayout` 값이라 이어져 보임), 시스템 인증 창은 OS가 위에 띄움. 실패 시 아래에 글자 버튼 "인증에 실패하거나 비밀번호를 잊으셨나요?" 314×45, 안전 영역 위 30, 14 SemiBold −0.35 `lockHelpText`(`rgba(76,83,95,0.8)`), 누르는 동안 알약 배경 `lockHelpPressed`(`rgba(160,167,180,0.2)`). 앱 전환 화면 덮개는 버튼 없이 로고만 | ✅ (Figma) |
+| 당겨서 새로고침 `AppRefreshControl` | `app_refresh_control.dart` | iOS 스타일 하나로 통일(iOS·Android 모두 튀는 스크롤 + 회색 톱니 스피너 `textSecondary`, 머티리얼 원형 스피너는 쓰지 않음). `CustomScrollView`의 첫 sliver나 고정 헤더 바로 다음에 넣음. 기준만큼 당기면 `AppHaptics.tap`, 최소 `refreshMinDuration`(600ms, 추정) 보임, 스크린 리더 "새로고침 중". 지금은 투데이만 씀(상단 유리 바 높이의 투명 고정 헤더 아래에 나타남) | ✅ (추정) |
 | 오류 상태 `ErrorState` | `empty_state.dart` | "불러오지 못했어요" + "잠시 뒤에 다시 시도해 주세요." + "다시 시도". 오류 원인(기술 문구)은 보이지 않음 | ✅ |
 
 ### 7.6 화면 흐름용 컴포넌트 (구현됨, 디버그 갤러리 "감정·기록" 이하에서 확인)

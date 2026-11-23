@@ -10,7 +10,9 @@ import '../../../app/theme/app_text_styles.dart';
 import '../../../core/providers/clock_provider.dart';
 import '../../../app/theme/app_motion.dart';
 import '../../../shared/widgets/app_card.dart';
+import '../../../core/errors/app_error_log.dart';
 import '../../../shared/widgets/app_dialogs.dart';
+import '../../../shared/widgets/app_refresh_control.dart';
 import '../../../shared/widgets/cta_button.dart';
 import '../../todos/models/todo.dart';
 import '../../todos/presentation/todos_providers.dart';
@@ -37,11 +39,26 @@ class TodayScreen extends ConsumerWidget {
     final summary = ref.watch(homeSummaryProvider);
     final background = context.colors.background;
 
+    /// 당겨서 새로고침: 홈 데이터를 다시 읽는다. 실패하면 지금 내용을 그대로 두고 토스트로 알린다.
+    Future<void> refresh() async {
+      ref.invalidate(homeSummaryProvider);
+      try {
+        await ref.read(homeSummaryProvider.future);
+      } catch (error, stack) {
+        ref
+            .read(appErrorLogProvider)
+            .record(error, stack, where: 'home-refresh');
+        if (context.mounted) showAppToast(context, '새로고침하지 못했어요');
+      }
+    }
+
     return Scaffold(
       backgroundColor: background,
       body: summary.when(
         skipLoadingOnReload: true,
-        data: (data) => _HomeContent(summary: data),
+        // 값이 있는 상태에서 다시 불러오다 실패하면 오류 화면 대신 지금 내용을 유지한다.
+        skipError: true,
+        data: (data) => _HomeContent(summary: data, onRefresh: refresh),
         loading: () => const HomeSkeleton(),
         error: (error, stack) =>
             HomeErrorView(onRetry: () => ref.invalidate(homeSummaryProvider)),
@@ -51,9 +68,10 @@ class TodayScreen extends ConsumerWidget {
 }
 
 class _HomeContent extends ConsumerStatefulWidget {
-  const _HomeContent({required this.summary});
+  const _HomeContent({required this.summary, required this.onRefresh});
 
   final HomeSummary summary;
+  final Future<void> Function() onRefresh;
 
   @override
   ConsumerState<_HomeContent> createState() => _HomeContentState();
@@ -132,103 +150,120 @@ class _HomeContentState extends ConsumerState<_HomeContent> {
 
     return Stack(
       children: [
-        SingleChildScrollView(
+        CustomScrollView(
           controller: _scrollController,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // 상단 바(고정)가 차지하는 자리.
-              SizedBox(height: HomeTopBar.heightOf(context)),
-              const SizedBox(height: HomeLayout.headerToDate),
-              HomeGreeting(today: summary.today, nickname: summary.nickname),
-              const SizedBox(height: HomeLayout.greetingToRecordCard),
-              card(
-                summary.todayRecorded
-                    ? RecordCardAfter(
-                        streak: summary.streak,
-                        peopleCount: summary.todayPeopleCount,
-                        onViewToday: () {
-                          final id = summary.todayEntryId;
-                          if (id != null) {
-                            context.push(AppRoutes.recordDetail(id));
-                          }
-                        },
-                      )
-                    : RecordCardBefore(
-                        onRecord: () => context.go(AppRoutes.record),
-                      ),
-              ),
-              const SizedBox(height: HomeLayout.recordCardToSignalTitle),
-              SectionTitleRow(
-                title: '최근 관계 신호',
-                onSeeAll: () => context.go(AppRoutes.relations),
-              ),
-              const SizedBox(height: HomeLayout.sectionTitleToCard),
-              if (summary.relationSignals.isEmpty)
-                card(
-                  Text(
-                    '아직 감지된 관계 변화가 없어요. 기록이 쌓이면 알려 드릴게요.',
-                    style: AppTextStyles.body.copyWith(
-                      color: colors.textSecondary,
-                    ),
+          // 당겨서 새로고침을 위해 iOS처럼 끝에서 튀는 스크롤(Android도 같음).
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
+          ),
+          slivers: [
+            // 상단 바(고정)가 차지하는 자리. 고정 헤더라서 새로고침 스피너가 바 아래에 나타나고,
+            // 내용은 지금처럼 유리 바 뒤로 지나간다.
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _TopBarSpace(HomeTopBar.heightOf(context)),
+            ),
+            AppRefreshControl(onRefresh: widget.onRefresh),
+            SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: HomeLayout.headerToDate),
+                  HomeGreeting(
+                    today: summary.today,
+                    nickname: summary.nickname,
                   ),
-                )
-              else
-                for (final signal in summary.relationSignals)
+                  const SizedBox(height: HomeLayout.greetingToRecordCard),
                   card(
-                    RelationSignalCard(
-                      signal: signal,
-                      onTap: () => context.push(
-                        AppRoutes.insightDetail(signal.insightId),
-                      ),
-                    ),
+                    summary.todayRecorded
+                        ? RecordCardAfter(
+                            streak: summary.streak,
+                            peopleCount: summary.todayPeopleCount,
+                            onViewToday: () {
+                              final id = summary.todayEntryId;
+                              if (id != null) {
+                                context.push(AppRoutes.recordDetail(id));
+                              }
+                            },
+                          )
+                        : RecordCardBefore(
+                            onRecord: () => context.go(AppRoutes.record),
+                          ),
                   ),
-              const SizedBox(height: HomeLayout.signalCardToGraph),
-              card(
-                WeeklyEmotionCard(
-                  flow: summary.weeklyEmotion,
-                  onTitleTap: () => context.go(AppRoutes.record),
-                ),
-              ),
-              const SizedBox(height: HomeLayout.graphToActionTitle),
-              SectionTitleRow(
-                title: '오늘 해볼까요?',
-                trailingChevron: true,
-                onTitleTap: () => context.go(AppRoutes.all),
-              ),
-              const SizedBox(height: HomeLayout.sectionTitleToCard),
-              if (_visibleSuggestions().isEmpty)
-                card(
-                  summary.suggestionsDone
-                      ? _SuggestionsDone(
-                          onOpenChecklist: () => context.go(AppRoutes.all),
-                        )
-                      : Text(
-                          '관계 변화가 감지되면 해 볼 만한 일을 제안해 드려요.',
-                          style: AppTextStyles.body.copyWith(
-                            color: colors.textSecondary,
+                  const SizedBox(height: HomeLayout.recordCardToSignalTitle),
+                  SectionTitleRow(
+                    title: '최근 관계 신호',
+                    onSeeAll: () => context.go(AppRoutes.relations),
+                  ),
+                  const SizedBox(height: HomeLayout.sectionTitleToCard),
+                  if (summary.relationSignals.isEmpty)
+                    card(
+                      Text(
+                        '아직 감지된 관계 변화가 없어요. 기록이 쌓이면 알려 드릴게요.',
+                        style: AppTextStyles.body.copyWith(
+                          color: colors.textSecondary,
+                        ),
+                      ),
+                    )
+                  else
+                    for (final signal in summary.relationSignals)
+                      card(
+                        RelationSignalCard(
+                          signal: signal,
+                          onTap: () => context.push(
+                            AppRoutes.insightDetail(signal.insightId),
                           ),
                         ),
-                ),
-              for (final (i, s) in _visibleSuggestions().indexed) ...[
-                if (i > 0) const SizedBox(height: AppSpacing.actionCardGap),
-                card(
-                  AnimatedSwitcher(
-                    duration: AppMotion.normal,
-                    switchInCurve: AppMotion.enter,
-                    child: ActionSuggestionCard(
-                      key: ValueKey(s.id),
-                      suggestion: s,
-                      onTap: () =>
-                          context.push(AppRoutes.insightDetail(s.insightId)),
-                      onAdd: () => _add(context, ref, s, i),
+                      ),
+                  const SizedBox(height: HomeLayout.signalCardToGraph),
+                  card(
+                    WeeklyEmotionCard(
+                      flow: summary.weeklyEmotion,
+                      onTitleTap: () => context.go(AppRoutes.record),
                     ),
                   ),
-                ),
-              ],
-              const SizedBox(height: BottomNavTokens.scrollBottomPadding),
-            ],
-          ),
+                  const SizedBox(height: HomeLayout.graphToActionTitle),
+                  SectionTitleRow(
+                    title: '오늘 해볼까요?',
+                    trailingChevron: true,
+                    onTitleTap: () => context.go(AppRoutes.all),
+                  ),
+                  const SizedBox(height: HomeLayout.sectionTitleToCard),
+                  if (_visibleSuggestions().isEmpty)
+                    card(
+                      summary.suggestionsDone
+                          ? _SuggestionsDone(
+                              onOpenChecklist: () => context.go(AppRoutes.all),
+                            )
+                          : Text(
+                              '관계 변화가 감지되면 해 볼 만한 일을 제안해 드려요.',
+                              style: AppTextStyles.body.copyWith(
+                                color: colors.textSecondary,
+                              ),
+                            ),
+                    ),
+                  for (final (i, s) in _visibleSuggestions().indexed) ...[
+                    if (i > 0) const SizedBox(height: AppSpacing.actionCardGap),
+                    card(
+                      AnimatedSwitcher(
+                        duration: AppMotion.normal,
+                        switchInCurve: AppMotion.enter,
+                        child: ActionSuggestionCard(
+                          key: ValueKey(s.id),
+                          suggestion: s,
+                          onTap: () => context.push(
+                            AppRoutes.insightDetail(s.insightId),
+                          ),
+                          onAdd: () => _add(context, ref, s, i),
+                        ),
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: BottomNavTokens.scrollBottomPadding),
+                ],
+              ),
+            ),
+          ],
         ),
         Positioned(
           left: 0,
@@ -239,6 +274,26 @@ class _HomeContentState extends ConsumerState<_HomeContent> {
       ],
     );
   }
+}
+
+/// 상단 바 높이만큼 비워 두는 투명한 고정 헤더(실제 바는 화면 위에 따로 그린다).
+class _TopBarSpace extends SliverPersistentHeaderDelegate {
+  const _TopBarSpace(this.height);
+
+  final double height;
+
+  @override
+  double get minExtent => height;
+
+  @override
+  double get maxExtent => height;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlaps) =>
+      const SizedBox.expand();
+
+  @override
+  bool shouldRebuild(_TopBarSpace oldDelegate) => oldDelegate.height != height;
 }
 
 /// 제안을 모두 담았을 때의 한 줄 안내와 체크리스트로 가는 버튼.

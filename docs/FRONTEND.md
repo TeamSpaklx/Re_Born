@@ -45,6 +45,8 @@ test/features/<기능>/   lib과 같은 구조
 
 홈 화면 하나가 `HomeSummary`를 받아 그립니다. 필드 이름과 의미를 백엔드와 맞춥니다.
 
+**당겨서 새로고침:** 투데이를 아래로 당기면 `homeSummaryProvider`를 다시 읽습니다(`AppRefreshControl`). 새로고침 중에도 지금 내용은 그대로 보이고, 실패하면 내용을 유지한 채 "새로고침하지 못했어요" 토스트를 띄우고 `AppErrorLog`(`home-refresh`)에 남깁니다. 처음 불러올 때의 실패만 오류 화면(`HomeErrorView`)을 보여 줍니다. 지금은 메모리 저장소라 새로고침해도 바뀌는 게 없고, Supabase를 연결하면 서버의 최신 값을 가져옵니다.
+
 ```dart
 class HomeSummary {
   String nickname;              // "규리" → 인사말 "규리님, 오늘도 즐거운 하루 보내세요!"
