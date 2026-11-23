@@ -7,6 +7,7 @@ import 'package:reborn_app/app/app.dart';
 import 'package:reborn_app/app/data_providers.dart';
 import 'package:reborn_app/app/router.dart';
 import 'package:reborn_app/app/theme/app_assets.dart';
+import 'package:reborn_app/app/theme/app_text_styles.dart';
 import 'package:reborn_app/core/errors/app_error_log.dart';
 import 'package:reborn_app/features/auth/data/auth_session_store.dart';
 import 'package:reborn_app/features/auth/data/in_memory_auth_repository.dart';
@@ -96,6 +97,19 @@ void main() {
     expect(legal.top - kakao.bottom, 57);
     expect(legal.bottom, closeTo(874 - 48, 0.5));
     expect(legal.center.dx, closeTo(201, 0.5));
+
+    // Scaffold 없이 그려도 글자에 기본(노란 밑줄) 스타일이 새지 않는다.
+    final label = tester.widget<Text>(find.text('구글로 로그인'));
+    final effective = DefaultTextStyle.of(
+      tester.element(find.text('구글로 로그인')),
+    ).style.merge(label.style);
+    expect(effective.decoration, isNot(TextDecoration.underline));
+    expect(
+      DefaultTextStyle.of(
+        tester.element(find.text('구글로 로그인')),
+      ).style.fontFamily,
+      AppTextStyles.fontFamily,
+    );
   });
 
   testWidgets('기존 회원은 투데이로 가고, 로그인 상태가 기기에 남는다', (tester) async {

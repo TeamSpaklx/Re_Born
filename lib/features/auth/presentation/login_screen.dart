@@ -31,44 +31,48 @@ class LoginScreen extends ConsumerWidget {
       height: LoginLayout.logoHeight,
       semanticLabel: 'Re:Born',
     );
-    return ColoredBox(
-      color: colors.splashBackground,
-      child: Stack(
-        children: [
-          Align(
-            alignment: LoginLayout.logoAlignment,
-            child: kDebugMode
-                ? GestureDetector(
-                    key: const Key('login-debug-trigger'),
-                    onLongPress: () => _showDebugPanel(context, ref),
-                    child: logo,
-                  )
-                : logo,
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  LoginLayout.horizontalMargin,
-                  0,
-                  LoginLayout.horizontalMargin,
-                  LoginLayout.legalBottom,
-                ),
-                child: const Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SocialLoginButtonPair(),
-                    SizedBox(height: LoginLayout.buttonsToLegal),
-                    _LegalNotice(),
-                  ],
+    // Scaffold 없이 그리므로 기본 글자 스타일을 직접 준다(없으면 글자에 노란 밑줄이 생긴다).
+    return DefaultTextStyle(
+      style: AppTextStyles.loginLegal.copyWith(color: colors.loginLegalText),
+      child: ColoredBox(
+        color: colors.splashBackground,
+        child: Stack(
+          children: [
+            Align(
+              alignment: LoginLayout.logoAlignment,
+              child: kDebugMode
+                  ? GestureDetector(
+                      key: const Key('login-debug-trigger'),
+                      onLongPress: () => _showDebugPanel(context, ref),
+                      child: logo,
+                    )
+                  : logo,
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    LoginLayout.horizontalMargin,
+                    0,
+                    LoginLayout.horizontalMargin,
+                    LoginLayout.legalBottom,
+                  ),
+                  child: const Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SocialLoginButtonPair(),
+                      SizedBox(height: LoginLayout.buttonsToLegal),
+                      _LegalNotice(),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
