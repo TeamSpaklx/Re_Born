@@ -16,7 +16,7 @@ import 'consent_texts.dart';
 import 'social_login_buttons.dart';
 
 /// 로그인 (F-01, Figma 8877:1929): 흰 배경 가운데 RE:BORN 워드마크, 아래에 구글·카카오 버튼과 약관 안내.
-/// 처음 들어온 사용자는 약관 동의 → 온보딩으로, 기존 사용자는 투데이로 간다([handleSocialSignIn]).
+/// 로그인하면 신규·기존 회원 모두 바로 투데이로 간다([handleSocialSignIn]).
 ///
 /// 디버그 빌드에서는 워드마크를 길게 누르면 다음 로그인 결과(취소·오류·지연)를 고르는 패널이 뜬다.
 class LoginScreen extends ConsumerWidget {

@@ -20,7 +20,7 @@ enum SocialProvider {
   final String label;
 }
 
-/// 소셜 로그인 결과. 처음 들어온 사용자면 [isNewUser]가 true라 약관 동의·온보딩으로 이어진다.
+/// 소셜 로그인 결과. 처음 들어온 사용자면 [isNewUser]가 true라 닉네임·필수 동의를 기본값으로 채운다.
 class SocialSignInResult {
   const SocialSignInResult({required this.user, required this.isNewUser});
 

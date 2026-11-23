@@ -4,10 +4,10 @@ import 'auth_session_store.dart';
 
 /// 디버그 패널에서 고르는 "다음 소셜 로그인 결과". 백엔드가 없어서 실패 상황을 직접 만들어 본다.
 enum SocialOutcome {
-  /// 평소 동작: 약관 동의를 마친 적이 있으면 기존 회원, 아니면 신규 회원.
+  /// 평소 동작: 전에 로그인한 적이 있으면 기존 회원, 아니면 신규 회원(둘 다 투데이로 간다).
   auto('평소대로'),
-  newUser('신규 회원 → 약관 동의'),
-  existingUser('기존 회원 → 홈'),
+  newUser('신규 회원(첫 로그인)'),
+  existingUser('기존 회원'),
   cancelled('사용자가 취소'),
   network('네트워크 오류'),
   unknown('알 수 없는 오류');
@@ -41,7 +41,7 @@ class InMemoryAuthRepository implements AuthRepository {
   final Map<String, String> _accounts;
   final AuthSessionStore? _store;
 
-  /// 약관 동의까지 마친 소셜 종류.
+  /// 첫 설정까지 마친(한 번 이상 로그인한) 소셜 종류.
   final Set<SocialProvider> _socialMembers;
   AuthUser? _current;
 
@@ -55,7 +55,7 @@ class InMemoryAuthRepository implements AuthRepository {
           provider: provider,
         );
 
-  /// 소셜 로그인 상태만 기기에 남긴다(가입 중인 신규 회원은 동의를 마칠 때 저장).
+  /// 소셜 로그인 상태만 기기에 남긴다(신규 회원은 첫 설정을 저장한 뒤 [completeSocialSignup]에서 저장).
   Future<void> _persist({bool keepSession = true}) async {
     final provider = _current?.provider;
     await _store?.save(

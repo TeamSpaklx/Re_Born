@@ -5,11 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/all/presentation/all_screen.dart';
 import '../features/auth/presentation/account_delete_screen.dart';
-import '../features/auth/presentation/consent_screen.dart';
 import '../features/auth/presentation/login_screen.dart';
-import '../features/auth/presentation/onboarding_screen.dart';
-import '../features/auth/presentation/permission_screen.dart';
-import '../features/auth/presentation/signup_screen.dart';
 import '../features/home/presentation/today_screen.dart';
 import '../features/insights/presentation/insight_detail_screen.dart';
 import '../features/notifications/presentation/notification_settings_screen.dart';
@@ -34,12 +30,8 @@ abstract final class AppRoutes {
   /// 디자인 갤러리(개발용). 디버그 빌드에서만 등록된다.
   static const devGallery = '/dev/gallery';
 
-  // 인증·온보딩
+  // 인증
   static const login = '/login';
-  static const signup = '/signup';
-  static const signupConsent = '/signup/consent';
-  static const onboarding = '/onboarding';
-  static const onboardingPermission = '/onboarding/permission';
   static const accountDelete = '/account/delete';
   static const notifications = '/notifications';
   static const notificationSettings = '/notifications/settings';
@@ -82,24 +74,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.login,
         pageBuilder: (context, state) => _fade(state, const LoginScreen()),
-      ),
-      GoRoute(
-        path: AppRoutes.signup,
-        pageBuilder: (context, state) => _swipe(state, const SignupScreen()),
-      ),
-      GoRoute(
-        path: AppRoutes.signupConsent,
-        pageBuilder: (context, state) => _swipe(state, const ConsentScreen()),
-      ),
-      GoRoute(
-        path: AppRoutes.onboarding,
-        pageBuilder: (context, state) =>
-            _swipe(state, const OnboardingScreen()),
-      ),
-      GoRoute(
-        path: AppRoutes.onboardingPermission,
-        pageBuilder: (context, state) =>
-            _swipe(state, const PermissionScreen()),
       ),
       GoRoute(
         path: AppRoutes.notifications,

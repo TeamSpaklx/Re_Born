@@ -245,15 +245,15 @@
 |---|---|---|
 | `EmotionFace` | `features/entries/.../emotion_face.dart` | 감정 캐릭터 이미지 7종 |
 | `CharacterAvatar` · `UserAvatar` | `shared/widgets/` | 캐릭터 기반 임시 프로필 · 사용자 사진/기본 캐릭터 |
-| `SocialLoginButton` · `SocialLoginButtonPair` · `SocialLoginButtons` | `features/auth/.../social_login_buttons.dart` | Figma `8877:1931`: 높이 55 알약(Figma 메모대로 두 버튼 높이 통일), 아이콘 24 + 간격 16 + 14 SemiBold −0.35, 버튼 사이 16. 구글(위) 흰 배경·`socialBorder` `#E5E5E5` 테두리, 카카오(아래) `kakaoYellow`. 한쪽을 누르면 끝날 때까지 두 버튼 모두 막고 누른 버튼에 로딩 표시(추정). 가입 화면은 `SocialLoginButtons`("또는" 구분선 포함) |
+| `SocialLoginButton` · `SocialLoginButtonPair` | `features/auth/.../social_login_buttons.dart` | Figma `8877:1931`: 높이 55 알약(Figma 메모대로 두 버튼 높이 통일), 아이콘 24 + 간격 16 + 14 SemiBold −0.35, 버튼 사이 16. 구글(위) 흰 배경·`socialBorder` `#E5E5E5` 테두리, 카카오(아래) `kakaoYellow`. 한쪽을 누르면 끝날 때까지 두 버튼 모두 막고 누른 버튼에 로딩 표시(추정) |
 | `EmotionPicker`, `EmotionRatioBar` | `emotion_picker.dart` | 기록 작성의 감정 선택(4열×2행), 감정 비율 막대 |
 | `MonthCalendar` | `shared/widgets/month_calendar.dart` | 기록 탭 달력(날짜 아래 마커, 미래 날짜 비활성) |
 | `DonutChart` | `donut_chart.dart` | 인물 상세 감정 분포 |
 | `IndexLineChart` | `features/relations/.../index_line_chart.dart` | 관계 지수 곡선 + 영역 + 오늘 점 |
 | `StepProgressBar` | `step_progress_bar.dart` | 가입 4단계 |
 | `SelectCard` | `select_card.dart` | 온보딩 관계 유형 |
-| `ConsentRow` | `consent_row.dart` | 약관 동의(전체 동의 강조형 포함) |
-| `PermissionRow` | `permission_row.dart` | 알림 안내 |
+| `ConsentRow` | `consent_row.dart` | 확인 체크(계정 삭제), 전체 동의 강조형 포함 |
+| `PermissionRow` | `permission_row.dart` | 권한·기능 안내 행(지금은 디자인 갤러리에서만, 가입 단계 화면을 지워서) |
 | `SummaryCard` | `summary_card.dart` | 전체 탭·관계 탭·인사이트 상세의 수치 2~3칸 |
 | `NotificationRow` | `notification_row.dart` | 알림 목록(읽지 않음 강조) |
 | `SwipeToDelete` | `swipe_to_delete.dart` | 기록·체크리스트 밀어서 삭제(확인 팝업 선택) |

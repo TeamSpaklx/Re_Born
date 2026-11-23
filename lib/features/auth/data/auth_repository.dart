@@ -11,11 +11,11 @@ abstract interface class AuthRepository {
   Future<AuthUser> signUp({required String email, required String password});
 
   /// 구글·카카오로 로그인(처음이면 계정이 만들어진다). 실제 연결은 Supabase OAuth로 교체한다.
-  /// 약관 동의를 아직 마치지 않은 계정이면 [SocialSignInResult.isNewUser]가 true다.
+  /// 첫 설정(닉네임·동의)을 아직 마치지 않은 계정이면 [SocialSignInResult.isNewUser]가 true다.
   /// 사용자가 로그인 창을 닫으면 [AuthFailureType.cancelled]를 던진다.
   Future<SocialSignInResult> signInWithSocial(SocialProvider provider);
 
-  /// 소셜 신규 가입의 약관 동의를 마쳤다고 표시한다. 이후 로그인은 "기존 회원"이 된다.
+  /// 신규 회원의 첫 설정(닉네임·동의 저장)을 마쳤다고 표시한다. 이후 로그인은 "기존 회원"이 된다.
   /// (Supabase에서는 사용자 프로필 행을 만드는 시점.)
   Future<void> completeSocialSignup();
 

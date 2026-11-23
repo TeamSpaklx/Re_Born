@@ -10,7 +10,7 @@ abstract interface class AuthSessionStore {
   /// 지금 로그인한 소셜 종류. 로그아웃 상태면 null. 첫 화면을 정해야 해서 동기로 읽는다.
   SocialProvider? get session;
 
-  /// 약관 동의까지 마친 소셜 종류(다음에 들어오면 "기존 회원"으로 본다).
+  /// 첫 설정까지 마친 소셜 종류(다음에 들어오면 "기존 회원"으로 본다).
   Set<SocialProvider> get members;
 
   Future<void> save({

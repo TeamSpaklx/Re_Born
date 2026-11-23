@@ -15,6 +15,7 @@ import 'package:reborn_app/features/auth/models/auth_user.dart';
 import 'package:reborn_app/features/auth/presentation/auth_providers.dart';
 import 'package:reborn_app/features/auth/presentation/login_screen.dart';
 import 'package:reborn_app/features/home/presentation/today_screen.dart';
+import 'package:reborn_app/features/settings/presentation/settings_providers.dart';
 
 import '../../helpers/fakes.dart';
 
@@ -131,42 +132,22 @@ void main() {
     );
   });
 
-  testWidgets('신규 회원은 약관 동의로 가고, 동의를 마쳐야 로그인 상태가 저장된다', (tester) async {
+  testWidgets('신규 회원도 바로 투데이로 가고, 닉네임·필수 동의가 기본값으로 저장된다', (tester) async {
     final c = await pumpLogin(tester);
 
     await tester.tap(find.byKey(const Key('social-kakao')));
     await tester.pumpAndSettle();
-    expect(find.text('약관에\n동의해 주세요'), findsOneWidget);
-    expect(store.session, isNull);
 
-    await tester.tap(find.byKey(const Key('consent-all')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('동의하고 가입하기'));
-    await tester.pumpAndSettle();
-
-    expect(find.byKey(const Key('onboarding-name')), findsOneWidget);
+    expect(find.byType(TodayScreen), findsOneWidget);
     expect(c.read(sessionProvider)?.provider, SocialProvider.kakao);
+    final settings = await c.read(settingsProvider.future);
+    expect(settings.nickname, '카카오 사용자');
+    expect(settings.consents.privacy, isTrue);
+    expect(settings.consents.aiAnalysis, isTrue);
+    expect(settings.consents.analytics, isFalse);
+    // 로그인 상태가 바로 기기에 남고, 다음부터는 기존 회원이다.
     expect(store.session, SocialProvider.kakao);
     expect(store.members, {SocialProvider.kakao});
-  });
-
-  testWidgets('약관 동의에서 뒤로 가면 가입이 취소되고 로그인 화면으로 돌아온다', (tester) async {
-    final c = await pumpLogin(tester);
-    await tester.tap(find.byKey(const Key('social-kakao')));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.bySemanticsLabel('뒤로'));
-    await tester.pumpAndSettle();
-
-    expect(find.byType(LoginScreen), findsOneWidget);
-    expect(c.read(sessionProvider), isNull);
-    expect(store.session, isNull);
-    expect(store.members, isEmpty);
-
-    // 다시 눌러도 약관 동의부터 한다.
-    await tester.tap(find.byKey(const Key('social-kakao')));
-    await tester.pumpAndSettle();
-    expect(find.text('약관에\n동의해 주세요'), findsOneWidget);
   });
 
   testWidgets('사용자가 로그인 창을 닫으면 안내 없이 로그인 화면에 그대로 있다', (tester) async {
@@ -200,7 +181,7 @@ void main() {
     auth.nextOutcome = SocialOutcome.auto;
     await tester.tap(find.byKey(const Key('social-kakao')));
     await tester.pumpAndSettle();
-    expect(find.text('약관에\n동의해 주세요'), findsOneWidget);
+    expect(find.byType(TodayScreen), findsOneWidget);
     expect(auth.socialCalls, 2);
   });
 
@@ -251,7 +232,7 @@ void main() {
 
     auth.hold!.complete();
     await tester.pumpAndSettle();
-    expect(find.text('약관에\n동의해 주세요'), findsOneWidget);
+    expect(find.byType(TodayScreen), findsOneWidget);
   });
 
   testWidgets('약관 안내의 두 링크가 각각 내용을 연다', (tester) async {
@@ -288,7 +269,7 @@ void main() {
     final repo = InMemoryAuthRepository(store: s);
 
     await repo.signInWithSocial(SocialProvider.google);
-    expect(s.session, isNull, reason: '약관 동의 전');
+    expect(s.session, isNull, reason: '첫 설정 저장 전');
     await repo.completeSocialSignup();
     expect(s.session, SocialProvider.google);
 

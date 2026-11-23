@@ -16,7 +16,7 @@ import '../../../shared/widgets/pressable.dart';
 import '../models/auth_user.dart';
 import 'auth_providers.dart';
 
-/// 소셜 로그인을 처리한다: 약관 동의 전인 사용자는 약관 동의(→ 온보딩)로, 기존 사용자는 홈으로 보낸다.
+/// 소셜 로그인을 처리한다: 성공하면 신규·기존 회원 모두 바로 투데이로 보낸다.
 ///
 /// - 사용자가 로그인 창을 닫으면(취소) 아무 안내 없이 그대로 둔다.
 /// - 네트워크·알 수 없는 오류는 토스트로 알리고, 알 수 없는 오류는 오류 기록에 남긴다.
@@ -28,14 +28,8 @@ Future<void> handleSocialSignIn(
 ) async {
   final router = GoRouter.of(context);
   try {
-    final isNew = await ref
-        .read(authActionsProvider)
-        .signInWithSocial(provider);
-    if (isNew) {
-      router.push(AppRoutes.signupConsent);
-    } else {
-      router.go(AppRoutes.today);
-    }
+    await ref.read(authActionsProvider).signInWithSocial(provider);
+    router.go(AppRoutes.today);
   } on AuthFailure catch (failure) {
     if (failure.type == AuthFailureType.cancelled) return;
     if (context.mounted) showAppToast(context, failure.message);
@@ -50,14 +44,7 @@ Future<void> handleSocialSignIn(
 /// 구글·카카오 버튼 한 쌍(구글 위, 카카오 아래, Figma 8877:1931).
 /// 하나를 누르면 끝날 때까지 두 버튼 모두 막고, 누른 버튼에 로딩 표시를 한다.
 class SocialLoginButtonPair extends ConsumerStatefulWidget {
-  const SocialLoginButtonPair({
-    super.key,
-    this.googleLabel = '구글로 로그인',
-    this.kakaoLabel = '카카오로 로그인',
-  });
-
-  final String googleLabel;
-  final String kakaoLabel;
+  const SocialLoginButtonPair({super.key});
 
   @override
   ConsumerState<SocialLoginButtonPair> createState() =>
@@ -86,7 +73,7 @@ class _SocialLoginButtonPairState extends ConsumerState<SocialLoginButtonPair> {
       children: [
         SocialLoginButton(
           key: const Key('social-google'),
-          label: widget.googleLabel,
+          label: '구글로 로그인',
           iconAsset: AppAssets.googleG,
           background: colors.cardWhite,
           foreground: colors.textBlack,
@@ -97,7 +84,7 @@ class _SocialLoginButtonPairState extends ConsumerState<SocialLoginButtonPair> {
         const SizedBox(height: LoginLayout.buttonGap),
         SocialLoginButton(
           key: const Key('social-kakao'),
-          label: widget.kakaoLabel,
+          label: '카카오로 로그인',
           iconAsset: AppAssets.kakaoBubble,
           background: colors.kakaoYellow,
           foreground: colors.textBlack,
@@ -105,57 +92,6 @@ class _SocialLoginButtonPairState extends ConsumerState<SocialLoginButtonPair> {
           onTap: idle ? () => _signIn(SocialProvider.kakao) : null,
         ),
       ],
-    );
-  }
-}
-
-/// 가입 화면용: 소셜 버튼 한 쌍과 "또는 …" 구분선. [dividerOnTop]이면 구분선이 위에 온다.
-class SocialLoginButtons extends StatelessWidget {
-  const SocialLoginButtons({
-    super.key,
-    required this.dividerLabel,
-    this.dividerOnTop = false,
-  });
-
-  final String dividerLabel;
-  final bool dividerOnTop;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    final divider = Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.space20),
-      child: Row(
-        children: [
-          Expanded(
-            child: ColoredBox(
-              color: colors.chip,
-              child: const SizedBox(height: 1),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space12),
-            child: Text(
-              dividerLabel,
-              style: AppTextStyles.body.copyWith(color: colors.textSecondary),
-            ),
-          ),
-          Expanded(
-            child: ColoredBox(
-              color: colors.chip,
-              child: const SizedBox(height: 1),
-            ),
-          ),
-        ],
-      ),
-    );
-    const buttons = SocialLoginButtonPair(
-      googleLabel: '구글로 계속하기',
-      kakaoLabel: '카카오로 계속하기',
-    );
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: dividerOnTop ? [divider, buttons] : [buttons, divider],
     );
   }
 }
