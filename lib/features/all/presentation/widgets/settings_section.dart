@@ -42,7 +42,7 @@ class SettingsSection extends ConsumerWidget {
     );
     if (!ok) return;
     await ref.read(authActionsProvider).signOut();
-    if (context.mounted) context.go(AppRoutes.today);
+    if (context.mounted) context.go(AppRoutes.login);
   }
 
   @override

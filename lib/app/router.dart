@@ -5,10 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/all/presentation/all_screen.dart';
 import '../features/auth/presentation/account_delete_screen.dart';
-import '../features/auth/presentation/consent_screen.dart';
-import '../features/auth/presentation/onboarding_screen.dart';
-import '../features/auth/presentation/permission_screen.dart';
-import '../features/auth/presentation/signup_screen.dart';
+import '../features/auth/presentation/login_screen.dart';
 import '../features/home/presentation/today_screen.dart';
 import '../features/insights/presentation/insight_detail_screen.dart';
 import '../features/notifications/presentation/notification_settings_screen.dart';
@@ -33,11 +30,8 @@ abstract final class AppRoutes {
   /// 디자인 갤러리(개발용). 디버그 빌드에서만 등록된다.
   static const devGallery = '/dev/gallery';
 
-  // 인증·온보딩
-  static const signup = '/signup';
-  static const signupConsent = '/signup/consent';
-  static const onboarding = '/onboarding';
-  static const onboardingPermission = '/onboarding/permission';
+  // 인증
+  static const login = '/login';
   static const accountDelete = '/account/delete';
   static const notifications = '/notifications';
   static const notificationSettings = '/notifications/settings';
@@ -76,23 +70,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           pageBuilder: (context, state) =>
               _swipe(state, const DesignGalleryScreen()),
         ),
+      // 로그인은 뒤로 갈 곳이 없는 첫 화면이라 스와이프 백 없이, 스플래시 위로 서서히 나타난다.
       GoRoute(
-        path: AppRoutes.signup,
-        pageBuilder: (context, state) => _swipe(state, const SignupScreen()),
-      ),
-      GoRoute(
-        path: AppRoutes.signupConsent,
-        pageBuilder: (context, state) => _swipe(state, const ConsentScreen()),
-      ),
-      GoRoute(
-        path: AppRoutes.onboarding,
-        pageBuilder: (context, state) =>
-            _swipe(state, const OnboardingScreen()),
-      ),
-      GoRoute(
-        path: AppRoutes.onboardingPermission,
-        pageBuilder: (context, state) =>
-            _swipe(state, const PermissionScreen()),
+        path: AppRoutes.login,
+        pageBuilder: (context, state) => _fade(state, const LoginScreen()),
       ),
       GoRoute(
         path: AppRoutes.notifications,
@@ -157,19 +138,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       StatefulShellRoute.indexedStack(
         // 스플래시에서 넘어올 때 옆에서 밀리지 않고, 로고 화면 위로 서서히 나타난다.
         pageBuilder: (context, state, navigationShell) =>
-            CustomTransitionPage<void>(
-              key: state.pageKey,
-              transitionDuration: SplashLayout.fadeDuration,
-              reverseTransitionDuration: SplashLayout.fadeDuration,
-              transitionsBuilder: (context, animation, secondary, child) =>
-                  FadeTransition(
-                    opacity: animation.drive(
-                      CurveTween(curve: Curves.easeInOut),
-                    ),
-                    child: child,
-                  ),
-              child: MainShell(navigationShell: navigationShell),
-            ),
+            _fade(state, MainShell(navigationShell: navigationShell)),
         branches: [
           _branch(AppRoutes.today, const TodayScreen()),
           _branch(AppRoutes.relations, const RelationsScreen()),
@@ -182,6 +151,20 @@ final routerProvider = Provider<GoRouter>((ref) {
   ref.onDispose(router.dispose);
   return router;
 });
+
+/// 스플래시에서 넘어가는 첫 화면(투데이·로그인): 옆에서 밀리지 않고 로고 화면 위로 서서히 나타난다.
+Page<void> _fade(GoRouterState state, Widget child) =>
+    CustomTransitionPage<void>(
+      key: state.pageKey,
+      transitionDuration: SplashLayout.fadeDuration,
+      reverseTransitionDuration: SplashLayout.fadeDuration,
+      transitionsBuilder: (context, animation, secondary, child) =>
+          FadeTransition(
+            opacity: animation.drive(CurveTween(curve: Curves.easeInOut)),
+            child: child,
+          ),
+      child: child,
+    );
 
 /// 탭 위로 쌓이는 화면: 화면 어디서나 오른쪽으로 밀어 뒤로 갈 수 있다([SwipeBackPage]).
 Page<void> _swipe(GoRouterState state, Widget child) =>

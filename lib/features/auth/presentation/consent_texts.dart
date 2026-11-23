@@ -15,4 +15,12 @@ abstract final class ConsentTexts {
   static const analyticsTitle = '사용 분석';
   static const analytics =
       '앱을 더 좋게 만들기 위해 어떤 화면을 얼마나 쓰는지 통계로 살펴봐요. 기록 본문은 포함되지 않고, 동의하지 않아도 앱을 쓸 수 있어요.';
+
+  static const termsTitle = '서비스 이용약관';
+  static const terms =
+      '리본은 감정과 관계를 스스로 돌아보도록 돕는 기록 서비스예요.\n\n'
+      '• 기록과 분석 결과는 참고용이고 전문 상담을 대신하지 않아요.\n'
+      '• 다른 사람의 개인정보를 함부로 적거나 공유하지 말아 주세요.\n'
+      '• 계정과 모든 기록은 설정에서 언제든 삭제할 수 있어요.\n\n'
+      '자세한 약관은 출시 전에 확정해 이곳에 안내할게요.';
 }

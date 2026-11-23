@@ -9,11 +9,12 @@ import '../../../app/theme/app_assets.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../app/theme/app_text_styles.dart';
+import '../../auth/presentation/auth_providers.dart';
 import '../../home/presentation/home_providers.dart';
 import '../../settings/presentation/settings_providers.dart';
 
 /// 스플래시 화면(Figma 805:953): 흰 배경 한가운데에 로고, 아래에 팀 표기 "TeamSpaklx".
-/// 홈 화면 데이터가 준비되는 대로 투데이(홈)로 넘어간다.
+/// 로그인한 상태면 홈 화면 데이터가 준비되는 대로 투데이(홈)로, 아니면 로그인 화면으로 넘어간다.
 /// 로고는 처음부터 끝까지 같은 불투명 원본 색으로 그린다(투명도·크기 애니메이션 없음).
 /// 홈으로 넘어갈 때는 홈이 이 화면 위로 서서히 나타난다(`router.dart`의 크로스페이드).
 class SplashScreen extends ConsumerStatefulWidget {
@@ -35,10 +36,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   }
 
   /// 스플래시가 끝난 뒤 어디로 갈지는 이 함수 하나에서 정한다.
-  /// 지금은 로그인·온보딩 없이 최소 표시 시간과 홈 데이터 준비를 모두 기다린 뒤 투데이로 간다.
+  /// 로그인 상태가 아니면 최소 표시 시간만 지나고 로그인 화면으로 간다.
+  /// 로그인 상태면 최소 표시 시간과 홈 데이터 준비를 모두 기다린 뒤 투데이로 간다.
   /// 홈 데이터가 오래 걸리거나 실패해도 [SplashLayout.maxDuration] 안에 넘어간다
   /// (실패하면 홈이 자체 오류 화면을 보여 준다).
   Future<void> _goNext() async {
+    if (ref.read(sessionProvider) == null) {
+      await Future<void>.delayed(SplashLayout.minDuration);
+      if (mounted) context.go(AppRoutes.login);
+      return;
+    }
     final homeReady = ref
         .read(homeSummaryProvider.future)
         .then<void>((_) {}, onError: (_) {});

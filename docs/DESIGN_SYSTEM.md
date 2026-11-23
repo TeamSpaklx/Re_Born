@@ -180,7 +180,7 @@
 
 ## 6. 아이콘·일러스트
 
-- **아이콘:** 하단 탭 투데이·관계·기록은 Phosphor, 전체는 Iconsax(`menu`). **앱에 새 아이콘이 필요하면 Iconsax(Linear)를 씁니다**: Iconsax 공개 저장소(`lusaxweb/iconsax`)의 SVG를 받아 `assets/icons/ui/ix_*.svg`로 넣고 `AppAssets`에 상수를 추가합니다(아이콘 패키지는 쓰지 않음). 지금 쓰는 것: add, edit, camera, gallery, eye, eye-off, trash. 소셜 로그인 마크(`google_g`, `kakao_bubble`)는 단순화한 로고라 출시 전 브랜드 가이드 확인이 필요합니다. 크기 20(행 화살표·체크), 24(체크 원), 28(탭·벨).
+- **아이콘:** 하단 탭 투데이·관계·기록은 Phosphor, 전체는 Iconsax(`menu`). **앱에 새 아이콘이 필요하면 Iconsax(Linear)를 씁니다**: Iconsax 공개 저장소(`lusaxweb/iconsax`)의 SVG를 받아 `assets/icons/ui/ix_*.svg`로 넣고 `AppAssets`에 상수를 추가합니다(아이콘 패키지는 쓰지 않음). 지금 쓰는 것: add, edit, camera, gallery, eye, eye-off, trash. 소셜 로그인 마크(`google_g` 24, `kakao_bubble` 24×23)는 Figma 로그인 화면(`8877:1934`·`8877:1938`)에서 받은 그대로이고, 출시 전 각 회사 브랜드 가이드 확인이 필요합니다. 크기 20(행 화살표·체크), 24(체크 원), 28(탭·벨).
 - **마스코트(여우원숭이, `AppAssets.mascotLemur`):** 홈 기록 카드(버튼 뒤에서 얼굴만), 빈·오류 상태(120×120, `EmptyState(showMascot: true)`).
 - **감정 캐릭터 7종:** `assets/images/emotions/`의 PNG(`AppAssets.emotionImages`)를 `EmotionFace`로 그립니다(달력 20, 카드 44, 상세 64, 선택 격자 칸). 정식 에셋이 오면 같은 파일 이름으로 교체합니다.
 - 이모지는 쓰지 않습니다(8장 글자 규칙).
@@ -238,6 +238,7 @@
 | 조용한 빈 상태 `QuietEmptyState` | `empty_state.dart` | Figma 알림 `834:1148`: 마스코트 151 + 한 줄(20 Regular `emptyText`). `ComponentLayout.quietEmptyAlignment`로 가운데보다 조금 위 | ✅ (Figma) |
 | 스켈레톤 `SkeletonPulse` · `SkeletonBox` · `SkeletonCard` · `SkeletonListCard` · `SkeletonList` | `skeleton.dart` | Figma 홈 스켈레톤 `834:2351`: 흰 카드(24) 위 `#E4E4E4` 막대(6). 한 화면을 `SkeletonPulse`로 감싸 1.2초 왕복으로 깜빡임(불투명도 1↔0.5, 추정), '동작 줄이기'면 정지, "불러오는 중"으로 한 번 읽힘. 홈은 `HomeSkeleton`(Figma 좌표 그대로), 기록·관계·알림 목록과 인물 그래프는 같은 조각으로 만든 추정 배치 | ✅ |
 | 앱 잠금 화면 `LockScreen` | `lib/features/security/presentation/lock_screen.dart` | Figma `834:1480`·`834:2141`: 흰 배경(`splashBackground`) 가운데 로고 160(스플래시와 같은 `SplashLayout` 값이라 이어져 보임), 시스템 인증 창은 OS가 위에 띄움. 실패 시 아래에 글자 버튼 "인증에 실패하거나 비밀번호를 잊으셨나요?" 314×45, 안전 영역 위 30, 14 SemiBold −0.35 `lockHelpText`(`rgba(76,83,95,0.8)`), 누르는 동안 알약 배경 `lockHelpPressed`(`rgba(160,167,180,0.2)`). 앱 전환 화면 덮개는 버튼 없이 로고만 | ✅ (Figma) |
+| 로그인 화면 `LoginScreen` | `lib/features/auth/presentation/login_screen.dart` | Figma `8877:1929`: 흰 배경(`splashBackground`), RE:BORN 워드마크 314×78(`AppAssets.logo`, Figma 위쪽 331을 기기 높이 비율로 `LoginLayout.logoAlignment`). 아래에 구글·카카오 버튼(`SocialLoginButtonPair`), 버튼 끝에서 57 아래 약관 안내 12 Regular −0.3 줄 높이 14 `loginLegalText`, 안전 영역 위 14. Figma 메모대로 "개인정보 보호 정책"·"서비스 약관"을 각각 링크로 나눠 시트로 엶(밑줄은 추정). 디버그 빌드에서만 워드마크를 길게 누르면 다음 로그인 결과를 고르는 패널(출시 빌드에는 없음) | ✅ (Figma) |
 | 오류 상태 `ErrorState` | `empty_state.dart` | "불러오지 못했어요" + "잠시 뒤에 다시 시도해 주세요." + "다시 시도". 오류 원인(기술 문구)은 보이지 않음 | ✅ |
 
 ### 7.6 화면 흐름용 컴포넌트 (구현됨, 디버그 갤러리 "감정·기록" 이하에서 확인)
@@ -245,15 +246,15 @@
 |---|---|---|
 | `EmotionFace` | `features/entries/.../emotion_face.dart` | 감정 캐릭터 이미지 7종 |
 | `CharacterAvatar` · `UserAvatar` | `shared/widgets/` | 캐릭터 기반 임시 프로필 · 사용자 사진/기본 캐릭터 |
-| `SocialLoginButtons` | `features/auth/.../social_login_buttons.dart` | 카카오·Google 로그인 버튼 + "또는" 구분선 |
+| `SocialLoginButton` · `SocialLoginButtonPair` | `features/auth/.../social_login_buttons.dart` | Figma `8877:1931`: 높이 55 알약(Figma 메모대로 두 버튼 높이 통일), 아이콘 24 + 간격 16 + 14 SemiBold −0.35, 버튼 사이 16. 구글(위) 흰 배경·`socialBorder` `#E5E5E5` 테두리, 카카오(아래) `kakaoYellow`. 한쪽을 누르면 끝날 때까지 두 버튼 모두 막고 누른 버튼에 로딩 표시(추정) |
 | `EmotionPicker`, `EmotionRatioBar` | `emotion_picker.dart` | 기록 작성의 감정 선택(4열×2행), 감정 비율 막대 |
 | `MonthCalendar` | `shared/widgets/month_calendar.dart` | 기록 탭 달력(날짜 아래 마커, 미래 날짜 비활성) |
 | `DonutChart` | `donut_chart.dart` | 인물 상세 감정 분포 |
 | `IndexLineChart` | `features/relations/.../index_line_chart.dart` | 관계 지수 곡선 + 영역 + 오늘 점 |
 | `StepProgressBar` | `step_progress_bar.dart` | 가입 4단계 |
 | `SelectCard` | `select_card.dart` | 온보딩 관계 유형 |
-| `ConsentRow` | `consent_row.dart` | 약관 동의(전체 동의 강조형 포함) |
-| `PermissionRow` | `permission_row.dart` | 알림 안내 |
+| `ConsentRow` | `consent_row.dart` | 확인 체크(계정 삭제), 전체 동의 강조형 포함 |
+| `PermissionRow` | `permission_row.dart` | 권한·기능 안내 행(지금은 디자인 갤러리에서만, 가입 단계 화면을 지워서) |
 | `SummaryCard` | `summary_card.dart` | 전체 탭·관계 탭·인사이트 상세의 수치 2~3칸 |
 | `NotificationRow` | `notification_row.dart` | 알림 목록(읽지 않음 강조) |
 | `SwipeToDelete` | `swipe_to_delete.dart` | 기록·체크리스트 밀어서 삭제(확인 팝업 선택) |

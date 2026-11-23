@@ -8,6 +8,8 @@ import 'package:reborn_app/app/router.dart';
 import 'package:reborn_app/app/theme/app_assets.dart';
 import 'package:reborn_app/app/theme/app_spacing.dart';
 import 'package:reborn_app/app/theme/app_theme.dart';
+import 'package:reborn_app/features/auth/data/in_memory_auth_repository.dart';
+import 'package:reborn_app/features/auth/presentation/login_screen.dart';
 import 'package:reborn_app/features/entries/data/in_memory_entries_repository.dart';
 import 'package:reborn_app/features/entries/models/entry.dart';
 import 'package:reborn_app/features/home/presentation/today_screen.dart';
@@ -43,6 +45,7 @@ void main() {
   Future<void> pumpSplash(
     WidgetTester tester, {
     List<Override> overrides = const [],
+    bool signedIn = true,
   }) async {
     tester.view.physicalSize = const Size(402, 874);
     tester.view.devicePixelRatio = 1;
@@ -55,6 +58,11 @@ void main() {
         overrides: [
           initialLocationProvider.overrideWithValue(AppRoutes.splash),
           notificationServiceProvider.overrideWithValue(notifications),
+          authRepositoryProvider.overrideWithValue(
+            InMemoryAuthRepository(
+              signedInEmail: signedIn ? InMemoryAuthRepository.demoEmail : null,
+            ),
+          ),
           ...overrides,
         ],
         child: const RebornApp(),
@@ -126,6 +134,30 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(SplashScreen), findsNothing);
     expect(find.byType(TodayScreen), findsOneWidget);
+  });
+
+  testWidgets('로그인하지 않았으면 최소 표시 시간 뒤 로그인 화면으로 간다(홈 데이터는 기다리지 않는다)', (
+    tester,
+  ) async {
+    await pumpSplash(
+      tester,
+      signedIn: false,
+      overrides: [
+        entriesRepositoryProvider.overrideWithValue(
+          _SlowEntries(const Duration(seconds: 10)),
+        ),
+      ],
+    );
+    await tester.pump(
+      SplashLayout.minDuration - const Duration(milliseconds: 1),
+    );
+    expect(find.byType(LoginScreen), findsNothing);
+
+    await tester.pump(const Duration(milliseconds: 1));
+    await tester.pumpAndSettle();
+    expect(find.byType(LoginScreen), findsOneWidget);
+    expect(find.byType(TodayScreen), findsNothing);
+    await tester.pump(const Duration(seconds: 10));
   });
 
   testWidgets('홈 데이터가 늦으면 준비될 때까지 기다린다', (tester) async {

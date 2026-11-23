@@ -61,6 +61,8 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.lockHelpPressed,
     required this.kakaoYellow,
     required this.onKakao,
+    required this.socialBorder,
+    required this.loginLegalText,
     required this.emotionJoy,
     required this.emotionLove,
     required this.emotionExcited,
@@ -176,6 +178,12 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color kakaoYellow;
   final Color onKakao;
 
+  /// 로그인 화면 구글 버튼 테두리 `#E5E5E5` (Figma 8877:1932).
+  final Color socialBorder;
+
+  /// 로그인 화면 약관 안내 글자 `rgba(76,83,95,0.8)` (Figma 8877:1940). 값은 [lockHelpText]와 같지만 쓰임이 달라 따로 둔다.
+  final Color loginLegalText;
+
   /// 감정 7색(RebornMood 캐릭터의 이름표 색에서 뽑음): 기쁨
   final Color emotionJoy;
 
@@ -252,6 +260,8 @@ class AppColors extends ThemeExtension<AppColors> {
     lockHelpPressed: Color(0x33A0A7B4),
     kakaoYellow: Color(0xFFFEE500),
     onKakao: Color(0xFF191919),
+    socialBorder: Color(0xFFE5E5E5),
+    loginLegalText: Color(0xCC4C535F),
     emotionJoy: Color(0xFFF4B1CB),
     emotionLove: Color(0xFFFF9EC4),
     emotionExcited: Color(0xFFFAD599),
@@ -316,6 +326,8 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? lockHelpPressed,
     Color? kakaoYellow,
     Color? onKakao,
+    Color? socialBorder,
+    Color? loginLegalText,
     Color? emotionJoy,
     Color? emotionLove,
     Color? emotionExcited,
@@ -378,6 +390,8 @@ class AppColors extends ThemeExtension<AppColors> {
       lockHelpPressed: lockHelpPressed ?? this.lockHelpPressed,
       kakaoYellow: kakaoYellow ?? this.kakaoYellow,
       onKakao: onKakao ?? this.onKakao,
+      socialBorder: socialBorder ?? this.socialBorder,
+      loginLegalText: loginLegalText ?? this.loginLegalText,
       emotionJoy: emotionJoy ?? this.emotionJoy,
       emotionLove: emotionLove ?? this.emotionLove,
       emotionExcited: emotionExcited ?? this.emotionExcited,
@@ -446,6 +460,8 @@ class AppColors extends ThemeExtension<AppColors> {
       lockHelpPressed: mix(lockHelpPressed, other.lockHelpPressed),
       kakaoYellow: mix(kakaoYellow, other.kakaoYellow),
       onKakao: mix(onKakao, other.onKakao),
+      socialBorder: mix(socialBorder, other.socialBorder),
+      loginLegalText: mix(loginLegalText, other.loginLegalText),
       emotionJoy: mix(emotionJoy, other.emotionJoy),
       emotionLove: mix(emotionLove, other.emotionLove),
       emotionExcited: mix(emotionExcited, other.emotionExcited),

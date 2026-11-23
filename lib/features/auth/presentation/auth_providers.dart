@@ -17,60 +17,7 @@ final sessionProvider = NotifierProvider<SessionNotifier, AuthUser?>(
   SessionNotifier.new,
 );
 
-/// 가입 화면들(정보 입력 → 동의)이 값을 이어 받는 임시 보관함.
-class SignupDraft {
-  const SignupDraft({
-    this.email = '',
-    this.password = '',
-    this.nickname = '',
-    this.consents = const Consents(
-      privacy: false,
-      aiAnalysis: false,
-      analytics: false,
-    ),
-    this.social,
-  });
-
-  final String email;
-  final String password;
-  final String nickname;
-  final Consents consents;
-
-  /// 소셜 로그인으로 들어온 신규 가입이면 그 종류(비밀번호 입력 없이 약관 동의부터 이어 간다).
-  final SocialProvider? social;
-
-  SignupDraft copyWith({
-    String? email,
-    String? password,
-    String? nickname,
-    Consents? consents,
-    SocialProvider? social,
-  }) {
-    return SignupDraft(
-      email: email ?? this.email,
-      password: password ?? this.password,
-      nickname: nickname ?? this.nickname,
-      consents: consents ?? this.consents,
-      social: social ?? this.social,
-    );
-  }
-}
-
-class SignupDraftNotifier extends Notifier<SignupDraft> {
-  @override
-  SignupDraft build() => const SignupDraft();
-
-  void update(SignupDraft Function(SignupDraft) change) =>
-      state = change(state);
-
-  void clear() => state = const SignupDraft();
-}
-
-final signupDraftProvider = NotifierProvider<SignupDraftNotifier, SignupDraft>(
-  SignupDraftNotifier.new,
-);
-
-/// 로그인·가입·로그아웃·계정 삭제. 실패하면 [AuthFailure]가 그대로 나간다.
+/// 로그인·로그아웃·계정 삭제. 실패하면 [AuthFailure]가 그대로 나간다.
 class AuthActions {
   AuthActions(this._ref);
 
@@ -83,59 +30,38 @@ class AuthActions {
     _ref.read(sessionProvider.notifier).set(user);
   }
 
-  /// 가입을 끝내고 닉네임·동의를 저장한다.
-  Future<void> signUp(SignupDraft draft) async {
-    final user = await _ref
-        .read(authRepositoryProvider)
-        .signUp(email: draft.email, password: draft.password);
-    final settings = _ref.read(settingsRepositoryProvider);
-    final current = await settings.get();
-    await settings.save(
-      current.copyWith(
-        nickname: draft.nickname.trim(),
-        consents: draft.consents,
-      ),
-    );
-    _ref.read(signupDraftProvider.notifier).clear();
-    _ref.read(sessionProvider.notifier).set(user);
-    _ref.read(dataRevisionProvider.notifier).bump();
-  }
+  /// 소셜 로그인이 이 시간 안에 끝나지 않으면 네트워크 문제로 본다.
+  static const socialSignInTimeout = Duration(seconds: 30);
 
-  /// 구글·카카오 로그인. 처음 온 사용자면 `true`를 돌려주고, 약관 동의부터 이어 가도록 가입 임시 보관함에 표시한다.
-  Future<bool> signInWithSocial(SocialProvider provider) async {
-    final pendingSignup = _ref.read(signupDraftProvider).social;
-    final result = await _ref
-        .read(authRepositoryProvider)
-        .signInWithSocial(provider);
-    _ref.read(sessionProvider.notifier).set(result.user);
+  /// 구글·카카오 로그인. 끝나면 신규·기존 회원 모두 바로 투데이로 간다.
+  /// 처음 들어온 사용자는 로그인 화면 문구("로그인은 … 동의하는 것으로 간주")대로
+  /// 필수 동의(개인정보·감정 분석)를 켜고, 닉네임은 "카카오 사용자" 같은 임시값으로 시작한다.
+  /// 시간이 너무 걸리면 [AuthFailureType.network]로 실패한다.
+  Future<void> signInWithSocial(SocialProvider provider) async {
+    final repo = _ref.read(authRepositoryProvider);
+    final result = await repo
+        .signInWithSocial(provider)
+        .timeout(
+          socialSignInTimeout,
+          onTimeout: () => throw const AuthFailure(AuthFailureType.network),
+        );
     if (result.isNewUser) {
-      _ref
-          .read(signupDraftProvider.notifier)
-          .update(
-            (d) => d.copyWith(
-              social: provider,
-              nickname: '${provider.label} 사용자',
-              email: result.user.email,
-            ),
-          );
-    } else if (pendingSignup != provider) {
-      _ref.read(signupDraftProvider.notifier).clear();
+      final settings = _ref.read(settingsRepositoryProvider);
+      final current = await settings.get();
+      await settings.save(
+        current.copyWith(
+          nickname: '${provider.label} 사용자',
+          consents: const Consents(
+            privacy: true,
+            aiAnalysis: true,
+            analytics: false,
+          ),
+        ),
+      );
+      await repo.completeSocialSignup();
+      _ref.read(dataRevisionProvider.notifier).bump();
     }
-    return result.isNewUser || pendingSignup == provider;
-  }
-
-  /// 소셜 신규 가입의 약관 동의를 저장하고 가입을 마친다(계정은 로그인 때 이미 만들어졌다).
-  Future<void> completeSocialSignup(SignupDraft draft) async {
-    final settings = _ref.read(settingsRepositoryProvider);
-    final current = await settings.get();
-    await settings.save(
-      current.copyWith(
-        nickname: draft.nickname.trim(),
-        consents: draft.consents,
-      ),
-    );
-    _ref.read(signupDraftProvider.notifier).clear();
-    _ref.read(dataRevisionProvider.notifier).bump();
+    _ref.read(sessionProvider.notifier).set(result.user);
   }
 
   Future<void> signOut() async {

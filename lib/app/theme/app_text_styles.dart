@@ -67,6 +67,12 @@ abstract final class AppTextStyles {
   /// 잠금 화면 "인증에 실패하거나 비밀번호를 잊으셨나요?" 14 SemiBold (Figma 860:2655).
   static final lockHelp = _style(14, _semiBold, -0.35);
 
+  /// 로그인 화면 소셜 버튼 글자 14 SemiBold (Figma 8877:1935).
+  static final socialButton = _style(14, _semiBold, -0.35);
+
+  /// 로그인 화면 약관 안내 12 Regular, 두 줄 상자 높이 28이라 줄 높이 14 (Figma 8877:1940).
+  static final loginLegal = _style(12, _regular, -0.3, lineHeight: 14);
+
   /// 기록 카드(Before) 부제 16 Medium ("1분만 천천히 돌아볼까요?", 수정안).
   static final recordCardSubtitle = _style(16, _medium, -0.4);
 

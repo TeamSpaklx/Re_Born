@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -16,8 +16,11 @@ import '../../../shared/widgets/pressable.dart';
 import '../models/auth_user.dart';
 import 'auth_providers.dart';
 
-/// 소셜 로그인을 처리한다: 처음 온 사용자는 약관 동의(→ 온보딩)로, 기존 사용자는 홈으로 보낸다.
-/// 실패하면 안내 토스트를 보여 준다.
+/// 소셜 로그인을 처리한다: 성공하면 신규·기존 회원 모두 바로 투데이로 보낸다.
+///
+/// - 사용자가 로그인 창을 닫으면(취소) 아무 안내 없이 그대로 둔다.
+/// - 네트워크·알 수 없는 오류는 토스트로 알리고, 알 수 없는 오류는 오류 기록에 남긴다.
+/// 진행 중 연타 막기는 부르는 화면이 맡는다(버튼을 끄고 로딩 표시).
 Future<void> handleSocialSignIn(
   BuildContext context,
   WidgetRef ref,
@@ -25,15 +28,10 @@ Future<void> handleSocialSignIn(
 ) async {
   final router = GoRouter.of(context);
   try {
-    final isNew = await ref
-        .read(authActionsProvider)
-        .signInWithSocial(provider);
-    if (isNew) {
-      router.push(AppRoutes.signupConsent);
-    } else {
-      router.go(AppRoutes.today);
-    }
+    await ref.read(authActionsProvider).signInWithSocial(provider);
+    router.go(AppRoutes.today);
   } on AuthFailure catch (failure) {
+    if (failure.type == AuthFailureType.cancelled) return;
     if (context.mounted) showAppToast(context, failure.message);
   } catch (error, stack) {
     ref.read(appErrorLogProvider).record(error, stack, where: 'social-login');
@@ -43,78 +41,65 @@ Future<void> handleSocialSignIn(
   }
 }
 
-/// 구글·카카오 로그인 버튼 두 개. [dividerLabel]이 있으면 위나 아래에 "또는 …" 구분선을 둔다.
-class SocialLoginButtons extends ConsumerWidget {
-  const SocialLoginButtons({
-    super.key,
-    required this.dividerLabel,
-    this.dividerOnTop = false,
-  });
-
-  final String dividerLabel;
-  final bool dividerOnTop;
+/// 구글·카카오 버튼 한 쌍(구글 위, 카카오 아래, Figma 8877:1931).
+/// 하나를 누르면 끝날 때까지 두 버튼 모두 막고, 누른 버튼에 로딩 표시를 한다.
+class SocialLoginButtonPair extends ConsumerStatefulWidget {
+  const SocialLoginButtonPair({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SocialLoginButtonPair> createState() =>
+      _SocialLoginButtonPairState();
+}
+
+class _SocialLoginButtonPairState extends ConsumerState<SocialLoginButtonPair> {
+  SocialProvider? _busy;
+
+  Future<void> _signIn(SocialProvider provider) async {
+    if (_busy != null) return;
+    setState(() => _busy = provider);
+    try {
+      await handleSocialSignIn(context, ref, provider);
+    } finally {
+      if (mounted) setState(() => _busy = null);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final colors = context.colors;
-    final divider = Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.space20),
-      child: Row(
-        children: [
-          Expanded(
-            child: ColoredBox(
-              color: colors.chip,
-              child: const SizedBox(height: 1),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space12),
-            child: Text(
-              dividerLabel,
-              style: AppTextStyles.body.copyWith(color: colors.textSecondary),
-            ),
-          ),
-          Expanded(
-            child: ColoredBox(
-              color: colors.chip,
-              child: const SizedBox(height: 1),
-            ),
-          ),
-        ],
-      ),
-    );
-    final buttons = Column(
+    final idle = _busy == null;
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _SocialButton(
-          key: const Key('social-kakao'),
-          label: '카카오로 계속하기',
-          iconAsset: AppAssets.kakaoBubble,
-          background: colors.kakaoYellow,
-          foreground: colors.onKakao,
-          onTap: () => handleSocialSignIn(context, ref, SocialProvider.kakao),
-        ),
-        const SizedBox(height: AppSpacing.space12),
-        _SocialButton(
+        SocialLoginButton(
           key: const Key('social-google'),
-          label: 'Google로 계속하기',
+          label: '구글로 로그인',
           iconAsset: AppAssets.googleG,
           background: colors.cardWhite,
           foreground: colors.textBlack,
-          borderColor: colors.cardBorder,
-          onTap: () => handleSocialSignIn(context, ref, SocialProvider.google),
+          borderColor: colors.socialBorder,
+          loading: _busy == SocialProvider.google,
+          onTap: idle ? () => _signIn(SocialProvider.google) : null,
+        ),
+        const SizedBox(height: LoginLayout.buttonGap),
+        SocialLoginButton(
+          key: const Key('social-kakao'),
+          label: '카카오로 로그인',
+          iconAsset: AppAssets.kakaoBubble,
+          background: colors.kakaoYellow,
+          foreground: colors.textBlack,
+          loading: _busy == SocialProvider.kakao,
+          onTap: idle ? () => _signIn(SocialProvider.kakao) : null,
         ),
       ],
-    );
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: dividerOnTop ? [divider, buttons] : [buttons, divider],
     );
   }
 }
 
-class _SocialButton extends StatelessWidget {
-  const _SocialButton({
+/// 소셜 로그인 버튼 하나(Figma 8877:1932): 높이 55 알약, 아이콘 24 + 간격 16 + 14 SemiBold.
+/// [onTap]이 null이면 눌리지 않는다. [loading]이면 아이콘·글자 자리에 로딩 표시를 한다.
+class SocialLoginButton extends StatelessWidget {
+  const SocialLoginButton({
     super.key,
     required this.label,
     required this.iconAsset,
@@ -122,6 +107,7 @@ class _SocialButton extends StatelessWidget {
     required this.foreground,
     required this.onTap,
     this.borderColor,
+    this.loading = false,
   });
 
   final String label;
@@ -129,42 +115,53 @@ class _SocialButton extends StatelessWidget {
   final Color background;
   final Color foreground;
   final Color? borderColor;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
+  final bool loading;
 
   @override
   Widget build(BuildContext context) {
+    final tap = onTap;
     void press() {
       AppHaptics.tap();
-      onTap();
+      tap?.call();
     }
 
     return Semantics(
       button: true,
-      label: label,
+      enabled: tap != null,
+      label: loading ? '$label, 로그인 중' : label,
       excludeSemantics: true,
-      onTap: press,
+      onTap: tap == null ? null : press,
       child: Pressable(
-        onTap: press,
+        onTap: tap == null ? null : press,
         child: Container(
-          height: 52,
+          height: LoginLayout.buttonHeight,
           decoration: BoxDecoration(
             color: background,
-            borderRadius: BorderRadius.circular(AppRadii.button),
+            borderRadius: AppRadii.pillBorderRadius,
             border: borderColor == null
                 ? null
                 : Border.all(color: borderColor!),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SvgPicture.asset(iconAsset, width: 20, height: 20),
-              const SizedBox(width: AppSpacing.space8),
-              Text(
-                label,
-                style: AppTextStyles.buttonLarge.copyWith(color: foreground),
-              ),
-            ],
-          ),
+          alignment: Alignment.center,
+          child: loading
+              ? CupertinoActivityIndicator(color: foreground)
+              : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox.square(
+                      dimension: LoginLayout.iconSize,
+                      child: Center(child: SvgPicture.asset(iconAsset)),
+                    ),
+                    const SizedBox(width: LoginLayout.iconGap),
+                    Text(
+                      label,
+                      style: AppTextStyles.socialButton.copyWith(
+                        color: foreground,
+                      ),
+                    ),
+                  ],
+                ),
         ),
       ),
     );
