@@ -94,6 +94,19 @@ class _ConsentScreenState extends ConsumerState<ConsentScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    // 소셜 신규 가입 중 여기서 나가면(뒤로 버튼·스와이프) 가입을 취소하고 로그아웃한다.
+    // 동의를 마치면 임시 보관함이 비워져 있어 아무 일도 하지 않는다.
+    return PopScope<Object?>(
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop && ref.read(signupDraftProvider).social != null) {
+          ref.read(authActionsProvider).cancelSocialSignup();
+        }
+      },
+      child: _page(colors),
+    );
+  }
+
+  Widget _page(AppColors colors) {
     return PageScaffold(
       title: '약관에\n동의해 주세요',
       subtitle: '내 기록은 나만 볼 수 있어요.',

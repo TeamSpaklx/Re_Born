@@ -8,6 +8,7 @@ import 'package:reborn_app/features/auth/data/in_memory_auth_repository.dart';
 import 'package:reborn_app/features/auth/models/auth_user.dart';
 import 'package:reborn_app/features/auth/models/auth_validator.dart';
 import 'package:reborn_app/features/auth/presentation/auth_providers.dart';
+import 'package:reborn_app/features/auth/presentation/login_screen.dart';
 import 'package:reborn_app/features/auth/presentation/signup_screen.dart';
 import 'package:reborn_app/features/home/presentation/today_screen.dart';
 import 'package:reborn_app/features/people/presentation/people_providers.dart';
@@ -201,7 +202,7 @@ void main() {
 
     await tester.tap(find.text('처음으로'));
     await tester.pumpAndSettle();
-    expect(find.byType(TodayScreen), findsOneWidget);
+    expect(find.byType(LoginScreen), findsOneWidget);
   });
 
   group('소셜 로그인', () {
@@ -235,6 +236,8 @@ void main() {
       await tester.tap(find.bySemanticsLabel('뒤로'));
       await tester.pumpAndSettle();
       expect(find.byType(SignupScreen), findsOneWidget);
+      // 동의 없이 나가면 가입이 취소되어 로그인된 채 남지 않는다.
+      expect(c.read(sessionProvider), isNull);
 
       await tester.tap(find.byKey(const Key('social-kakao')));
       await tester.pumpAndSettle();
@@ -248,6 +251,7 @@ void main() {
       final c = await pumpAt(tester, AppRoutes.signup);
       final repo = c.read(authRepositoryProvider);
       await repo.signInWithSocial(SocialProvider.google); // 처음 한 번
+      await repo.completeSocialSignup(); // 약관 동의까지 마침
       await repo.signOut();
 
       await tester.tap(find.byKey(const Key('social-google')));

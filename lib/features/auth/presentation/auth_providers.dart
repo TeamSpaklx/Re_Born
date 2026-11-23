@@ -101,27 +101,35 @@ class AuthActions {
     _ref.read(dataRevisionProvider.notifier).bump();
   }
 
-  /// 구글·카카오 로그인. 처음 온 사용자면 `true`를 돌려주고, 약관 동의부터 이어 가도록 가입 임시 보관함에 표시한다.
+  /// 소셜 로그인이 이 시간 안에 끝나지 않으면 네트워크 문제로 본다.
+  static const socialSignInTimeout = Duration(seconds: 30);
+
+  /// 구글·카카오 로그인. 약관 동의를 아직 마치지 않은 사용자면 `true`를 돌려주고,
+  /// 약관 동의부터 이어 가도록 가입 임시 보관함에 표시한다.
+  /// 시간이 너무 걸리면 [AuthFailureType.network]로 실패한다.
   Future<bool> signInWithSocial(SocialProvider provider) async {
-    final pendingSignup = _ref.read(signupDraftProvider).social;
     final result = await _ref
         .read(authRepositoryProvider)
-        .signInWithSocial(provider);
+        .signInWithSocial(provider)
+        .timeout(
+          socialSignInTimeout,
+          onTimeout: () => throw const AuthFailure(AuthFailureType.network),
+        );
     _ref.read(sessionProvider.notifier).set(result.user);
     if (result.isNewUser) {
       _ref
           .read(signupDraftProvider.notifier)
           .update(
-            (d) => d.copyWith(
+            (d) => SignupDraft(
               social: provider,
               nickname: '${provider.label} 사용자',
               email: result.user.email,
             ),
           );
-    } else if (pendingSignup != provider) {
+    } else {
       _ref.read(signupDraftProvider.notifier).clear();
     }
-    return result.isNewUser || pendingSignup == provider;
+    return result.isNewUser;
   }
 
   /// 소셜 신규 가입의 약관 동의를 저장하고 가입을 마친다(계정은 로그인 때 이미 만들어졌다).
@@ -134,8 +142,16 @@ class AuthActions {
         consents: draft.consents,
       ),
     );
+    await _ref.read(authRepositoryProvider).completeSocialSignup();
     _ref.read(signupDraftProvider.notifier).clear();
     _ref.read(dataRevisionProvider.notifier).bump();
+  }
+
+  /// 소셜 신규 가입 중 약관 동의에서 나가면 가입을 취소한다: 로그아웃하고 임시 보관함을 비운다.
+  /// (동의 없이 로그인된 채 남지 않게. 다음에 다시 들어오면 약관 동의부터 다시 한다.)
+  Future<void> cancelSocialSignup() async {
+    _ref.read(signupDraftProvider.notifier).clear();
+    await signOut();
   }
 
   Future<void> signOut() async {

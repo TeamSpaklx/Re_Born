@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:reborn_app/features/auth/presentation/login_screen.dart';
 import 'package:reborn_app/app/app.dart';
 import 'package:reborn_app/app/data_providers.dart';
 import 'package:reborn_app/app/main_shell.dart';
@@ -228,7 +229,7 @@ void main() {
     expect(find.byKey(const Key('delete-password')), findsOneWidget);
   });
 
-  testWidgets('로그아웃은 확인 뒤 세션을 지운다', (tester) async {
+  testWidgets('로그아웃은 확인 뒤 세션을 지우고 로그인 화면으로 간다', (tester) async {
     final container = await pumpAll(tester, signedIn: true);
     await tester.scrollUntilVisible(
       find.byKey(const Key('logout')),
@@ -242,6 +243,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(container.read(sessionProvider), isNull);
+    expect(find.byType(LoginScreen), findsOneWidget);
   });
 
   testWidgets('프로필: 닉네임과 이메일이 보이고 닉네임을 바꿀 수 있다', (tester) async {
