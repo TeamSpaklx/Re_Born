@@ -19,15 +19,26 @@ void main() {
   );
 
   /// 햅틱 호출을 기록한다 (`HapticFeedback.xxx`는 platform 채널의 `HapticFeedback.vibrate`).
+  /// 울린 햅틱 종류(`selection`·`tap`). Android는 앱 채널(`reborn/haptics`), iOS는 Flutter 기본 햅틱으로 간다.
   late List<String> haptics;
+  const nativeHaptics = MethodChannel('reborn/haptics');
+  const flutterKinds = {
+    'HapticFeedbackType.selectionClick': 'selection',
+    'HapticFeedbackType.lightImpact': 'tap',
+  };
 
   setUp(() {
     haptics = [];
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(SystemChannels.platform, (call) async {
           if (call.method == 'HapticFeedback.vibrate') {
-            haptics.add(call.arguments as String);
+            haptics.add(flutterKinds[call.arguments] ?? '${call.arguments}');
           }
+          return null;
+        });
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(nativeHaptics, (call) async {
+          haptics.add(call.method);
           return null;
         });
   });
@@ -35,6 +46,8 @@ void main() {
   tearDown(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(SystemChannels.platform, null);
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(nativeHaptics, null);
   });
 
   Future<ProviderContainer> pumpApp(WidgetTester tester) async {
@@ -104,7 +117,7 @@ void main() {
 
     await tester.tap(navTab('관계'));
     await tester.pumpAndSettle();
-    expect(haptics, ['HapticFeedbackType.selectionClick']);
+    expect(haptics, ['selection']);
 
     await tester.tap(navTab('관계')); // 같은 탭을 다시 누르면 울리지 않는다
     await tester.pumpAndSettle();
@@ -116,14 +129,14 @@ void main() {
 
     await tester.tap(find.text('전체 보기'));
     await tester.pumpAndSettle();
-    expect(haptics, ['HapticFeedbackType.lightImpact']);
+    expect(haptics, ['tap']);
 
     await tester.tap(navTab('투데이'));
     await tester.pumpAndSettle();
     haptics.clear();
     await tester.tap(find.text('감정 기록하기'));
     await tester.pumpAndSettle();
-    expect(haptics, ['HapticFeedbackType.lightImpact']);
+    expect(haptics, ['tap']);
   });
 
   testWidgets('관계·기록·전체 탭은 각자의 화면을 보여 준다', (tester) async {
