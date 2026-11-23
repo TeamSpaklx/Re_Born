@@ -33,6 +33,9 @@ abstract final class AppMotion {
   /// 뒤로 밀다 놓았을 때 남은 거리를 마저 가는 최소 시간.
   static const swipeBackMinDuration = Duration(milliseconds: 100);
 
+  /// 당겨서 새로고침 스피너를 최소한 이만큼은 보여 준다(데이터가 즉시 와도 번쩍 사라지지 않게, 추정).
+  static const refreshMinDuration = Duration(milliseconds: 600);
+
   /// 눌렸을 때 불투명도와 크기 배율.
   static const pressedOpacity = 0.7;
   static const pressedScale = 0.97;
