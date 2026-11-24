@@ -19,20 +19,33 @@ class NativeTabIcons {
   final List<Uint8List> selectedIcons;
 }
 
+/// [tint]는 선택되지 않은 탭 아이콘에 입힐 색이다(선택된 아이콘은 분홍 그대로).
 typedef NativeTabIconLoader =
-    Future<NativeTabIcons> Function(double pixelRatio);
+    Future<NativeTabIcons> Function(double pixelRatio, Color tint);
 
 /// Figma SVG 아이콘을 [BottomNavTokens.iconSize] 크기의 PNG로 그린다(기기 배율 적용).
 /// 네이티브 탭 바(UIKit)는 SVG를 읽지 못해서 Flutter가 대신 그려 넘긴다.
-Future<NativeTabIcons> renderNativeTabIcons(double pixelRatio) async {
-  Future<Uint8List> render(String asset) async {
+Future<NativeTabIcons> renderNativeTabIcons(
+  double pixelRatio,
+  Color tint,
+) async {
+  Future<Uint8List> render(String asset, {Color? color}) async {
     final info = await vg.loadPicture(SvgAssetLoader(asset), null);
     try {
       final side = (BottomNavTokens.iconSize * pixelRatio).round();
       final recorder = ui.PictureRecorder();
-      Canvas(recorder)
+      final canvas = Canvas(recorder);
+      // 한 색 아이콘이라, 모양(알파)만 쓰고 색은 [color]로 바꿔 칠한다.
+      if (color != null) {
+        canvas.saveLayer(
+          Rect.fromLTWH(0, 0, side.toDouble(), side.toDouble()),
+          Paint()..colorFilter = ColorFilter.mode(color, BlendMode.srcIn),
+        );
+      }
+      canvas
         ..scale(side / info.size.width, side / info.size.height)
         ..drawPicture(info.picture);
+      if (color != null) canvas.restore();
       final image = await recorder.endRecording().toImage(side, side);
       final data = await image.toByteData(format: ui.ImageByteFormat.png);
       image.dispose();
@@ -43,7 +56,7 @@ Future<NativeTabIcons> renderNativeTabIcons(double pixelRatio) async {
   }
 
   return NativeTabIcons(
-    icons: [for (final tab in NavTab.all) await render(tab.icon)],
+    icons: [for (final tab in NavTab.all) await render(tab.icon, color: tint)],
     selectedIcons: [for (final tab in NavTab.all) await render(tab.activeIcon)],
   );
 }
@@ -78,6 +91,8 @@ class NativeTabBar extends StatefulWidget {
 class _NativeTabBarState extends State<NativeTabBar> {
   Future<NativeTabIcons>? _icons;
   double? _pixelRatio;
+  Color? _tint;
+  bool _dark = false;
   MethodChannel? _channel;
 
   /// 네이티브 뷰를 만들 때 넘긴 선택 index (그 뒤로 바뀌었으면 만들어진 뒤에 맞춰 준다).
@@ -87,9 +102,14 @@ class _NativeTabBarState extends State<NativeTabBar> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final ratio = MediaQuery.devicePixelRatioOf(context);
-    if (ratio != _pixelRatio) {
+    final tint = context.colors.textStrong;
+    if (ratio != _pixelRatio || tint != _tint) {
       _pixelRatio = ratio;
-      _icons = widget.iconLoader(ratio);
+      _tint = tint;
+      _dark = Theme.of(context).brightness == Brightness.dark;
+      _icons = widget.iconLoader(ratio, tint);
+      // 화면 모드가 바뀌면 네이티브 뷰를 새로 만든다(아이콘·색·재질을 만들 때 한 번만 넘기므로).
+      _initialIndex = null;
     }
   }
 
@@ -121,6 +141,7 @@ class _NativeTabBarState extends State<NativeTabBar> {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final tint = colors.textStrong;
     final label = AppTextStyles.navLabel;
 
     // 시스템이 알약을 뷰 안쪽에 그리므로 그만큼 넓게 만든다(알약 폭 = width).
@@ -131,10 +152,15 @@ class _NativeTabBarState extends State<NativeTabBar> {
         future: _icons,
         builder: (context, snapshot) {
           final icons = snapshot.data;
-          // 아이콘이 준비되기 전에는 같은 크기의 빈 자리만 둔다.
-          if (icons == null) return const SizedBox.shrink();
+          // 아이콘이 준비되기 전에는 같은 크기의 빈 자리만 둔다. 화면 모드가 바뀌어 새 아이콘을
+          // 그리는 중에는 이전 아이콘이 남아 있으므로, 이번 그리기가 끝난 뒤에만 뷰를 만든다.
+          if (snapshot.connectionState != ConnectionState.done ||
+              icons == null) {
+            return const SizedBox.shrink();
+          }
           _initialIndex ??= widget.currentIndex;
           return UiKitView(
+            key: ValueKey('${tint.toARGB32()}-$_dark'),
             viewType: NativeTabBar.viewType,
             // 네이티브 탭 바가 터치를 받고 뒤의 Flutter 화면으로 새지 않게 한다.
             hitTestBehavior: PlatformViewHitTestBehavior.opaque,
@@ -145,6 +171,7 @@ class _NativeTabBarState extends State<NativeTabBar> {
               'selectedIcons': icons.selectedIcons,
               'selectedIndex': _initialIndex,
               'pixelRatio': _pixelRatio,
+              'dark': _dark,
               'normalColor': colors.textStrong.toARGB32(),
               'selectedColor': colors.brand.toARGB32(),
               'fontAsset': AppAssets.pretendardBold,

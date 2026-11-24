@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../app/theme/app_assets.dart';
 import '../../app/theme/app_colors.dart';
@@ -7,6 +6,7 @@ import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_text_styles.dart';
 import 'character_avatar.dart';
 import 'pressable.dart';
+import 'tinted_svg.dart';
 
 /// 프로필 행: 둥근 아바타 + 이름 + 보조 문구 + 화살표 (전체 탭 맨 위, 인물 목록).
 /// [avatar]가 없으면 회색 원 + 사람 아이콘.
@@ -68,7 +68,8 @@ class ProfileRow extends StatelessWidget {
               ],
             ),
           ),
-          if (onTap != null) SvgPicture.asset(AppAssets.chevronSignal),
+          if (onTap != null)
+            TintedSvg(AppAssets.chevronSignal, color: context.colors.iconMuted),
         ],
       ),
     );

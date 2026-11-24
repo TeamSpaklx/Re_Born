@@ -51,7 +51,7 @@ docs/                명세서, 디자인 시스템, 프론트 문서 (design/ �
 ## 화면 규칙
 
 - **하단 탭 4개:** 투데이(홈) / 관계 / 기록 / 전체. Figma가 있는 화면은 홈뿐이고(2026-11-17 리디자인, 배경 `#F2F2F4`), 관계·기록·전체 탭과 로그인·가입·알림 등은 레퍼런스를 해석해 만들었습니다(FRONTEND.md 2장). 토글·모달·토스트·설정 목록은 Figma에 없어 Reborn 공통 컴포넌트로 만들어 쓰고 머티리얼 위젯은 쓰지 않습니다(DESIGN_SYSTEM.md 7장).
-- **고정 규칙:** 글자 크기 배율 1.0(시스템 글자 크기 설정 무시), 라이트 모드만, 세로 방향만. **다크 모드는 나중에 추가할 예정**이라 색은 `AppColors` 팔레트로만 씁니다.
+- **고정 규칙:** 글자 크기 배율 1.0(시스템 글자 크기 설정 무시), 세로 방향만. 라이트/다크는 설정의 다크 모드 토글로 고르며(`AppColors.light`/`AppColors.dark`, 시스템 설정은 따르지 않음) 색은 `AppColors` 팔레트로만 씁니다. 네이티브 런치 화면은 흰색 고정이라 다크 사용자는 켤 때 한 번 깜빡입니다.
 - 앱은 스플래시(`/splash`, Figma `805:953`)에서 시작해 투데이(`/today`)로 넘어갑니다. 로그인 화면은 지웠고 새 디자인이 나오면 추가합니다. 시작 경로는 `initialLocationProvider`이며, Supabase 초기화는 첫 프레임 뒤에 시작합니다(화면이 Supabase를 쓰기 시작하면 그 전에 끝나도록 바꿀 것).
 - iOS와 Android는 첫 Flutter 프레임을 준비하는 동안 보이는 네이티브 시작 화면(`LaunchScreen.storyboard`, `launch_background.xml`)에도 흰 배경 + 가운데 로고(160) + 아래 "TeamSpaklx"(Pretendard 글자를 이미지로 만들어 `LaunchBrand`·`launch_brand.png`로 넣음)를 두어 Flutter 스플래시와 이어서 보이게 합니다. Android 12+는 시스템 스플래시가 따로 있어 위 설정이 그대로 보이지 않을 수 있습니다(미확인).
 - 하단 탭 바는 플랫폼별로 다릅니다: **iOS 26 이상 = 네이티브 `UITabBar`(Liquid Glass)**, iOS 26 미만·Android = Flutter가 그린 탭 바(블러). 분기는 `lib/shared/widgets/app_bottom_nav_bar.dart` 한 곳이고, 네이티브 쪽은 `ios/Runner/NativeTabBarView.swift`(플랫폼 뷰)와 `lib/shared/widgets/native_tab_bar.dart`입니다. 새 패키지는 쓰지 않습니다.

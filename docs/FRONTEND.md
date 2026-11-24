@@ -189,7 +189,7 @@ MVP 데이터 처리는 SPEC 6.4대로 **분석·지수·인사이트 계산은 
 
 ## 5. 화면 공통 규칙
 
-- 글자 크기 배율 1.0 고정, 라이트 모드만, 세로 방향만. 다크 모드는 나중에 추가하므로 색은 `context.colors`로만 읽습니다.
+- 글자 크기 배율 1.0 고정, 세로 방향만. 라이트/다크는 설정의 "다크 모드" 토글로 고르며(`themeModeProvider`, 저장은 `ThemeModeStore`의 `dark_mode`) 시스템 설정은 따르지 않습니다. 색은 `context.colors`로만 읽습니다.
 - **쌓이는 화면 등록:** 탭 위로 쌓이는 새 화면은 `lib/app/router.dart`에서 `pageBuilder: (context, state) => _swipe(state, 화면)`으로 등록합니다(`SwipeBackPage`). 그래야 iOS·Android 모두 화면 어디서나 오른쪽으로 밀어 뒤로 갈 수 있습니다. 밀어서 나가면 안 되는 화면(저장 중 등)은 `PopScope(canPop: false)`로 막습니다.
 - **로딩 상태:** 데이터를 불러오는 동안 빈 화면을 두지 않고 스켈레톤(`lib/shared/widgets/skeleton.dart`)으로 내용 자리를 보여 줍니다. 홈은 Figma 홈 스켈레톤(`834:2351`)을 그대로 옮긴 `HomeSkeleton`, 목록은 `SkeletonList`(아이콘형·아바타형 카드)를 씁니다. 한 화면에 `SkeletonPulse`는 하나만 둡니다.
 - **토스트:** 저장·완료 같은 성공 알림은 `showAppToast(context, 문구, success: true)`(체크 표시), 오류·권한·안내 문구는 `success` 없이 씁니다.

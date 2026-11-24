@@ -34,8 +34,10 @@ class AppErrorFallback extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 테마가 아직 없는 자리에서도 뜰 수 있어서, 없으면 라이트 색으로 그린다.
+    final colors = Theme.of(context).extension<AppColors>() ?? AppColors.light;
     return Container(
-      color: AppColors.light.background,
+      color: colors.background,
       alignment: Alignment.center,
       padding: const EdgeInsets.all(24),
       child: Text(
@@ -43,7 +45,7 @@ class AppErrorFallback extends StatelessWidget {
         textAlign: TextAlign.center,
         textDirection: TextDirection.ltr,
         style: AppTextStyles.body.copyWith(
-          color: AppColors.light.textSecondary,
+          color: colors.textSecondary,
           decoration: TextDecoration.none,
         ),
       ),

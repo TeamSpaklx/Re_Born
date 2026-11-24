@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -299,12 +301,20 @@ void main() {
   });
 
   group('테마', () {
-    test('라이트 전용이며 Pretendard와 AppColors를 쓴다', () {
+    test('라이트 테마는 Pretendard와 AppColors.light를 쓴다', () {
       final theme = AppTheme.light;
       expect(theme.brightness, Brightness.light);
       expect(theme.textTheme.bodyMedium?.fontFamily, 'Pretendard');
       expect(theme.extension<AppColors>(), AppColors.light);
       expect(theme.scaffoldBackgroundColor, AppColors.light.background);
+    });
+
+    test('다크 테마는 AppColors.dark를 쓰고 페이지 배경은 #0F1013이다', () {
+      final theme = AppTheme.dark;
+      expect(theme.brightness, Brightness.dark);
+      expect(theme.textTheme.bodyMedium?.fontFamily, 'Pretendard');
+      expect(theme.extension<AppColors>(), AppColors.dark);
+      expect(theme.scaffoldBackgroundColor, const Color(0xFF0F1013));
     });
 
     testWidgets('context.colors로 팔레트를 읽을 수 있다', (tester) async {
@@ -321,6 +331,85 @@ void main() {
         ),
       );
       expect(read.brand, const Color(0xFFFF6090));
+    });
+  });
+
+  group('다크 팔레트 (docs/DESIGN_SYSTEM.md 다크 표)', () {
+    const dark = AppColors.dark;
+    const light = AppColors.light;
+
+    double contrast(Color a, Color b) {
+      double lum(Color c) {
+        double ch(double v) => v <= 0.03928
+            ? v / 12.92
+            : math.pow((v + 0.055) / 1.055, 2.4).toDouble();
+        return 0.2126 * ch(c.r) + 0.7152 * ch(c.g) + 0.0722 * ch(c.b);
+      }
+
+      final l1 = lum(a);
+      final l2 = lum(b);
+      final hi = l1 > l2 ? l1 : l2;
+      final lo = l1 > l2 ? l2 : l1;
+      return (hi + 0.05) / (lo + 0.05);
+    }
+
+    test('Figma 시안 값', () {
+      expect(dark.background, const Color(0xFF0F1013));
+      expect(dark.cardWhite, const Color(0xFF1C1D23));
+      expect(dark.cardBorder, const Color(0xFF3B3D47));
+      expect(dark.chip, const Color(0xFF2D2F39));
+      expect(dark.textBlack, const Color(0xFFE4E4E4));
+      expect(dark.textSecondary, const Color(0xFFB7BAC6));
+      expect(dark.sheetSurface, const Color(0xFF33353E));
+      expect(dark.toastSurface, const Color(0xFF202229));
+      expect(dark.splashBackground, dark.background);
+    });
+
+    test('브랜드·감정·카카오 색은 라이트와 같다', () {
+      expect(dark.brand, light.brand);
+      expect(dark.ctaPrimary, light.ctaPrimary);
+      expect(dark.ctaSoft, light.ctaSoft);
+      expect(dark.kakaoYellow, light.kakaoYellow);
+      expect(dark.emotionJoy, light.emotionJoy);
+      expect(dark.emotionSadness, light.emotionSadness);
+    });
+
+    test('주요 글자는 배경과 명암비 4.5:1 이상이다', () {
+      for (final bg in [dark.background, dark.cardWhite, dark.sheetSurface]) {
+        expect(contrast(dark.textBlack, bg), greaterThan(4.5));
+        expect(contrast(dark.textSecondary, bg), greaterThan(4.5));
+      }
+      // 분홍 버튼 위 글자.
+      expect(contrast(dark.onCtaSoft, dark.ctaSoft), greaterThan(4.5));
+      // 카카오·구글 버튼 위 글자.
+      expect(contrast(dark.onSocial, dark.kakaoYellow), greaterThan(4.5));
+      expect(contrast(dark.onSocial, dark.socialSurface), greaterThan(4.5));
+    });
+
+    test('아이콘 색은 어두운 배경에서 보인다', () {
+      expect(contrast(dark.iconStrong, dark.cardWhite), greaterThan(4.5));
+      expect(contrast(dark.iconMuted, dark.cardWhite), greaterThan(3));
+    });
+
+    test('카드는 페이지 배경과 구분되고 테두리가 있다', () {
+      expect(dark.cardWhite, isNot(dark.background));
+      expect(dark.cardBorder, isNot(dark.cardWhite));
+    });
+
+    test('lerp는 양 끝에서 각 팔레트와 같다', () {
+      final start = light.lerp(dark, 0);
+      final end = light.lerp(dark, 1);
+      for (final pick in <Color Function(AppColors)>[
+        (c) => c.background,
+        (c) => c.cardWhite,
+        (c) => c.textBlack,
+        (c) => c.sheetSurface,
+        (c) => c.iconMuted,
+        (c) => c.socialSurface,
+      ]) {
+        expect(pick(start), pick(light));
+        expect(pick(end), pick(dark));
+      }
     });
   });
 

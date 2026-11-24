@@ -8,6 +8,7 @@ import '../../app/theme/app_radii.dart';
 import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_text_styles.dart';
 import '../../core/utils/app_haptics.dart';
+import 'tinted_svg.dart';
 
 /// 약관·동의 한 줄: 체크 원 + 항목 이름 + ("필수"/"선택") + (내용 보기 화살표).
 /// [emphasized]면 "전체 동의"처럼 연한 핑크 상자 안에 굵게 보인다.
@@ -120,7 +121,12 @@ class ConsentRow extends StatelessWidget {
               child: SizedBox(
                 width: AppSpacing.minTouchTarget,
                 height: AppSpacing.minTouchTarget,
-                child: Center(child: SvgPicture.asset(AppAssets.chevronSignal)),
+                child: Center(
+                  child: TintedSvg(
+                    AppAssets.chevronSignal,
+                    color: context.colors.iconMuted,
+                  ),
+                ),
               ),
             ),
           ),

@@ -21,6 +21,7 @@ import '../../todos/models/todo.dart';
 import '../../todos/presentation/todos_providers.dart';
 import '../models/insight.dart';
 import 'insights_providers.dart';
+import '../../../shared/widgets/tinted_svg.dart';
 
 /// 인사이트 상세와 행동 제안 (F-07, F-08): 핵심 문구 → 근거 수치(이전·지금·변화) → 제안 목록.
 /// 제안마다 "체크리스트에 담기"를 누르면 체크리스트(source = suggestion)에 항목이 생긴다.
@@ -93,11 +94,18 @@ class _InsightDetailScreenState extends ConsumerState<InsightDetailScreen> {
                 children: [
                   Row(
                     children: [
-                      SvgPicture.asset(
-                        negative ? AppAssets.forum : AppAssets.sealCheck,
-                        width: 28,
-                        height: 28,
-                      ),
+                      negative
+                          ? TintedSvg(
+                              AppAssets.forum,
+                              color: context.colors.textBlack,
+                              width: 28,
+                              height: 28,
+                            )
+                          : SvgPicture.asset(
+                              AppAssets.sealCheck,
+                              width: 28,
+                              height: 28,
+                            ),
                       const SizedBox(width: AppSpacing.space8),
                       Text(
                         name,

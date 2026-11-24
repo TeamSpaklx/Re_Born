@@ -12,6 +12,7 @@ import '../../app/theme/bottom_nav_tokens.dart';
 import '../../core/platform/native_ui_support.dart';
 import 'nav_tabs.dart';
 import 'native_tab_bar.dart';
+import 'tinted_svg.dart';
 
 /// 하단 탭 바 (Figma `ButtonNavigator[Liquid Glass]`, docs/DESIGN_HOME.md 5.8).
 ///
@@ -121,8 +122,9 @@ class AppBottomNavBar extends StatelessWidget {
                             2,
                         width: BottomNavTokens.selectionWidth,
                         height: BottomNavTokens.selectionHeight,
-                        child: SvgPicture.asset(
+                        child: TintedSvg(
                           AppAssets.tabSelection,
+                          color: context.colors.navSelection,
                           fit: BoxFit.fill,
                         ),
                       ),
@@ -185,11 +187,18 @@ class _NavItem extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SvgPicture.asset(
-              selected ? tab.activeIcon : tab.icon,
-              width: BottomNavTokens.iconSize,
-              height: BottomNavTokens.iconSize,
-            ),
+            selected
+                ? SvgPicture.asset(
+                    tab.activeIcon,
+                    width: BottomNavTokens.iconSize,
+                    height: BottomNavTokens.iconSize,
+                  )
+                : TintedSvg(
+                    tab.icon,
+                    color: context.colors.textBlack,
+                    width: BottomNavTokens.iconSize,
+                    height: BottomNavTokens.iconSize,
+                  ),
             Text(
               label,
               textAlign: TextAlign.center,

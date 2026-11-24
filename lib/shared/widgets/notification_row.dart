@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../app/theme/app_assets.dart';
 import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_radii.dart';
 import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_text_styles.dart';
 import 'pressable.dart';
+import 'tinted_svg.dart';
 
 /// 알림 한 줄: 아이콘 타일 + 제목 + 본문 + 시간. 읽지 않은 알림은 연한 핑크 배경과 점으로 강조한다.
 class NotificationRow extends StatelessWidget {
@@ -56,7 +58,14 @@ class NotificationRow extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppRadii.iconTile),
                 ),
                 child: Center(
-                  child: SvgPicture.asset(iconAsset, width: 26, height: 26),
+                  child: iconAsset == AppAssets.sealCheck
+                      ? SvgPicture.asset(iconAsset, width: 26, height: 26)
+                      : TintedSvg(
+                          iconAsset,
+                          color: colors.textBlack,
+                          width: 26,
+                          height: 26,
+                        ),
                 ),
               ),
               const SizedBox(width: AppSpacing.space12),

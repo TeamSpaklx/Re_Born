@@ -192,7 +192,7 @@ class _AppBottomSheetState extends State<_AppBottomSheet>
       key: _cardKey,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: colors.cardWhite,
+        color: colors.sheetSurface,
         borderRadius: AppRadii.sheetBorderRadius,
         boxShadow: AppShadows.sheet,
       ),

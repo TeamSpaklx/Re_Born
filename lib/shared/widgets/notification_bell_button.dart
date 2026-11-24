@@ -40,6 +40,7 @@ class NotificationBellButton extends StatelessWidget {
           ),
           child: SvgPicture.asset(
             unread ? AppAssets.bellUnread : AppAssets.bell,
+            theme: SvgTheme(currentColor: context.colors.textBlack),
             width: ComponentLayout.bellIconSize,
             height: ComponentLayout.bellIconSize,
           ),

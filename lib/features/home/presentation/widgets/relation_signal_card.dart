@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../../shared/widgets/character_avatar.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../app/theme/app_assets.dart';
 import '../../../../app/theme/app_colors.dart';
@@ -10,6 +9,7 @@ import '../../../../app/theme/app_text_styles.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/centered_line.dart';
 import '../../models/relation_signal.dart';
+import '../../../../shared/widgets/tinted_svg.dart';
 
 /// "최근 관계 신호" 카드 하나 (높이 104). 좌표는 테두리 안쪽 기준(docs/DESIGN_HOME.md 5.4).
 class RelationSignalCard extends StatelessWidget {
@@ -110,7 +110,10 @@ class RelationSignalCard extends StatelessWidget {
             Positioned(
               right: 18,
               top: 40,
-              child: SvgPicture.asset(AppAssets.chevronSignal),
+              child: TintedSvg(
+                AppAssets.chevronSignal,
+                color: context.colors.iconMuted,
+              ),
             ),
           ],
         ),

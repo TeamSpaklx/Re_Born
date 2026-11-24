@@ -78,6 +78,18 @@ class SettingsSection extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: AppSpacing.space12),
+        SettingsGroup(
+          title: '화면',
+          children: [
+            SettingsRow.toggle(
+              key: const Key('dark-mode-toggle'),
+              title: '다크 모드',
+              value: ref.watch(themeModeProvider) == ThemeMode.dark,
+              onChanged: (v) => ref.read(themeModeProvider.notifier).setDark(v),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.space12),
         const _SecurityGroup(),
         const SizedBox(height: AppSpacing.space12),
         SettingsGroup(

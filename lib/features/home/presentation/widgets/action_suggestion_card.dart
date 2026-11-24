@@ -11,6 +11,7 @@ import '../../../../shared/widgets/centered_line.dart';
 import '../../../../app/theme/app_motion.dart';
 import '../../../../core/utils/app_haptics.dart';
 import '../../models/action_suggestion.dart';
+import '../../../../shared/widgets/tinted_svg.dart';
 
 /// "오늘 해볼까요?" 카드 하나 (높이 90, docs/DESIGN_HOME.md 5.6).
 class ActionSuggestionCard extends StatelessWidget {
@@ -48,8 +49,9 @@ class ActionSuggestionCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(AppRadii.iconTile),
               ),
               child: Center(
-                child: SvgPicture.asset(
+                child: TintedSvg(
                   AppAssets.forum,
+                  color: context.colors.textBlack,
                   width: HomeLayout.forumIconSize,
                   height: HomeLayout.forumIconSize,
                 ),
@@ -130,9 +132,10 @@ class ActionSuggestionCard extends StatelessWidget {
                                 ),
                               ),
                             )
-                          : SvgPicture.asset(
+                          : TintedSvg(
                               AppAssets.radioCircle,
                               key: const ValueKey('open'),
+                              color: context.colors.iconMuted,
                             ),
                     ),
                   ),
