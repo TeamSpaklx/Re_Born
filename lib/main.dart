@@ -14,6 +14,7 @@ import 'core/errors/app_error_log.dart';
 import 'core/errors/error_handlers.dart';
 import 'features/auth/data/auth_session_store.dart';
 import 'features/auth/data/in_memory_auth_repository.dart';
+import 'features/onboarding/data/intro_store.dart';
 import 'features/security/data/app_lock_store.dart';
 import 'features/security/presentation/app_lock_back_guard.dart';
 
@@ -44,6 +45,8 @@ Future<void> main() async {
   final appLockStore = await _loadAppLockStore(errorLog);
   // 로그인 상태도 첫 화면(로그인 / 투데이)을 정해야 해서 미리 읽는다.
   final authSessionStore = await _loadAuthSessionStore(errorLog);
+  // 인트로를 이미 봤는지도 스플래시가 끝날 때 바로 필요해서 미리 읽는다.
+  final introStore = await _loadIntroStore(errorLog);
   // 잠긴 동안 뒤로 버튼을 막는 관찰자는 라우터보다 먼저 등록해야 먼저 불린다.
   AppLockBackGuard.instance.install();
 
@@ -52,6 +55,7 @@ Future<void> main() async {
       overrides: [
         appErrorLogProvider.overrideWithValue(errorLog),
         appLockStoreProvider.overrideWithValue(appLockStore),
+        introStoreProvider.overrideWithValue(introStore),
         // Supabase Auth를 붙이면 이 줄을 Supabase 구현으로 바꾼다.
         authRepositoryProvider.overrideWithValue(
           InMemoryAuthRepository(store: authSessionStore),
@@ -90,6 +94,16 @@ Future<AuthSessionStore> _loadAuthSessionStore(AppErrorLog errorLog) async {
   } catch (error, stack) {
     errorLog.record(error, stack, where: 'auth_session_store');
     return InMemoryAuthSessionStore();
+  }
+}
+
+/// 저장소를 못 읽으면 처음 켠 것으로 보고 인트로를 보여 준다. 오류는 기록에 남긴다.
+Future<IntroStore> _loadIntroStore(AppErrorLog errorLog) async {
+  try {
+    return await PrefsIntroStore.create();
+  } catch (error, stack) {
+    errorLog.record(error, stack, where: 'intro_store');
+    return InMemoryIntroStore();
   }
 }
 

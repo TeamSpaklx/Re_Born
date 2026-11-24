@@ -181,6 +181,41 @@ abstract final class SplashLayout {
   static const fadeDuration = Duration(milliseconds: 400);
 }
 
+/// 인트로 온보딩 화면 (Figma 8877:1945, 402×874 기준, 상태 바 62 포함).
+abstract final class IntroLayout {
+  /// 앱 화면 목업 상자 314×490. 상단은 화면 위에서 101px.
+  static const previewWidth = 314.0;
+  static const previewHeight = 490.0;
+  static const previewTop = 101.0;
+
+  /// 목업 이미지는 상자 안에서 위로 4.1% 내려 놓고, 높이를 상자의 132.9%로 키워 아래를 잘라 낸다.
+  static const previewImageTopFactor = 0.041;
+  static const previewImageHeightFactor = 1.329;
+
+  /// 목업 아래쪽이 흰색으로 사라지는 구간 26px (목업 상자 아래 끝에서 위로 확장해 겹침).
+  static const previewFade = 26.0;
+
+  /// 목업 아래 끝에서 제목 상자까지: Figma 목업 끝 591 → 글자 묶음 시작 598.
+  static const previewToText = 7.0;
+
+  /// 제목 상자 안 위 여백: 상자 높이 32 / 글자 묶음 시작에서 제목 위까지 15.
+  static const titleTop = 15.0;
+
+  /// 제목 아래 ~ 설명 사이 (제목 끝 47 → 설명 시작 59).
+  static const titleToBody = 12.0;
+
+  /// 설명 아래 ~ 버튼 사이 (설명 끝 97 → 버튼 시작 162).
+  static const bodyToCta = 65.0;
+
+  static const ctaHeight = 60.0;
+
+  /// 버튼 아래 여백: 버튼 끝이 화면 위에서 820 → 화면 끝 874에서 홈 인디케이터(34)를 빼면 안전 영역 위로 20px.
+  static const ctaBottom = 20.0;
+
+  /// 상태 바 높이(62)를 뺀 목업 위 여백. 기기마다 다른 상태 바는 안전 영역이 맡는다.
+  static const previewTopInset = previewTop - 62.0;
+}
+
 /// 공통 컴포넌트 치수. 토글·세그먼트·토스트·바텀시트·CTA·알림 버튼·스켈레톤은
 /// Figma 컴포넌트 섹션(`749:337`) 값이고, 모달·설정 목록·애니메이션 시간은 Figma에 없어 추정이다.
 /// 로그인 화면 (Figma 8877:1929, 402×874 기준).
