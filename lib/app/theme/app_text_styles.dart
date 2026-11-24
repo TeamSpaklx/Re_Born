@@ -73,6 +73,12 @@ abstract final class AppTextStyles {
   /// 인트로 온보딩 설명 16 Regular (Figma 8877:1954). 줄 높이는 지정이 없어 기본값.
   static final introBody = _style(16, _regular, -0.4);
 
+  /// 인트로 끝 화면 제목 26 Bold, 줄 높이 32 (Figma 8877:1971).
+  static final startTitle = _style(26, _bold, -0.65, lineHeight: 32);
+
+  /// 인트로 끝 화면 설명 16 Regular, 줄 높이 24 (Figma 8877:1972).
+  static final startBody = _style(16, _regular, -0.4, lineHeight: 24);
+
   /// 로그인 화면 소셜 버튼 글자 14 SemiBold (Figma 8877:1935).
   static final socialButton = _style(14, _semiBold, -0.35);
 

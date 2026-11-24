@@ -15,6 +15,7 @@ import 'package:reborn_app/features/auth/models/auth_user.dart';
 import 'package:reborn_app/features/auth/presentation/auth_providers.dart';
 import 'package:reborn_app/features/auth/presentation/login_screen.dart';
 import 'package:reborn_app/features/home/presentation/today_screen.dart';
+import 'package:reborn_app/features/onboarding/data/intro_store.dart';
 import 'package:reborn_app/features/settings/presentation/settings_providers.dart';
 
 import '../../helpers/fakes.dart';
@@ -58,6 +59,8 @@ void main() {
           notificationServiceProvider.overrideWithValue(
             FakeNotificationService(),
           ),
+          // 첫 로그인 뒤 끝 화면은 인트로 테스트에서 다룬다. 여기서는 이미 본 상태로 둔다.
+          introStoreProvider.overrideWithValue(InMemoryIntroStore(true, true)),
           authRepositoryProvider.overrideWithValue(auth),
           appErrorLogProvider.overrideWithValue(errorLog),
         ],

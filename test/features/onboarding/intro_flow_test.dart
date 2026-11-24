@@ -9,6 +9,7 @@ import 'package:reborn_app/features/auth/presentation/login_screen.dart';
 import 'package:reborn_app/features/home/presentation/today_screen.dart';
 import 'package:reborn_app/features/onboarding/data/intro_store.dart';
 import 'package:reborn_app/features/onboarding/presentation/intro_screen.dart';
+import 'package:reborn_app/features/onboarding/presentation/start_screen.dart';
 
 import '../../helpers/fakes.dart';
 
@@ -113,6 +114,68 @@ void main() {
 
     expect(find.byType(TodayScreen), findsOneWidget);
     expect(find.byType(IntroScreen), findsNothing);
+  });
+
+  testWidgets('첫 로그인 직후에는 끝 화면이 뜨고, 시작하기를 누르면 투데이로 간다', (tester) async {
+    final store = InMemoryIntroStore(true);
+    await pumpApp(
+      tester,
+      store: store,
+      signedIn: false,
+      start: AppRoutes.login,
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('구글로 로그인'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(StartScreen), findsOneWidget);
+    expect(find.text('시작할 준비가 끝났어요.'), findsOneWidget);
+    expect(find.byType(TodayScreen), findsNothing);
+
+    await tester.tap(find.byKey(const Key('start-go')));
+    await tester.pumpAndSettle();
+
+    expect(store.startSeen, isTrue);
+    expect(find.byType(TodayScreen), findsOneWidget);
+  });
+
+  testWidgets('끝 화면을 이미 봤으면 로그인 직후 바로 투데이로 간다', (tester) async {
+    await pumpApp(
+      tester,
+      store: InMemoryIntroStore(true, true),
+      signedIn: false,
+      start: AppRoutes.login,
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('구글로 로그인'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(TodayScreen), findsOneWidget);
+    expect(find.byType(StartScreen), findsNothing);
+  });
+
+  testWidgets('끝 화면은 작은 화면에서도 넘치지 않고 버튼이 보인다', (tester) async {
+    tester.view.physicalSize = const Size(360, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          initialLocationProvider.overrideWithValue(AppRoutes.start),
+          notificationServiceProvider.overrideWithValue(
+            FakeNotificationService(),
+          ),
+        ],
+        child: const RebornApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    final button = tester.getRect(find.byKey(const Key('start-go')));
+    expect(button.bottom, lessThanOrEqualTo(640));
   });
 
   testWidgets('작은 화면에서도 넘치지 않고 시작하기가 보인다', (tester) async {

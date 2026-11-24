@@ -216,6 +216,35 @@ abstract final class IntroLayout {
   static const previewTopInset = previewTop - 62.0;
 }
 
+/// 인트로 끝 "시작할 준비가 끝났어요" 화면 (Figma 8877:1965, 402×874 기준, 상태 바 62 포함).
+abstract final class StartLayout {
+  /// 제목 가운데가 화면 위에서 128 → 상태 바를 뺀 위 여백. 제목 상자 높이 32라 위쪽은 112.
+  static const titleTop = 112.0 - 62.0;
+
+  /// 제목 가운데 128 ~ 설명 가운데 180, 설명 두 줄(24씩) 상자 높이 48이라 시작은 156. 제목 끝 144 → 12.
+  static const titleToBody = 12.0;
+
+  /// 목업 상자 338×560(가로 가운데), 위 240에서 상태 바 62를 뺀 178, 불투명도 82%.
+  static const previewTop = 240.0 - 62.0;
+  static const previewWidth = 338.0;
+  static const previewHeight = 560.0;
+  static const previewOpacity = 0.82;
+
+  /// 목업 이미지는 상자 안에서 너비 235.76%, 높이 138.07%, 왼쪽 −66.04%, 위 −18.78%.
+  static const imageWidthFactor = 2.3576;
+  static const imageHeightFactor = 1.3807;
+  static const imageLeftFactor = -0.6604;
+  static const imageTopFactor = -0.1878;
+
+  /// 아래 그라데이션: 높이 254, 위(투명) → 52%부터 검정. 버튼은 그 안 위에서 144.
+  static const fadeHeight = 254.0;
+  static const fadeSolidFrom = 0.52;
+  static const ctaHeight = 60.0;
+
+  /// 버튼 아래 여백: 버튼 끝 620+144+60 = 824 → 화면 끝 874에서 홈 인디케이터(34)를 빼면 안전 영역 위로 16px.
+  static const ctaBottom = 16.0;
+}
+
 /// 공통 컴포넌트 치수. 토글·세그먼트·토스트·바텀시트·CTA·알림 버튼·스켈레톤은
 /// Figma 컴포넌트 섹션(`749:337`) 값이고, 모달·설정 목록·애니메이션 시간은 Figma에 없어 추정이다.
 /// 로그인 화면 (Figma 8877:1929, 402×874 기준).

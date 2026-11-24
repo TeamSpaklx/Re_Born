@@ -13,10 +13,12 @@ import '../../../core/errors/app_error_log.dart';
 import '../../../core/utils/app_haptics.dart';
 import '../../../shared/widgets/app_dialogs.dart';
 import '../../../shared/widgets/pressable.dart';
+import '../../onboarding/data/intro_store.dart';
 import '../models/auth_user.dart';
 import 'auth_providers.dart';
 
-/// 소셜 로그인을 처리한다: 성공하면 신규·기존 회원 모두 바로 투데이로 보낸다.
+/// 소셜 로그인을 처리한다: 성공하면 신규·기존 회원 모두 투데이로 보낸다.
+/// 설치 후 처음 로그인이면 투데이 앞에 "시작할 준비가 끝났어요" 화면이 한 번 끼어든다.
 ///
 /// - 사용자가 로그인 창을 닫으면(취소) 아무 안내 없이 그대로 둔다.
 /// - 네트워크·알 수 없는 오류는 토스트로 알리고, 알 수 없는 오류는 오류 기록에 남긴다.
@@ -29,7 +31,9 @@ Future<void> handleSocialSignIn(
   final router = GoRouter.of(context);
   try {
     await ref.read(authActionsProvider).signInWithSocial(provider);
-    router.go(AppRoutes.today);
+    // 설치 후 첫 로그인이면 "시작할 준비가 끝났어요" 화면을 한 번 거친다.
+    final startSeen = ref.read(introStoreProvider).startSeen;
+    router.go(startSeen ? AppRoutes.today : AppRoutes.start);
   } on AuthFailure catch (failure) {
     if (failure.type == AuthFailureType.cancelled) return;
     if (context.mounted) showAppToast(context, failure.message);

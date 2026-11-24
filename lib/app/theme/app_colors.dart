@@ -63,6 +63,10 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.onKakao,
     required this.socialBorder,
     required this.loginLegalText,
+    required this.startBackground,
+    required this.startTitle,
+    required this.startBody,
+    required this.onStartCta,
     required this.emotionJoy,
     required this.emotionLove,
     required this.emotionExcited,
@@ -184,6 +188,18 @@ class AppColors extends ThemeExtension<AppColors> {
   /// 로그인 화면 약관 안내 글자 `rgba(76,83,95,0.8)` (Figma 8877:1940). 값은 [lockHelpText]와 같지만 쓰임이 달라 따로 둔다.
   final Color loginLegalText;
 
+  /// 인트로 끝 화면(Figma 8877:1965) 배경 검정.
+  final Color startBackground;
+
+  /// 인트로 끝 화면 제목 글자 흰색.
+  final Color startTitle;
+
+  /// 인트로 끝 화면 설명 글자 #C2C2C7.
+  final Color startBody;
+
+  /// 인트로 끝 화면 CTA 글자 #260913(분홍 위 흰 글자는 대비 2.36:1이라 Figma 메모대로 어둡게).
+  final Color onStartCta;
+
   /// 감정 7색(RebornMood 캐릭터의 이름표 색에서 뽑음): 기쁨
   final Color emotionJoy;
 
@@ -262,6 +278,10 @@ class AppColors extends ThemeExtension<AppColors> {
     onKakao: Color(0xFF191919),
     socialBorder: Color(0xFFE5E5E5),
     loginLegalText: Color(0xCC4C535F),
+    startBackground: Color(0xFF000000),
+    startTitle: Color(0xFFFFFFFF),
+    startBody: Color(0xFFC2C2C7),
+    onStartCta: Color(0xFF260913),
     emotionJoy: Color(0xFFF4B1CB),
     emotionLove: Color(0xFFFF9EC4),
     emotionExcited: Color(0xFFFAD599),
@@ -328,6 +348,10 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? onKakao,
     Color? socialBorder,
     Color? loginLegalText,
+    Color? startBackground,
+    Color? startTitle,
+    Color? startBody,
+    Color? onStartCta,
     Color? emotionJoy,
     Color? emotionLove,
     Color? emotionExcited,
@@ -392,6 +416,10 @@ class AppColors extends ThemeExtension<AppColors> {
       onKakao: onKakao ?? this.onKakao,
       socialBorder: socialBorder ?? this.socialBorder,
       loginLegalText: loginLegalText ?? this.loginLegalText,
+      startBackground: startBackground ?? this.startBackground,
+      startTitle: startTitle ?? this.startTitle,
+      startBody: startBody ?? this.startBody,
+      onStartCta: onStartCta ?? this.onStartCta,
       emotionJoy: emotionJoy ?? this.emotionJoy,
       emotionLove: emotionLove ?? this.emotionLove,
       emotionExcited: emotionExcited ?? this.emotionExcited,
@@ -462,6 +490,10 @@ class AppColors extends ThemeExtension<AppColors> {
       onKakao: mix(onKakao, other.onKakao),
       socialBorder: mix(socialBorder, other.socialBorder),
       loginLegalText: mix(loginLegalText, other.loginLegalText),
+      startBackground: mix(startBackground, other.startBackground),
+      startTitle: mix(startTitle, other.startTitle),
+      startBody: mix(startBody, other.startBody),
+      onStartCta: mix(onStartCta, other.onStartCta),
       emotionJoy: mix(emotionJoy, other.emotionJoy),
       emotionLove: mix(emotionLove, other.emotionLove),
       emotionExcited: mix(emotionExcited, other.emotionExcited),
