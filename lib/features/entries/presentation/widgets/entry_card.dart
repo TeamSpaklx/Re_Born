@@ -11,18 +11,12 @@ import '../../models/intensity_level.dart';
 import 'emotion_chip.dart';
 import 'emotion_face.dart';
 
-/// 기록 목록의 카드 한 장: 감정 캐릭터 + 감정 이름·강도·시각, 인물·분석 상태 칩, 본문 미리보기.
+/// 기록 목록의 카드 한 장: 감정 캐릭터 + 감정 이름·강도·시각, 분석 상태 칩, 본문 미리보기.
 /// 배경은 감정 대표색을 옅게 깐다(Mentry식 감정색 카드).
 class EntryCard extends StatelessWidget {
-  const EntryCard({
-    super.key,
-    required this.entry,
-    required this.personName,
-    required this.onTap,
-  });
+  const EntryCard({super.key, required this.entry, required this.onTap});
 
   final Entry entry;
-  final String? personName;
   final VoidCallback onTap;
 
   @override
@@ -34,7 +28,7 @@ class EntryCard extends StatelessWidget {
       button: true,
       label:
           '${entry.emotion.label} ${IntensityLevel.of(entry.intensity)?.label ?? ''}, $time, '
-          '${personName == null ? '' : '$personName, '}${entry.body}',
+          '${entry.body}',
       excludeSemantics: true,
       onTap: onTap,
       child: Pressable(
@@ -77,22 +71,15 @@ class EntryCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    if (personName != null ||
-                        entry.analysisStatus != AnalysisStatus.done) ...[
+                    if (entry.analysisStatus != AnalysisStatus.done) ...[
                       const SizedBox(height: AppSpacing.space8),
                       Wrap(
                         spacing: 6,
                         runSpacing: 6,
                         children: [
-                          if (personName != null)
-                            _Pill(
-                              label: personName!,
-                              textColor: colors.textStrong,
-                              color: colors.cardWhite,
-                            ),
                           if (entry.analysisStatus == AnalysisStatus.pending)
                             _Pill(
-                              label: '분석 중',
+                              label: '코멘트 쓰는 중',
                               textColor: colors.textSecondary,
                               color: colors.cardWhite,
                             ),

@@ -11,10 +11,9 @@ class InMemoryEntriesRepository implements EntriesRepository {
   var _nextId = 1000;
 
   @override
-  Future<List<Entry>> list({String? personId}) async {
-    final result =
-        _items.where((e) => personId == null || e.personId == personId).toList()
-          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+  Future<List<Entry>> list() async {
+    final result = [..._items]
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return List.unmodifiable(result);
   }
 
@@ -33,12 +32,10 @@ class InMemoryEntriesRepository implements EntriesRepository {
     required int intensity,
     required int score,
     required DateTime createdAt,
-    String? personId,
   }) async {
     final entry = Entry(
       id: 'e${_nextId++}',
       body: body,
-      personId: personId,
       emotion: emotion,
       intensity: intensity,
       score: score,

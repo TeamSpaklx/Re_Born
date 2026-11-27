@@ -10,7 +10,7 @@ class NavTab {
   /// 홈 / 관계 / 기록 / 마이 순서. 라우터의 탭 순서와 같다.
   static const all = [
     NavTab(AppAssets.tabHome, AppAssets.tabHomeActive),
-    NavTab(AppAssets.tabRelations, AppAssets.tabRelationsActive),
+    NavTab(AppAssets.tabAnalysis, AppAssets.tabAnalysisActive),
     NavTab(AppAssets.tabRecord, AppAssets.tabRecordActive),
     NavTab(AppAssets.tabMy, AppAssets.tabMyActive),
   ];

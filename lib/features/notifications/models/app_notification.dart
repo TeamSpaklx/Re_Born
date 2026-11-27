@@ -1,7 +1,7 @@
-/// 알림 종류. 지금은 인사이트 도착뿐이다(F-10 MVP 범위: 인사이트 도착 알림).
-enum NotificationKind { insightNegative, insightRecovery }
+/// 알림 종류. 지금은 AI 코멘트 도착뿐이다(F-10).
+enum NotificationKind { aiComment }
 
-/// 앱 안 알림 목록의 한 건. 인사이트에서 만들어지며 [insightId]로 상세에 연결된다.
+/// 앱 안 알림 목록의 한 건. 일기의 AI 코멘트에서 만들어지며 [entryId]로 그 일기 상세에 연결된다.
 class AppNotification {
   const AppNotification({
     required this.id,
@@ -10,7 +10,7 @@ class AppNotification {
     required this.body,
     required this.createdAt,
     required this.read,
-    required this.insightId,
+    required this.entryId,
   });
 
   final String id;
@@ -19,7 +19,7 @@ class AppNotification {
   final String body;
   final DateTime createdAt;
   final bool read;
-  final String insightId;
+  final String entryId;
 }
 
 /// "방금 전", "3시간 전", "2일 전", "10월 3일" 같은 상대 시각 글자.

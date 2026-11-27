@@ -1,34 +1,23 @@
 import '../../../core/utils/dates.dart';
+import '../../ai_comment/data/fake_ai_comment_service.dart';
 import '../../entries/models/emotion.dart';
 import '../../entries/models/entry.dart';
-import '../../insights/models/index_point.dart';
-import '../../insights/models/insight.dart';
-import '../../people/models/person.dart';
-import '../../people/models/relation_type.dart';
 import '../../settings/models/app_settings.dart';
 import '../../todos/models/todo.dart';
 import '../emotion_analyzer.dart';
-import '../insight_detector.dart';
-import '../relation_index.dart';
 
-/// 백엔드가 붙기 전에 앱을 켜면 들어 있는 샘플 데이터 (Figma 홈 샘플과 같은 모양).
-/// 오늘은 아직 기록이 없어 홈이 "기록 전" 상태이고, 최근 5일 연속 기록(최장 20일),
-/// 지민과의 부정 추세 인사이트가 들어 있다.
+/// 백엔드가 붙기 전에 앱을 켜면 들어 있는 샘플 데이터.
+/// 오늘은 아직 기록이 없어 홈이 "기록 전" 상태이고, 최근 5일 연속 기록(최장 20일)이 있다.
+/// 모든 일기에는 가짜 AI 코멘트가 붙어 있다.
 class SampleData {
   const SampleData({
     required this.settings,
-    required this.people,
     required this.entries,
-    required this.indexPoints,
-    required this.insights,
     required this.todos,
   });
 
   final AppSettings settings;
-  final List<Person> people;
   final List<Entry> entries;
-  final List<IndexPoint> indexPoints;
-  final List<Insight> insights;
   final List<Todo> todos;
 }
 
@@ -37,27 +26,9 @@ SampleData buildSampleData(DateTime now) {
   DateTime day(int daysAgo, [int hour = 21]) =>
       DateTime(today.year, today.month, today.day - daysAgo, hour);
 
-  final jimin = Person(
-    id: 'p1',
-    name: '지민',
-    relationType: RelationType.friend,
-    createdAt: day(40),
-  );
-  final seunghyun = Person(
-    id: 'p2',
-    name: '승현',
-    relationType: RelationType.friend,
-    createdAt: day(40),
-  );
-
+  const settings = AppSettings(nickname: '규리');
   var entryCount = 0;
-  Entry entry(
-    int daysAgo,
-    String? personId,
-    Emotion emotion,
-    int intensity,
-    String body,
-  ) {
+  Entry entry(int daysAgo, Emotion emotion, int intensity, String body) {
     entryCount++;
     final createdAt = day(daysAgo);
     final analyzed = EmotionAnalyzer.analyze(
@@ -66,86 +37,62 @@ SampleData buildSampleData(DateTime now) {
       intensity: intensity,
       now: createdAt,
     );
-    return Entry(
+    final draft = Entry(
       id: 'e$entryCount',
       body: body,
-      personId: personId,
       emotion: emotion,
       intensity: intensity,
       score: analyzed.score,
       createdAt: createdAt,
+    );
+    final feedback = FakeAiCommentService.compose(
+      draft,
+      tone: settings.commentTone,
+      now: createdAt,
+    );
+    return draft.copyWith(
       analysisStatus: AnalysisStatus.done,
-      analysis: analyzed.analysis,
+      analysis: analyzed.analysis.withFeedback(feedback),
     );
   }
 
+  const older = [
+    (Emotion.joy, 2, '친구들과 저녁을 먹으며 많이 웃었다. 행복한 하루였다.'),
+    (Emotion.love, 3, '가족이 응원해 줘서 고마운 마음이 들었다.'),
+    (Emotion.neutral, 1, '평소와 비슷한 하루. 조용히 할 일을 했다.'),
+    (Emotion.excited, 3, '주말 여행 계획을 세우니 설레었다.'),
+    (Emotion.anxiety, 2, '발표 준비가 덜 돼서 조금 걱정됐다.'),
+  ];
+
   final entries = <Entry>[
-    // 오래전(11~30일 전) 20일 연속: 지민과 좋은 기록.
+    // 오래전(11~30일 전) 20일 연속.
     for (var d = 30; d >= 11; d--)
       entry(
         d,
-        jimin.id,
-        d.isEven ? Emotion.joy : Emotion.love,
-        2,
-        '지민이와 즐거운 하루였다. 고마운 마음이 들었다.',
+        older[d % older.length].$1,
+        older[d % older.length].$2,
+        older[d % older.length].$3,
       ),
-    // 최근 5일 연속: 지민에게 서운한 기록.
-    for (var d = 5; d >= 1; d--)
-      entry(d, jimin.id, Emotion.sadness, 2, '지민이가 답장을 늦게 해서 서운했다.'),
-    // 승현과의 기록 3건.
-    entry(9, seunghyun.id, Emotion.love, 2, '승현이가 도와줘서 고마웠다.'),
-    entry(4, seunghyun.id, Emotion.joy, 2, '승현이와 점심을 먹어서 기뻤다.'),
-    entry(2, seunghyun.id, Emotion.excited, 1, '승현이와 주말 약속이 설렌다.'),
-    // 인물 없는 기록.
-    entry(3, null, Emotion.neutral, 1, '조용히 산책을 하며 마음이 평온했다.'),
+    entry(9, Emotion.love, 2, '도와준 친구에게 고마웠다.'),
+    // 최근 5일 연속: 지치고 서운한 날이 이어진다.
+    entry(5, Emotion.sadness, 3, '답장을 늦게 받아서 서운했다. 하루 종일 신경이 쓰였다.'),
+    entry(4, Emotion.joy, 2, '점심을 맛있게 먹어서 기뻤다.'),
+    entry(3, Emotion.neutral, 1, '조용히 산책을 하며 마음이 평온했다.'),
+    entry(2, Emotion.anxiety, 4, '시험이 다가와서 불안하다. 집중이 잘 안 된다.'),
+    entry(1, Emotion.sadness, 3, '과제가 많아 지쳤다. 아무것도 하기 싫었다.'),
   ];
 
-  // 일별 관계 지수 이력(최근 30일, 계산할 수 있는 날만).
-  final points = <IndexPoint>[];
-  for (final person in [jimin, seunghyun]) {
-    final own = entries.where((e) => e.personId == person.id).toList();
-    for (var d = 30; d >= 0; d--) {
-      final result = RelationIndex.compute(own, day(d, 12));
-      if (result != null) {
-        points.add(
-          IndexPoint(
-            personId: person.id,
-            date: day(d, 0),
-            index: result.index,
-            entryCount: result.entryCount,
-          ),
-        );
-      }
-    }
-  }
-
-  // 인사이트: 지금 시각에 감지기를 돌린 결과(지민 부정 추세).
-  final insights = <Insight>[];
-  for (final person in [jimin, seunghyun]) {
-    final found = InsightDetector.detect(
-      person: person,
-      entries: entries.where((e) => e.personId == person.id).toList(),
-      existing: insights,
-      now: now,
-      newId: 'i${insights.length + 1}',
-    );
-    if (found != null) insights.add(found);
-  }
-
   return SampleData(
-    settings: const AppSettings(nickname: '규리'),
-    people: [jimin, seunghyun],
+    settings: settings,
     entries: entries,
-    indexPoints: points,
-    insights: insights,
     todos: [
+      // 이틀 전 일기의 AI 제안 하나를 담아 둔 상태.
       Todo(
         id: 't1',
-        title: '지민님에게 가볍게 안부 묻기',
-        personId: jimin.id,
+        title: entries[entries.length - 2].feedback!.suggestions.first,
         source: TodoSource.suggestion,
-        insightId: insights.isEmpty ? null : insights.first.id,
-        createdAt: day(1),
+        entryId: entries[entries.length - 2].id,
+        createdAt: day(2),
       ),
       Todo(
         id: 't2',

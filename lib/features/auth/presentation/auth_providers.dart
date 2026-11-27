@@ -66,9 +66,6 @@ class AuthActions {
   Future<void> deleteAccount(String password) async {
     await _ref.read(authRepositoryProvider).deleteAccount(password: password);
     await _ref.read(entriesRepositoryProvider).deleteAll();
-    await _ref.read(indexHistoryRepositoryProvider).deleteAll();
-    await _ref.read(insightsRepositoryProvider).deleteAll();
-    await _ref.read(peopleRepositoryProvider).deleteAll();
     await _ref.read(todosRepositoryProvider).deleteAll();
     _ref.read(sessionProvider.notifier).set(null);
     _ref.read(dataRevisionProvider.notifier).bump();

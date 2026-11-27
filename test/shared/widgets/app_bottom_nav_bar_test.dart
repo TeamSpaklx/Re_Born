@@ -51,11 +51,11 @@ void main() {
     await pumpNav(tester, currentIndex: 1);
 
     expect(
-      find.byWidgetPredicate((w) => usesAsset(w, AppAssets.tabRelationsActive)),
+      find.byWidgetPredicate((w) => usesAsset(w, AppAssets.tabAnalysisActive)),
       findsOneWidget,
     );
     expect(
-      find.byWidgetPredicate((w) => usesAsset(w, AppAssets.tabRelations)),
+      find.byWidgetPredicate((w) => usesAsset(w, AppAssets.tabAnalysis)),
       findsNothing,
     );
     for (final inactive in [
@@ -71,7 +71,7 @@ void main() {
 
     Color labelColor(String label) =>
         tester.widget<Text>(find.text(label)).style!.color!;
-    expect(labelColor('관계'), AppColors.light.navActive);
+    expect(labelColor('분석'), AppColors.light.navActive);
     expect(labelColor('홈'), AppColors.light.textStrong);
     expect(labelColor('기록'), AppColors.light.textStrong);
     expect(labelColor('마이'), AppColors.light.textStrong);

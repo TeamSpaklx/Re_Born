@@ -10,15 +10,15 @@ import '../../../app/theme/app_text_styles.dart';
 import '../../../core/utils/korean_date.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/app_dialogs.dart';
-import '../../../shared/widgets/cta_button.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/page_scaffold.dart';
 import '../../entries/models/entry.dart';
+import '../../entries/models/intensity_level.dart';
 import '../../entries/presentation/entries_providers.dart';
 import '../../entries/presentation/widgets/emotion_chip.dart';
 import '../../entries/presentation/widgets/emotion_face.dart';
 import '../../entries/presentation/widgets/entry_card.dart';
-import '../../people/presentation/people_providers.dart';
+import '../../ai_comment/presentation/ai_feedback_card.dart';
 
 /// 기록 상세 (F-03): 감정 캐릭터와 강도, 본문, 분석 결과. 수정·삭제(삭제하면 그 인물의 지수를 다시 계산한다).
 class RecordDetailScreen extends ConsumerWidget {
@@ -44,7 +44,6 @@ class RecordDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.colors;
     final entry = ref.watch(entryProvider(entryId)).value;
-    final people = ref.watch(peopleProvider).value ?? const [];
 
     if (entry == null) {
       return const PageScaffold(
@@ -53,10 +52,6 @@ class RecordDetailScreen extends ConsumerWidget {
       );
     }
 
-    final personName = people
-        .where((p) => p.id == entry.personId)
-        .map((p) => p.name)
-        .firstOrNull;
     final tint = emotionColor(entry.emotion, colors);
 
     return PageScaffold(
@@ -115,14 +110,6 @@ class RecordDetailScreen extends ConsumerWidget {
                             color: colors.textSecondary,
                           ),
                         ),
-                        if (personName != null) ...[
-                          const SizedBox(height: AppSpacing.space8),
-                          _Chip(
-                            personName,
-                            colors.cardWhite,
-                            colors.textStrong,
-                          ),
-                        ],
                       ],
                     ),
                   ),
@@ -138,6 +125,8 @@ class RecordDetailScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.space32),
+            AiFeedbackCard(entry: entry),
+            const SizedBox(height: AppSpacing.space16),
             _AnalysisSection(entry: entry),
           ],
         ),
@@ -146,25 +135,19 @@ class RecordDetailScreen extends ConsumerWidget {
   }
 }
 
-class _AnalysisSection extends ConsumerWidget {
+/// 앱 안 규칙 분석 결과: 감정 점수(−5~+5)와 본문에서 찾은 감정 단어.
+class _AnalysisSection extends StatelessWidget {
   const _AnalysisSection({required this.entry});
 
   final Entry entry;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final colors = context.colors;
-    final keywords = entry.analysis?.keywords ?? const [];
-
-    String status;
-    switch (entry.analysisStatus) {
-      case AnalysisStatus.pending:
-        status = '분석 중이에요';
-      case AnalysisStatus.done:
-        status = '분석을 마쳤어요';
-      case AnalysisStatus.failed:
-        status = '분석하지 못했어요';
-    }
+    final analysis = entry.analysis;
+    if (analysis == null) return const SizedBox.shrink();
+    final keywords = analysis.keywords;
+    final level = IntensityLevel.of(entry.intensity);
 
     return AppCard.white(
       padding: const EdgeInsets.all(AppSpacing.space20),
@@ -172,35 +155,55 @@ class _AnalysisSection extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '분석 결과',
+            '감정 데이터',
             style: AppTextStyles.groupTitle.copyWith(color: colors.textBlack),
           ),
-          const SizedBox(height: AppSpacing.space8),
-          Text(
-            status,
-            style: AppTextStyles.body.copyWith(color: colors.textSecondary),
-          ),
-          if (entry.analysisStatus == AnalysisStatus.done) ...[
-            const SizedBox(height: AppSpacing.space16),
+          if (level != null) ...[
+            const SizedBox(height: AppSpacing.space12),
             Row(
               children: [
                 Text(
-                  '감정 점수',
+                  '강도',
                   style: AppTextStyles.body.copyWith(
                     color: colors.textSecondary,
                   ),
                 ),
                 const Spacer(),
                 Text(
-                  '${entry.score > 0 ? '+' : ''}${entry.score}',
-                  key: const Key('entry-score'),
-                  style: AppTextStyles.sectionTitle.copyWith(
-                    color: entry.score < 0 ? colors.danger : colors.brand,
-                  ),
+                  '${level.value}단계 · ${level.label}',
+                  key: const Key('entry-level'),
+                  style: AppTextStyles.body.copyWith(color: colors.textBlack),
                 ),
               ],
             ),
+            const SizedBox(height: 2),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                level.description,
+                style: AppTextStyles.caption.copyWith(
+                  color: colors.textSecondary,
+                ),
+              ),
+            ),
           ],
+          const SizedBox(height: AppSpacing.space12),
+          Row(
+            children: [
+              Text(
+                '감정 점수',
+                style: AppTextStyles.body.copyWith(color: colors.textSecondary),
+              ),
+              const Spacer(),
+              Text(
+                '${entry.score > 0 ? '+' : ''}${entry.score}',
+                key: const Key('entry-score'),
+                style: AppTextStyles.sectionTitle.copyWith(
+                  color: entry.score < 0 ? colors.danger : colors.brand,
+                ),
+              ),
+            ],
+          ),
           if (keywords.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.space16),
             Wrap(
@@ -210,15 +213,6 @@ class _AnalysisSection extends ConsumerWidget {
                 for (final k in keywords)
                   _Chip(k, colors.chip, colors.textSecondary),
               ],
-            ),
-          ],
-          if (entry.analysisStatus == AnalysisStatus.failed) ...[
-            const SizedBox(height: AppSpacing.space16),
-            CtaButton(
-              label: '다시 분석',
-              height: 48,
-              onPressed: () =>
-                  ref.read(recordActionsProvider).retryAnalysis(entry.id),
             ),
           ],
         ],

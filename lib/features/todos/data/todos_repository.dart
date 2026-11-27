@@ -7,9 +7,8 @@ abstract interface class TodosRepository {
   Future<Todo> create({
     required String title,
     required DateTime createdAt,
-    String? personId,
     TodoSource source = TodoSource.manual,
-    String? insightId,
+    String? entryId,
   });
 
   /// 제목·완료 여부·완료 시각을 갱신한다.

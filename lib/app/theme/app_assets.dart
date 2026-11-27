@@ -3,11 +3,11 @@
 abstract final class AppAssets {
   static const _icons = 'assets/icons/ui';
 
-  // 하단 탭 (기본 / 선택[분홍]). 투데이·관계·기록은 Phosphor Icons, 전체는 Iconsax(menu).
+  // 하단 탭 (기본 / 선택[분홍]). 홈·분석·기록은 Phosphor Icons(fill), 마이는 Figma account_circle.
   static const tabHome = '$_icons/tab_home.svg';
   static const tabHomeActive = '$_icons/tab_home_active.svg';
-  static const tabRelations = '$_icons/tab_relations.svg';
-  static const tabRelationsActive = '$_icons/tab_relations_active.svg';
+  static const tabAnalysis = '$_icons/tab_analysis.svg';
+  static const tabAnalysisActive = '$_icons/tab_analysis_active.svg';
   static const tabRecord = '$_icons/tab_record.svg';
   static const tabRecordActive = '$_icons/tab_record_active.svg';
   static const tabMy = '$_icons/tab_my.svg';
@@ -109,8 +109,8 @@ abstract final class AppAssets {
   static const all = [
     tabHome,
     tabHomeActive,
-    tabRelations,
-    tabRelationsActive,
+    tabAnalysis,
+    tabAnalysisActive,
     tabRecord,
     tabRecordActive,
     tabMy,

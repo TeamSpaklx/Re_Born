@@ -12,24 +12,27 @@ import '../../../../shared/widgets/centered_line.dart';
 import '../../../../shared/widgets/cta_button.dart';
 import '../../models/record_streak.dart';
 
-/// 오늘 기록을 마쳤을 때의 핑크 카드 (Figma `UnWrite` After, 높이 399, docs/DESIGN_HOME.md 5.3).
-/// 아바타(오늘 기록에 나온 인물) · 완료 문구 · "오늘 기록 보기" · (출석 체크 패널은 [HomeLayout.showAttendance]가 켜졌을 때만).
+/// 오늘 기록을 마쳤을 때의 핑크 카드 (Figma `UnWrite` After, docs/DESIGN_HOME.md 5.3).
+/// 캐릭터 · 완료 문구 · 오늘 일기의 AI 코멘트 · "오늘 기록 보기" · (출석 체크 패널은 [HomeLayout.showAttendance]가 켜졌을 때만).
 class RecordCardAfter extends StatelessWidget {
   const RecordCardAfter({
     super.key,
     required this.streak,
-    required this.peopleCount,
     required this.onViewToday,
+    this.comment,
+    this.commentPending = false,
   });
 
   final RecordStreak streak;
-
-  /// 오늘 기록에 나온 서로 다른 인물 수. 최대 3개의 동그란 아바타를 겹쳐 그린다.
-  final int peopleCount;
   final VoidCallback onViewToday;
 
+  /// 오늘 일기의 AI 코멘트. 없으면 코멘트 말풍선을 그리지 않는다.
+  final String? comment;
+
+  /// 코멘트를 아직 받는 중이면 "코멘트를 쓰고 있어요"를 보여 준다.
+  final bool commentPending;
+
   static const _avatarSize = 44.0;
-  static const _avatarStep = 31.0;
   static const _gap = 22.0;
 
   @override
@@ -54,15 +57,14 @@ class RecordCardAfter extends StatelessWidget {
             height: _avatarSize,
             child: Stack(
               children: [
-                for (var i = 0; i < peopleCount.clamp(0, 3); i++)
-                  Positioned(
-                    left: i * _avatarStep,
-                    child: CharacterAvatar(
-                      seed: 'today-$i',
-                      size: _avatarSize,
-                      borderColor: colors.cardWhite,
-                    ),
+                Positioned(
+                  left: 0,
+                  child: CharacterAvatar(
+                    seed: 'today-0',
+                    size: _avatarSize,
+                    borderColor: colors.cardWhite,
                   ),
+                ),
                 Positioned(
                   right: 0,
                   child: SvgPicture.asset(
@@ -90,6 +92,10 @@ class RecordCardAfter extends StatelessWidget {
               ],
             ),
           ),
+          if (comment != null || commentPending) ...[
+            const SizedBox(height: AppSpacing.space16),
+            _CommentBubble(comment: comment, pending: commentPending),
+          ],
           const SizedBox(height: _gap),
           CtaButton(
             label: '오늘 기록 보기',
@@ -203,6 +209,51 @@ class _AttendancePanel extends StatelessWidget {
                   ),
                 ],
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 기록 완료 카드 안의 AI 코멘트 한 덩이(최대 2줄).
+class _CommentBubble extends StatelessWidget {
+  const _CommentBubble({required this.comment, required this.pending});
+
+  final String? comment;
+  final bool pending;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Container(
+      key: const Key('home-ai-comment'),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space16,
+        vertical: AppSpacing.space12,
+      ),
+      decoration: BoxDecoration(
+        color: colors.cardWhite,
+        borderRadius: BorderRadius.circular(AppRadii.card - 8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'AI 코멘트',
+            style: AppTextStyles.caption.copyWith(color: colors.brand),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            pending && comment == null ? '오늘 일기를 읽고 코멘트를 쓰고 있어요…' : comment!,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.body.copyWith(
+              color: pending && comment == null
+                  ? colors.textSecondary
+                  : colors.textStrong,
+              height: 1.45,
             ),
           ),
         ],

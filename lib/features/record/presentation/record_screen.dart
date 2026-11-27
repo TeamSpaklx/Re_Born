@@ -24,20 +24,39 @@ import '../../entries/presentation/entries_providers.dart';
 import '../../entries/presentation/widgets/emotion_face.dart';
 import '../../entries/presentation/widgets/emotion_picker.dart';
 import '../../entries/presentation/widgets/entry_card.dart';
-import '../../people/presentation/people_providers.dart';
+import '../../todos/presentation/widgets/checklist_section.dart';
 
-/// 기록 탭 (F-03): 달력으로 날짜를 골라 그날의 기록을 보거나, 날짜별 목록으로 훑는다.
-/// 달력의 날짜 아래에는 그날 마지막 기록의 감정 캐릭터가 붙고, 위에는 이번 달 감정 비율이 있다.
-/// 카드는 밀어서 지울 수 있다(확인 팝업). 기록이 있을 때 오른쪽 아래 "기록하기"가 작성 화면을 연다.
+/// 기록 탭의 보기: 달력 / 목록 / 체크리스트.
+enum RecordView {
+  calendar('달력'),
+  list('목록'),
+  checklist('체크리스트');
+
+  const RecordView(this.label);
+
+  final String label;
+
+  /// 경로 `?view=` 값. 모르는 값이면 null(지금 보기를 그대로 둔다).
+  static RecordView? fromQuery(String? value) =>
+      values.where((v) => v.name == value).firstOrNull;
+}
+
+/// 기록 탭 (F-03·F-04): 달력으로 날짜를 골라 그날의 일기를 보거나, 날짜별 목록으로 훑거나,
+/// 체크리스트(AI 제안·직접 추가한 할 일)를 관리한다.
+/// 달력의 날짜 아래에는 그날 마지막 일기의 감정 캐릭터가 붙고, 위에는 이번 달 감정 비율이 있다.
+/// 카드는 밀어서 지울 수 있다(확인 팝업). 일기가 있을 때 오른쪽 아래 "기록하기"가 작성 화면을 연다.
 class RecordScreen extends ConsumerStatefulWidget {
-  const RecordScreen({super.key});
+  const RecordScreen({super.key, this.initialView});
+
+  /// 처음(또는 경로가 바뀌어 다시 그려질 때) 보여 줄 보기. null이면 달력.
+  final RecordView? initialView;
 
   @override
   ConsumerState<RecordScreen> createState() => _RecordScreenState();
 }
 
 class _RecordScreenState extends ConsumerState<RecordScreen> {
-  int _view = 0; // 0 달력, 1 목록
+  late RecordView _view = widget.initialView ?? RecordView.calendar;
   DateTime? _month;
   DateTime? _selected;
 
@@ -54,6 +73,14 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
   );
 
   @override
+  void didUpdateWidget(RecordScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // 홈의 "체크리스트 보기"처럼 경로로 보기를 정해 들어오면 그 보기로 바꾼다.
+    final next = widget.initialView;
+    if (next != null && next != oldWidget.initialView) _view = next;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final now = ref.watch(clockProvider)();
@@ -61,8 +88,6 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
     final month = _month ?? DateTime(today.year, today.month);
     final selected = _selected ?? today;
     final entries = ref.watch(entriesProvider);
-    final people = ref.watch(peopleProvider).value ?? const [];
-    final names = {for (final p in people) p.id: p.name};
 
     Widget cardFor(Entry entry) => Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.actionCardGap),
@@ -75,7 +100,6 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
         },
         child: EntryCard(
           entry: entry,
-          personName: names[entry.personId],
           onTap: () => context.push(AppRoutes.recordDetail(entry.id)),
         ),
       ),
@@ -83,7 +107,7 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
 
     return TabPageScaffold(
       title: '기록',
-      floating: entries.value?.isEmpty == true
+      floating: entries.value?.isEmpty == true || _view == RecordView.checklist
           ? null
           : AppFab(
               label: '기록하기',
@@ -99,151 +123,156 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
             children: [
               const SizedBox(height: AppSpacing.space8),
               SegmentedControl(
-                labels: const ['달력', '목록'],
-                selectedIndex: _view,
-                onChanged: (i) => setState(() => _view = i),
+                labels: [for (final v in RecordView.values) v.label],
+                selectedIndex: _view.index,
+                onChanged: (i) => setState(() => _view = RecordView.values[i]),
               ),
               const SizedBox(height: AppSpacing.space16),
-              entries.when(
-                skipLoadingOnReload: true,
-                data: (all) {
-                  final list = [
-                    for (final e in all)
-                      if (!_removed.contains(e.id)) e,
-                  ];
-                  if (list.isEmpty) {
-                    return EmptyState(
-                      message: '아직 기록이 없어요',
-                      hint: '오늘의 마음을 한 줄로 남겨 보세요.',
-                      showMascot: true,
-                      actionLabel: '첫 기록 남기기',
-                      onAction: () => context.push(AppRoutes.recordNew),
-                    );
-                  }
-                  final byDay = <DateTime, List<Entry>>{};
-                  for (final e in list) {
-                    byDay.putIfAbsent(dateOnly(e.createdAt), () => []).add(e);
-                  }
-                  if (_view == 1) {
-                    final days = byDay.keys.toList()
-                      ..sort((a, b) => b.compareTo(a));
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        for (final day in days) ...[
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              top: AppSpacing.space12,
-                              bottom: AppSpacing.space8,
-                            ),
-                            child: Semantics(
-                              header: true,
-                              child: Text(
-                                formatKoreanDate(day),
-                                style: AppTextStyles.sectionLabel.copyWith(
-                                  color: colors.textSecondary,
-                                ),
-                              ),
-                            ),
-                          ),
-                          for (final entry in byDay[day]!) cardFor(entry),
-                        ],
-                      ],
-                    );
-                  }
-
-                  final counts = <Emotion, int>{};
-                  for (final e in list) {
-                    if (e.createdAt.year == month.year &&
-                        e.createdAt.month == month.month) {
-                      counts[e.emotion] = (counts[e.emotion] ?? 0) + 1;
+              // 체크리스트는 일기가 없어도 보여야 하므로 일기 불러오기 밖에서 그린다.
+              if (_view == RecordView.checklist)
+                const ChecklistSection()
+              else
+                entries.when(
+                  skipLoadingOnReload: true,
+                  data: (all) {
+                    final list = [
+                      for (final e in all)
+                        if (!_removed.contains(e.id)) e,
+                    ];
+                    if (list.isEmpty) {
+                      return EmptyState(
+                        message: '아직 기록이 없어요',
+                        hint: '오늘의 마음을 한 줄로 남겨 보세요.',
+                        showMascot: true,
+                        actionLabel: '첫 기록 남기기',
+                        onAction: () => context.push(AppRoutes.recordNew),
+                      );
                     }
-                  }
-                  final dayEntries = byDay[selected] ?? const <Entry>[];
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      AppCard.white(
-                        padding: const EdgeInsets.fromLTRB(
-                          AppSpacing.space12,
-                          AppSpacing.space8,
-                          AppSpacing.space12,
-                          AppSpacing.space12,
-                        ),
-                        child: MonthCalendar(
-                          month: month,
-                          selected: selected,
-                          today: today,
-                          onSelected: (d) => setState(() => _selected = d),
-                          onMonthChanged: (m) => setState(() => _month = m),
-                          markerFor: (day) {
-                            final dayList = byDay[dateOnly(day)];
-                            if (dayList == null) return null;
-                            return EmotionFace(
-                              emotion: dayList.first.emotion,
-                              size: 20,
-                            );
-                          },
-                        ),
-                      ),
-                      if (counts.isNotEmpty) ...[
-                        const SizedBox(height: AppSpacing.space16),
-                        AppCard.white(
-                          padding: const EdgeInsets.all(AppSpacing.space20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${month.month}월의 마음',
-                                style: AppTextStyles.groupTitle.copyWith(
-                                  color: colors.textBlack,
+                    final byDay = <DateTime, List<Entry>>{};
+                    for (final e in list) {
+                      byDay.putIfAbsent(dateOnly(e.createdAt), () => []).add(e);
+                    }
+                    if (_view == RecordView.list) {
+                      final days = byDay.keys.toList()
+                        ..sort((a, b) => b.compareTo(a));
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          for (final day in days) ...[
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: AppSpacing.space12,
+                                bottom: AppSpacing.space8,
+                              ),
+                              child: Semantics(
+                                header: true,
+                                child: Text(
+                                  formatKoreanDate(day),
+                                  style: AppTextStyles.sectionLabel.copyWith(
+                                    color: colors.textSecondary,
+                                  ),
                                 ),
                               ),
-                              const SizedBox(height: AppSpacing.space12),
-                              EmotionRatioBar(counts: counts),
-                            ],
+                            ),
+                            for (final entry in byDay[day]!) cardFor(entry),
+                          ],
+                        ],
+                      );
+                    }
+
+                    final counts = <Emotion, int>{};
+                    for (final e in list) {
+                      if (e.createdAt.year == month.year &&
+                          e.createdAt.month == month.month) {
+                        counts[e.emotion] = (counts[e.emotion] ?? 0) + 1;
+                      }
+                    }
+                    final dayEntries = byDay[selected] ?? const <Entry>[];
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        AppCard.white(
+                          padding: const EdgeInsets.fromLTRB(
+                            AppSpacing.space12,
+                            AppSpacing.space8,
+                            AppSpacing.space12,
+                            AppSpacing.space12,
+                          ),
+                          child: MonthCalendar(
+                            month: month,
+                            selected: selected,
+                            today: today,
+                            onSelected: (d) => setState(() => _selected = d),
+                            onMonthChanged: (m) => setState(() => _month = m),
+                            markerFor: (day) {
+                              final dayList = byDay[dateOnly(day)];
+                              if (dayList == null) return null;
+                              return EmotionFace(
+                                emotion: dayList.first.emotion,
+                                size: 20,
+                              );
+                            },
                           ),
                         ),
-                      ],
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          top: AppSpacing.space24,
-                          bottom: AppSpacing.space12,
-                        ),
-                        child: Semantics(
-                          header: true,
-                          child: Text(
-                            formatKoreanDate(selected),
-                            style: AppTextStyles.sectionTitle.copyWith(
-                              color: colors.textBlack,
+                        if (counts.isNotEmpty) ...[
+                          const SizedBox(height: AppSpacing.space16),
+                          AppCard.white(
+                            padding: const EdgeInsets.all(AppSpacing.space20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${month.month}월의 마음',
+                                  style: AppTextStyles.groupTitle.copyWith(
+                                    color: colors.textBlack,
+                                  ),
+                                ),
+                                const SizedBox(height: AppSpacing.space12),
+                                EmotionRatioBar(counts: counts),
+                              ],
                             ),
                           ),
-                        ),
-                      ),
-                      if (dayEntries.isEmpty)
+                        ],
                         Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: AppSpacing.space24,
+                          padding: const EdgeInsets.only(
+                            top: AppSpacing.space24,
+                            bottom: AppSpacing.space12,
                           ),
-                          child: Text(
-                            selected == today
-                                ? '오늘은 아직 기록이 없어요.'
-                                : '이날은 남긴 기록이 없어요.',
-                            textAlign: TextAlign.center,
-                            style: AppTextStyles.body.copyWith(
-                              color: colors.textSecondary,
+                          child: Semantics(
+                            header: true,
+                            child: Text(
+                              formatKoreanDate(selected),
+                              style: AppTextStyles.sectionTitle.copyWith(
+                                color: colors.textBlack,
+                              ),
                             ),
                           ),
-                        )
-                      else
-                        for (final entry in dayEntries) cardFor(entry),
-                    ],
-                  );
-                },
-                loading: () => const SkeletonList(count: 4),
-                error: (e, st) =>
-                    ErrorState(onRetry: () => ref.invalidate(entriesProvider)),
-              ),
+                        ),
+                        if (dayEntries.isEmpty)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppSpacing.space24,
+                            ),
+                            child: Text(
+                              selected == today
+                                  ? '오늘은 아직 기록이 없어요.'
+                                  : '이날은 남긴 기록이 없어요.',
+                              textAlign: TextAlign.center,
+                              style: AppTextStyles.body.copyWith(
+                                color: colors.textSecondary,
+                              ),
+                            ),
+                          )
+                        else
+                          for (final entry in dayEntries) cardFor(entry),
+                      ],
+                    );
+                  },
+                  loading: () => const SkeletonList(count: 4),
+                  error: (e, st) => ErrorState(
+                    onRetry: () => ref.invalidate(entriesProvider),
+                  ),
+                ),
             ],
           ),
         ),

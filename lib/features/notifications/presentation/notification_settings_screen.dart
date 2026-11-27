@@ -14,7 +14,7 @@ import '../../security/presentation/app_lock_controller.dart';
 import '../../settings/models/app_settings.dart';
 import '../../settings/presentation/settings_providers.dart';
 
-/// 알림 설정: 인사이트 알림, 기록 리마인드와 시각. 앱 안 알림 목록이 먼저이고 기기 푸시는 준비 중이다.
+/// 알림 설정: AI 코멘트 알림, 기록 리마인드와 시각. 앱 안 알림 목록이 먼저이고 기기 푸시는 준비 중이다.
 class NotificationSettingsScreen extends ConsumerWidget {
   const NotificationSettingsScreen({super.key});
 
@@ -97,11 +97,11 @@ class NotificationSettingsScreen extends ConsumerWidget {
             SettingsGroup(
               children: [
                 SettingsRow.toggle(
-                  key: const Key('notify-insight'),
-                  title: '인사이트 알림',
-                  value: prefs.insight,
+                  key: const Key('notify-ai-comment'),
+                  title: 'AI 코멘트 알림',
+                  value: prefs.aiComment,
                   onChanged: (v) =>
-                      actions.saveNotifications(prefs.copyWith(insight: v)),
+                      actions.saveNotifications(prefs.copyWith(aiComment: v)),
                 ),
                 SettingsRow.toggle(
                   key: const Key('notify-reminder'),

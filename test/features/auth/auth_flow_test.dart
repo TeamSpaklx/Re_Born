@@ -8,7 +8,7 @@ import 'package:reborn_app/features/auth/data/in_memory_auth_repository.dart';
 import 'package:reborn_app/features/auth/models/auth_validator.dart';
 import 'package:reborn_app/features/auth/presentation/auth_providers.dart';
 import 'package:reborn_app/features/auth/presentation/login_screen.dart';
-import 'package:reborn_app/features/people/presentation/people_providers.dart';
+import 'package:reborn_app/features/entries/presentation/entries_providers.dart';
 
 import '../../helpers/fakes.dart';
 
@@ -90,7 +90,7 @@ void main() {
 
     expect(find.text('계정을 삭제했어요'), findsOneWidget);
     expect(c.read(sessionProvider), isNull);
-    expect(await c.read(peopleProvider.future), isEmpty);
+    expect(await c.read(entriesProvider.future), isEmpty);
 
     await tester.tap(find.text('처음으로'));
     await tester.pumpAndSettle();

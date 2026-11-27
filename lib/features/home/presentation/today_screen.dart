@@ -26,11 +26,10 @@ import 'widgets/home_skeleton.dart';
 import 'widgets/home_top_bar.dart';
 import 'widgets/record_card_after.dart';
 import 'widgets/record_card_before.dart';
-import 'widgets/relation_signal_card.dart';
 import 'widgets/section_title_row.dart';
 import 'widgets/weekly_emotion_card.dart';
 
-/// 투데이(홈) 탭. 지금은 Before(기록 전) 상태만 구현한다. After(기록 완료)는 다음 작업.
+/// 홈 탭: 인사 · 기록 카드(전/후) · 이번 주 감정 흐름 · AI 행동 제안.
 class TodayScreen extends ConsumerWidget {
   const TodayScreen({super.key});
 
@@ -122,9 +121,8 @@ class _HomeContentState extends ConsumerState<_HomeContent> {
         .read(todoActionsProvider)
         .add(
           title: suggestion.title,
-          personId: suggestion.personId,
           source: TodoSource.suggestion,
-          insightId: suggestion.insightId,
+          entryId: suggestion.entryId,
           now: ref.read(clockProvider)(),
         );
     if (context.mounted) showAppToast(context, '체크리스트에 담았어요', success: true);
@@ -178,7 +176,8 @@ class _HomeContentState extends ConsumerState<_HomeContent> {
                     summary.todayRecorded
                         ? RecordCardAfter(
                             streak: summary.streak,
-                            peopleCount: summary.todayPeopleCount,
+                            comment: summary.todayComment,
+                            commentPending: summary.todayCommentPending,
                             onViewToday: () {
                               final id = summary.todayEntryId;
                               if (id != null) {
@@ -190,32 +189,7 @@ class _HomeContentState extends ConsumerState<_HomeContent> {
                             onRecord: () => context.go(AppRoutes.record),
                           ),
                   ),
-                  const SizedBox(height: HomeLayout.recordCardToSignalTitle),
-                  SectionTitleRow(
-                    title: '최근 관계 신호',
-                    onSeeAll: () => context.go(AppRoutes.relations),
-                  ),
-                  const SizedBox(height: HomeLayout.sectionTitleToCard),
-                  if (summary.relationSignals.isEmpty)
-                    card(
-                      Text(
-                        '아직 감지된 관계 변화가 없어요. 기록이 쌓이면 알려 드릴게요.',
-                        style: AppTextStyles.body.copyWith(
-                          color: colors.textSecondary,
-                        ),
-                      ),
-                    )
-                  else
-                    for (final signal in summary.relationSignals)
-                      card(
-                        RelationSignalCard(
-                          signal: signal,
-                          onTap: () => context.push(
-                            AppRoutes.insightDetail(signal.insightId),
-                          ),
-                        ),
-                      ),
-                  const SizedBox(height: HomeLayout.signalCardToGraph),
+                  const SizedBox(height: HomeLayout.recordCardToGraph),
                   card(
                     WeeklyEmotionCard(
                       flow: summary.weeklyEmotion,
@@ -226,17 +200,18 @@ class _HomeContentState extends ConsumerState<_HomeContent> {
                   SectionTitleRow(
                     title: '오늘 해볼까요?',
                     trailingChevron: true,
-                    onTitleTap: () => context.go(AppRoutes.all),
+                    onTitleTap: () => context.go(AppRoutes.checklist),
                   ),
                   const SizedBox(height: HomeLayout.sectionTitleToCard),
                   if (_visibleSuggestions().isEmpty)
                     card(
                       summary.suggestionsDone
                           ? _SuggestionsDone(
-                              onOpenChecklist: () => context.go(AppRoutes.all),
+                              onOpenChecklist: () =>
+                                  context.go(AppRoutes.checklist),
                             )
                           : Text(
-                              '관계 변화가 감지되면 해 볼 만한 일을 제안해 드려요.',
+                              '일기를 쓰면 AI가 해 볼 만한 일을 제안해 드려요.',
                               style: AppTextStyles.body.copyWith(
                                 color: colors.textSecondary,
                               ),
@@ -251,9 +226,8 @@ class _HomeContentState extends ConsumerState<_HomeContent> {
                         child: ActionSuggestionCard(
                           key: ValueKey(s.id),
                           suggestion: s,
-                          onTap: () => context.push(
-                            AppRoutes.insightDetail(s.insightId),
-                          ),
+                          onTap: () =>
+                              context.push(AppRoutes.recordDetail(s.entryId)),
                           onAdd: () => _add(context, ref, s, i),
                         ),
                       ),

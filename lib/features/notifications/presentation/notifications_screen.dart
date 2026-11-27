@@ -16,7 +16,7 @@ import '../models/app_notification.dart';
 import 'notifications_providers.dart';
 
 /// 알림 목록 (Figma 알림 `834:1148`): 가운데 제목 + 오른쪽 설정 톱니, "전체 / 안 읽음" 세그먼트.
-/// 읽지 않은 알림은 핑크 강조 + 점이고, 누르면 해당 인사이트로 간다. 비어 있으면 마스코트 + "받은 알림이 없습니다".
+/// 읽지 않은 알림은 핑크 강조 + 점이고, 누르면 그 일기 상세로 간다. 비어 있으면 마스코트 + "받은 알림이 없습니다".
 /// 알림이 있을 때의 목록 디자인은 Figma에 아직 없어 기존 [NotificationRow]를 쓴다.
 class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
@@ -37,14 +37,15 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     Widget rowFor(AppNotification n) => Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space8),
       child: NotificationRow(
-        iconAsset: n.kind == NotificationKind.insightNegative
-            ? AppAssets.forum
-            : AppAssets.sealCheck,
+        iconAsset: AppAssets.forum,
         title: n.title,
         body: n.body,
         timeLabel: formatRelativeTime(n.createdAt, now),
         unread: !n.read,
-        onTap: () => context.push(AppRoutes.insightDetail(n.insightId)),
+        onTap: () {
+          ref.read(readNotificationsProvider.notifier).markRead(n.id);
+          context.push(AppRoutes.recordDetail(n.entryId));
+        },
       ),
     );
 

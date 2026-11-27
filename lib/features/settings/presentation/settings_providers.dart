@@ -133,24 +133,22 @@ class SettingsActions {
     }
   }
 
-  /// 가입 마지막 "알림 켜기": OS 권한을 요청하고, 허용되면 인사이트 알림과 리마인드를 켠다.
-  /// 거부되면 인사이트 알림(앱 안 목록)만 켜고 false를 돌려준다.
+  /// 가입 마지막 "알림 켜기": OS 권한을 요청하고, 허용되면 AI 코멘트 알림과 리마인드를 켠다.
+  /// 거부되면 AI 코멘트 알림(앱 안 목록)만 켜고 false를 돌려준다.
   Future<bool> enableNotifications() async {
     final allowed = await _ref
         .read(appLockControllerProvider.notifier)
         .suspendWhile(_ref.read(notificationServiceProvider).requestPermission);
     final repo = _ref.read(settingsRepositoryProvider);
     final prefs = (await repo.get()).notifications;
-    await saveNotifications(prefs.copyWith(insight: true));
+    await saveNotifications(prefs.copyWith(aiComment: true));
     if (allowed) return setReminder(true);
     return false;
   }
 
-  /// 기록 전체 삭제: 기록과 거기서 만들어진 지수 이력·인사이트를 지운다. 인물·체크리스트는 남긴다.
+  /// 기록 전체 삭제: 일기와 거기 붙은 AI 코멘트를 지운다. 체크리스트는 남긴다.
   Future<void> deleteAllRecords() async {
     await _ref.read(entriesRepositoryProvider).deleteAll();
-    await _ref.read(indexHistoryRepositoryProvider).deleteAll();
-    await _ref.read(insightsRepositoryProvider).deleteAll();
     _ref.read(dataRevisionProvider.notifier).bump();
   }
 }

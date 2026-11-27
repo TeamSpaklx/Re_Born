@@ -6,8 +6,9 @@ import 'package:reborn_app/app/data_providers.dart';
 import 'package:reborn_app/app/main_shell.dart';
 import 'package:reborn_app/core/providers/clock_provider.dart';
 import 'package:reborn_app/features/entries/models/emotion.dart';
-import 'package:reborn_app/features/people/data/in_memory_people_repository.dart';
 import 'package:reborn_app/features/record/presentation/record_form_screen.dart';
+import 'package:reborn_app/features/record/presentation/record_result_screen.dart';
+import 'package:reborn_app/features/todos/models/todo.dart';
 import 'package:reborn_app/shared/widgets/page_scaffold.dart';
 
 final fixedNow = DateTime(2026, 10, 22, 12);
@@ -27,20 +28,11 @@ void main() {
     addTearDown(tester.view.reset);
   }
 
-  Future<ProviderContainer> pumpApp(
-    WidgetTester tester, {
-    bool noPeople = false,
-  }) async {
+  Future<ProviderContainer> pumpApp(WidgetTester tester) async {
     useDesignScreen(tester);
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          clockProvider.overrideWithValue(() => fixedNow),
-          if (noPeople)
-            peopleRepositoryProvider.overrideWithValue(
-              InMemoryPeopleRepository(),
-            ),
-        ],
+        overrides: [clockProvider.overrideWithValue(() => fixedNow)],
         child: const RebornApp(),
       ),
     );
@@ -86,7 +78,7 @@ void main() {
     await tester.tap(find.byKey(const Key('day-2026-10-21')));
     await tester.pumpAndSettle();
     expect(find.text('10월 21일 수요일'), findsOneWidget);
-    expect(find.text('지민이가 답장을 늦게 해서 서운했다.'), findsWidgets);
+    expect(find.text('과제가 많아 지쳤다. 아무것도 하기 싫었다.'), findsWidgets);
   });
 
   testWidgets('기록 탭: 목록으로 바꾸면 날짜별로 묶여 보인다', (tester) async {
@@ -97,7 +89,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('10월 21일 수요일'), findsOneWidget);
-    expect(find.text('지민이가 답장을 늦게 해서 서운했다.'), findsWidgets);
+    expect(find.text('과제가 많아 지쳤다. 아무것도 하기 싫었다.'), findsWidgets);
   });
 
   testWidgets('기록 탭: 카드를 밀면 확인 팝업 뒤에 삭제된다', (tester) async {
@@ -167,7 +159,46 @@ void main() {
     expect(saved.body, contains('하은이가'));
     expect(saved.emotion, Emotion.sadness);
     expect(saved.score, -2);
+
+    // 저장하면 결과 화면으로 가고, AI 코멘트가 도착한다.
+    expect(find.byType(RecordResultScreen), findsOneWidget);
+    expect(find.byType(RecordFormScreen), findsNothing);
+    expect(find.text('강도 2단계 · 의식됨'), findsOneWidget);
+    expect(find.byKey(const Key('ai-comment')), findsOneWidget);
+    final stored = await container
+        .read(entriesRepositoryProvider)
+        .get(saved.id);
+    expect(stored!.feedback, isNotNull);
+
+    await tester.tap(find.text('확인'));
+    await tester.pumpAndSettle();
+    expect(find.byType(RecordResultScreen), findsNothing);
     expect(find.textContaining('하은이가 노트를'), findsOneWidget);
+  });
+
+  testWidgets('결과 화면: AI 제안을 체크리스트에 담으면 "담았어요"로 바뀐다', (tester) async {
+    final container = await pumpApp(tester);
+    await openRecordForm(tester);
+    await tester.enterText(find.byKey(const Key('record-body')), '과제가 많아 지쳤다');
+    await pickEmotionAndIntensity(tester);
+    await tapSave(tester);
+
+    final firstSuggestion = find.byKey(const Key('ai-suggestion-0'));
+    expect(firstSuggestion, findsOneWidget);
+    await tester.tap(
+      find.descendant(of: firstSuggestion, matching: find.text('체크리스트에 담기')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.descendant(of: firstSuggestion, matching: find.text('담았어요')),
+      findsOneWidget,
+    );
+    final todos = await container.read(todosRepositoryProvider).list();
+    final saved =
+        (await container.read(entriesRepositoryProvider).list()).first;
+    final added = todos.firstWhere((t) => t.entryId == saved.id);
+    expect(added.source, TodoSource.suggestion);
   });
 
   testWidgets('T-33: 위기 표현이면 안내를 보여 주고 저장은 그대로 진행한다', (tester) async {
@@ -204,28 +235,10 @@ void main() {
     expect(find.text('마음이 많이 힘드신 것 같아요'), findsNothing);
   });
 
-  testWidgets('T-09: 인물이 없으면 선택 시트에 안내가 나온다', (tester) async {
-    await pumpApp(tester, noPeople: true);
-    await openRecordForm(tester);
-
-    await tester.scrollUntilVisible(
-      find.byKey(const Key('record-person')),
-      100,
-      scrollable: formScrollable(),
-    );
-    await tester.tap(find.byKey(const Key('record-person')));
-    await tester.pumpAndSettle();
-
-    expect(find.textContaining('등록된 인물이 없어요'), findsOneWidget);
-    await tester.tap(find.text('인물 없음').last);
-    await tester.pumpAndSettle();
-  });
-
-  testWidgets('T-14: 상세에서 삭제하면 기록이 사라지고 지수가 다시 계산된다', (tester) async {
+  testWidgets('T-14: 상세에서 삭제하면 기록이 사라진다', (tester) async {
     final container = await pumpApp(tester);
-    final history = container.read(indexHistoryRepositoryProvider);
     final entries = container.read(entriesRepositoryProvider);
-    final target = (await entries.list(personId: 'p1')).first;
+    final target = (await entries.list()).first;
     await tester.tap(find.text('기록'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('목록'));
@@ -240,10 +253,27 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(await entries.get(target.id), isNull);
-    final today = (await history.list('p1')).where(
-      (p) => p.date.day == fixedNow.day && p.date.month == fixedNow.month,
+  });
+
+  testWidgets('기록 상세: 강도 단계와 AI 코멘트·제안이 보인다', (tester) async {
+    final container = await pumpApp(tester);
+    final target =
+        (await container.read(entriesRepositoryProvider).list()).first;
+    await tester.tap(find.text('기록'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('목록'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(target.body).first);
+    await tester.pumpAndSettle();
+
+    expect(find.text(target.feedback!.comment), findsOneWidget);
+    expect(find.byKey(const Key('ai-suggestion-0')), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('entry-level')),
+      100,
+      scrollable: find.byType(Scrollable).last,
     );
-    expect(today, isNotEmpty, reason: '남은 기록으로 오늘 지수가 다시 저장됨');
+    expect(find.text('3단계 · 영향 있음'), findsOneWidget);
   });
 
   group('작성 중 나가기 확인', () {
@@ -302,7 +332,7 @@ void main() {
       expect(find.byType(RecordFormScreen), findsOneWidget);
     });
 
-    testWidgets('저장하면 묻지 않고 닫힌다', (tester) async {
+    testWidgets('저장하면 묻지 않고 결과 화면으로 바뀐다', (tester) async {
       await pumpApp(tester);
       await openRecordForm(tester);
       await pickEmotionAndIntensity(tester);

@@ -2,7 +2,7 @@ import '../entries/models/emotion.dart';
 import '../entries/models/entry.dart';
 
 /// 기록 1건의 규칙 기반 감정 분석 (SPEC F-05). 같은 입력에는 항상 같은 결과가 나온다.
-/// 외부 AI·서버를 쓰지 않고 앱 안에서만 계산한다.
+/// 앱 안에서 바로 계산한다(코멘트는 AI가 따로 쓴다: `AiCommentService`).
 abstract final class EmotionAnalyzer {
   /// 본문에서 찾을 감정 단어 목록 (제안값, 팀이 늘려 갈 수 있다). 앞에 있을수록 먼저 센다.
   static const keywordList = [

@@ -37,7 +37,7 @@ class _AccountDeleteScreenState extends ConsumerState<AccountDeleteScreen> {
   static const _items = [
     '남긴 모든 기록과 감정 분석 결과',
     '등록한 인물과 관계 지수 이력',
-    '인사이트와 체크리스트',
+    'AI 코멘트와 체크리스트',
     '이메일·닉네임 등 계정 정보',
   ];
 

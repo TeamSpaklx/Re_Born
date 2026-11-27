@@ -31,11 +31,7 @@ class HomeSkeleton extends StatelessWidget {
                   const _Greeting(),
                   const SizedBox(height: HomeLayout.greetingToRecordCard),
                   const _RecordCard(),
-                  const SizedBox(height: HomeLayout.recordCardToSignalTitle),
-                  const _SectionHeader(titleWidth: 110, seeAll: true),
-                  const SizedBox(height: HomeLayout.sectionTitleToCard),
-                  const SkeletonListCard.avatar(),
-                  const SizedBox(height: HomeLayout.signalCardToGraph),
+                  const SizedBox(height: HomeLayout.recordCardToGraph),
                   const _ChartCard(),
                   const SizedBox(height: HomeLayout.graphToActionTitle),
                   const _SectionHeader(titleWidth: 120),
@@ -124,10 +120,9 @@ class _RecordCard extends StatelessWidget {
 
 /// 섹션 제목(+ 오른쪽 "전체 보기") 자리 (Figma `859:467`, `859:468`).
 class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.titleWidth, this.seeAll = false});
+  const _SectionHeader({required this.titleWidth});
 
   final double titleWidth;
-  final bool seeAll;
 
   @override
   Widget build(BuildContext context) {
@@ -137,7 +132,6 @@ class _SectionHeader extends StatelessWidget {
         children: [
           SkeletonBox(width: titleWidth, height: 16),
           const Spacer(),
-          if (seeAll) const SkeletonBox(width: 55, height: 10),
         ],
       ),
     );

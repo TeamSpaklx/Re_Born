@@ -5,8 +5,8 @@ import 'package:reborn_app/app/app.dart';
 import 'package:reborn_app/app/data_providers.dart';
 import 'package:reborn_app/app/router.dart';
 import 'package:reborn_app/core/providers/clock_provider.dart';
-import 'package:reborn_app/features/insights/data/in_memory_insights_repository.dart';
-import 'package:reborn_app/features/insights/presentation/insight_detail_screen.dart';
+import 'package:reborn_app/features/entries/data/in_memory_entries_repository.dart';
+import 'package:reborn_app/features/record/presentation/record_detail_screen.dart';
 import 'package:reborn_app/features/notifications/models/app_notification.dart';
 import 'package:reborn_app/features/notifications/presentation/notifications_providers.dart';
 import 'package:reborn_app/features/settings/presentation/settings_providers.dart';
@@ -28,7 +28,7 @@ void main() {
   Future<ProviderContainer> pumpAt(
     WidgetTester tester,
     String location, {
-    bool noInsights = false,
+    bool noEntries = false,
   }) async {
     tester.view.devicePixelRatio = 1;
     tester.view.physicalSize = const Size(402, 1000);
@@ -39,9 +39,9 @@ void main() {
           clockProvider.overrideWithValue(() => fixedNow),
           notificationServiceProvider.overrideWithValue(service),
           initialLocationProvider.overrideWithValue(location),
-          if (noInsights)
-            insightsRepositoryProvider.overrideWithValue(
-              InMemoryInsightsRepository(),
+          if (noEntries)
+            entriesRepositoryProvider.overrideWithValue(
+              InMemoryEntriesRepository(),
             ),
         ],
         child: const RebornApp(),
@@ -79,7 +79,8 @@ void main() {
     expect(find.text('알림'), findsWidgets);
     expect(find.byKey(const Key('notification-settings')), findsOneWidget);
     expect(find.text('새 알림'), findsOneWidget);
-    expect(find.textContaining('관계를 살펴보세요'), findsOneWidget);
+    expect(find.text('AI 코멘트가 도착했어요'), findsWidgets);
+    expect(find.text('지난 알림'), findsOneWidget, reason: '하루 지난 코멘트는 읽은 것으로');
   });
 
   testWidgets('홈 벨: 안 읽은 알림이 있으면 분홍 점 종(Figma 828:960)을 쓴다', (tester) async {
@@ -105,11 +106,11 @@ void main() {
     expect(find.byType(NotificationSettingsScreen), findsOneWidget);
   });
 
-  testWidgets('알림을 누르면 인사이트가 열리고 읽음 처리되어 점이 사라진다', (tester) async {
+  testWidgets('알림을 누르면 그 일기 상세가 열리고 읽음 처리되어 점이 사라진다', (tester) async {
     final c = await pumpAt(tester, AppRoutes.notifications);
-    await tester.tap(find.textContaining('관계를 살펴보세요'));
+    await tester.tap(find.text('AI 코멘트가 도착했어요').first);
     await tester.pumpAndSettle();
-    expect(find.byType(InsightDetailScreen), findsOneWidget);
+    expect(find.byType(RecordDetailScreen), findsOneWidget);
 
     await c.read(notificationsProvider.future);
     await tester.pump();
@@ -118,22 +119,23 @@ void main() {
 
   testWidgets('안 읽음 탭: 읽지 않은 알림이 없으면 빈 상태', (tester) async {
     final c = await pumpAt(tester, AppRoutes.notifications);
-    final insights = await c.read(insightsRepositoryProvider).list();
-    await c.read(insightsRepositoryProvider).markRead(insights.first.id);
-    c.invalidate(notificationsProvider);
+    final list = await c.read(notificationsProvider.future);
+    for (final n in list.where((n) => !n.read)) {
+      c.read(readNotificationsProvider.notifier).markRead(n.id);
+    }
     await tester.tap(find.text('안 읽음'));
     await tester.pumpAndSettle();
 
     expect(find.text('받은 알림이 없습니다'), findsOneWidget);
   });
 
-  testWidgets('인사이트가 없으면 빈 상태 안내', (tester) async {
-    await pumpAt(tester, AppRoutes.notifications, noInsights: true);
+  testWidgets('AI 코멘트가 붙은 일기가 없으면 빈 상태 안내', (tester) async {
+    await pumpAt(tester, AppRoutes.notifications, noEntries: true);
     expect(find.text('받은 알림이 없습니다'), findsOneWidget);
     expect(find.byType(QuietEmptyState), findsOneWidget);
   });
 
-  testWidgets('알림 설정: 리마인드를 켜면 시간 행이 생기고, 인사이트 알림을 끄면 목록이 비어진다', (
+  testWidgets('알림 설정: 리마인드를 켜면 시간 행이 생기고, AI 코멘트 알림을 끄면 목록이 비어진다', (
     tester,
   ) async {
     final c = await pumpAt(tester, AppRoutes.notificationSettings);
@@ -169,7 +171,7 @@ void main() {
         .saveNotifications(
           (await c.read(
             settingsProvider.future,
-          )).notifications.copyWith(insight: false),
+          )).notifications.copyWith(aiComment: false),
         );
     expect(await c.read(notificationsProvider.future), isEmpty);
   });

@@ -2,20 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../app/theme/app_assets.dart';
+import '../../../app/router.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../core/errors/app_error_log.dart';
 import '../../../core/providers/clock_provider.dart';
 import '../../../core/utils/korean_date.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../app/theme/app_text_styles.dart';
-import '../../../shared/widgets/app_bottom_sheet.dart';
 import '../../../shared/widgets/app_dialogs.dart';
-import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/bottom_cta_bar.dart';
 import '../../../shared/widgets/leave_confirm_scope.dart';
-import '../../../shared/widgets/pressable.dart';
 import '../../../shared/widgets/page_scaffold.dart';
 import '../../analysis/crisis_checker.dart';
 import '../../entries/models/emotion.dart';
@@ -23,13 +20,12 @@ import '../../entries/models/entry.dart';
 import '../../entries/models/entry_validator.dart';
 import '../../entries/presentation/entries_providers.dart';
 import '../../entries/presentation/widgets/emotion_picker.dart';
-import '../../people/presentation/people_providers.dart';
 import 'crisis_notice.dart';
 import 'intensity_selector.dart';
-import '../../../shared/widgets/tinted_svg.dart';
 
-/// 기록 작성·수정 (F-03). **임시 디자인**.
-/// 본문(1~2000자) · 인물(선택) · 감정 · 강도를 고르고 저장하면 분석까지 이어진다.
+/// 일기 작성·수정 (F-03). **임시 디자인**.
+/// 감정 · 강도(1~5단계 기준표) · 본문(1~2000자)을 쓰고 저장하면 AI 코멘트 결과 화면으로 간다.
+/// 수정이면 저장 뒤 상세로 돌아가고, 코멘트는 다시 받는다.
 class RecordFormScreen extends ConsumerStatefulWidget {
   const RecordFormScreen({super.key, this.entryId});
 
@@ -44,7 +40,6 @@ class _RecordFormScreenState extends ConsumerState<RecordFormScreen> {
   final _body = TextEditingController();
   Emotion? _emotion;
   int? _intensity;
-  String? _personId;
   Entry? _editing;
 
   String? _bodyError;
@@ -67,7 +62,6 @@ class _RecordFormScreenState extends ConsumerState<RecordFormScreen> {
       _body.text = entry.body;
       _emotion = entry.emotion;
       _intensity = entry.intensity;
-      _personId = entry.personId;
     });
   }
 
@@ -84,13 +78,11 @@ class _RecordFormScreenState extends ConsumerState<RecordFormScreen> {
       if (widget.entryId != null) return false; // 수정할 기록을 아직 불러오는 중
       return _body.text.trim().isNotEmpty ||
           _emotion != null ||
-          _intensity != null ||
-          _personId != null;
+          _intensity != null;
     }
     return _body.text.trim() != editing.body.trim() ||
         _emotion != editing.emotion ||
-        _intensity != editing.intensity ||
-        _personId != editing.personId;
+        _intensity != editing.intensity;
   }
 
   Future<void> _save() async {
@@ -117,19 +109,21 @@ class _RecordFormScreenState extends ConsumerState<RecordFormScreen> {
     final router = GoRouter.of(context);
     try {
       if (editing == null) {
-        await actions.save(
+        final saved = await actions.save(
           body: _body.text,
           emotion: _emotion!,
           intensity: _intensity!,
-          personId: _personId,
         );
+        if (!mounted) return;
+        // 작성 화면을 결과 화면으로 바꾼다(뒤로 가면 작성 화면이 아니라 원래 탭으로).
+        router.pushReplacement(AppRoutes.recordResult(saved.id));
+        return;
       } else {
         await actions.update(
           editing.copyWith(
             body: _body.text.trim(),
             emotion: _emotion,
             intensity: _intensity,
-            personId: _personId,
           ),
         );
       }
@@ -144,49 +138,9 @@ class _RecordFormScreenState extends ConsumerState<RecordFormScreen> {
     router.pop();
   }
 
-  Future<void> _pickPerson() async {
-    final people = ref.read(peopleProvider).value ?? const [];
-    final colors = context.colors;
-    final picked = await showAppBottomSheet<_PersonChoice>(
-      context,
-      title: '누구와의 기록인가요?',
-      builder: (context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SheetOptionRow(
-            title: '인물 없음',
-            selected: _personId == null,
-            onTap: () => Navigator.of(context).pop(const _PersonChoice(null)),
-          ),
-          if (people.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: AppSpacing.space16),
-              child: Text(
-                '등록된 인물이 없어요. 인물 없이 저장할 수 있고, 관계 탭에서 인물을 추가할 수 있어요.',
-                style: AppTextStyles.body.copyWith(color: colors.textSecondary),
-              ),
-            ),
-          for (final p in people)
-            SheetOptionRow(
-              title: p.name,
-              subtitle: p.relationType.label,
-              selected: _personId == p.id,
-              onTap: () => Navigator.of(context).pop(_PersonChoice(p.id)),
-            ),
-        ],
-      ),
-    );
-    if (picked != null) setState(() => _personId = picked.id);
-  }
-
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final people = ref.watch(peopleProvider).value ?? const [];
-    final personName = people
-        .where((p) => p.id == _personId)
-        .map((p) => p.name)
-        .firstOrNull;
     final now = ref.watch(clockProvider)();
 
     Widget label(String text, {bool first = false}) => Padding(
@@ -208,7 +162,7 @@ class _RecordFormScreenState extends ConsumerState<RecordFormScreen> {
         title: _editing == null ? '작성 중인 기록을 버릴까요?' : '수정한 내용을 버릴까요?',
         child: child!,
       ),
-      child: _form(context, colors, label, personName, now),
+      child: _form(context, colors, label, now),
     );
   }
 
@@ -216,7 +170,6 @@ class _RecordFormScreenState extends ConsumerState<RecordFormScreen> {
     BuildContext context,
     AppColors colors,
     Widget Function(String, {bool first}) label,
-    String? personName,
     DateTime now,
   ) {
     return PageScaffold(
@@ -264,35 +217,6 @@ class _RecordFormScreenState extends ConsumerState<RecordFormScreen> {
                 if (_bodyError != null) setState(() => _bodyError = null);
               },
             ),
-            label('누구와의 일인가요? (선택)'),
-            Pressable(
-              key: const Key('record-person'),
-              onTap: _pickPerson,
-              child: AppCard.white(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space16,
-                  vertical: AppSpacing.space16,
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        personName ?? '인물 없음',
-                        style: AppTextStyles.rowTitle.copyWith(
-                          color: personName == null
-                              ? colors.textSecondary
-                              : colors.textBlack,
-                        ),
-                      ),
-                    ),
-                    TintedSvg(
-                      AppAssets.chevronSignal,
-                      color: context.colors.iconMuted,
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ],
         ),
       ),
@@ -307,11 +231,4 @@ class _RecordFormScreenState extends ConsumerState<RecordFormScreen> {
     padding: const EdgeInsets.only(top: AppSpacing.space8),
     child: Text(text, style: AppTextStyles.body.copyWith(color: colors.danger)),
   );
-}
-
-/// 인물 선택 시트의 결과(null id = 인물 없음). 시트를 그냥 닫으면 선택이 바뀌지 않는다.
-class _PersonChoice {
-  const _PersonChoice(this.id);
-
-  final String? id;
 }

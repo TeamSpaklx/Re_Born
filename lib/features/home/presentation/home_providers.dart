@@ -14,15 +14,11 @@ final homeSummaryProvider = FutureProvider<HomeSummary>((ref) async {
   final now = ref.watch(clockProvider)();
   final settings = await ref.watch(settingsRepositoryProvider).get();
   final entries = await ref.watch(entriesRepositoryProvider).list();
-  final people = await ref.watch(peopleRepositoryProvider).list();
-  final insights = await ref.watch(insightsRepositoryProvider).list();
   final todos = await ref.watch(todosRepositoryProvider).list();
   return buildHomeSummary(
     nickname: settings.nickname,
     now: now,
     entries: entries,
-    people: people,
-    insights: insights,
     todos: todos,
   );
 }, retry: (retryCount, error) => null);

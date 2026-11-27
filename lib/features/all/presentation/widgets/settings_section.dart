@@ -28,7 +28,7 @@ class SettingsSection extends ConsumerWidget {
     final ok = await showAppConfirmDialog(
       context,
       title: '기록을 모두 삭제할까요?',
-      message: '기록과 거기서 만들어진 지수·인사이트가 모두 지워지고, 되돌릴 수 없어요. 인물과 체크리스트는 남아요.',
+      message: '일기와 AI 코멘트가 모두 지워지고, 되돌릴 수 없어요. 체크리스트는 남아요.',
       confirmLabel: '삭제',
       destructive: true,
     );

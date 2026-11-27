@@ -68,7 +68,6 @@ abstract final class HomeLayout {
   static const double? recordCardHeightAfter = showAttendance ? 399.0 : null;
   static const ctaButtonHeightBefore = 52.0;
   static const ctaButtonHeightAfter = 48.0;
-  static const signalCardHeight = 104.0;
   static const graphCardHeight = 180.0;
   static const actionCardHeight = 90.0;
 
@@ -78,18 +77,15 @@ abstract final class HomeLayout {
   static const dateHeight = 17.0;
   static const dateToGreeting = 4.0;
   static const greetingToRecordCard = 24.0;
-  static const recordCardToSignalTitle = 22.0;
+  static const recordCardToGraph = 22.0;
   static const sectionTitleHeight = 32.0;
   static const sectionTitleToCard = 12.0;
-  static const signalCardToGraph = 22.0;
   static const graphToActionTitle = 27.0;
 
   // 참고 y 좌표 (Before)
   static const dateY = 128.0;
   static const greetingY = 149.0;
   static const recordCardY = 237.0;
-  static const signalTitleY = 527.0;
-  static const signalCardY = 571.0;
   static const graphCardY = 697.0;
   static const actionTitleY = 904.0;
   static const actionCardY1 = 948.0;

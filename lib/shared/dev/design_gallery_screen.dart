@@ -271,7 +271,7 @@ class _DesignGalleryScreenState extends State<DesignGalleryScreen> {
                   ),
                   CheckRow(
                     title: '오늘은 거리를 두기',
-                    subtitle: '인사이트에서 담았어요',
+                    subtitle: 'AI 제안에서 담았어요',
                     checked: _checkB,
                     onChanged: (v) => setState(() => _checkB = v),
                   ),
@@ -457,7 +457,7 @@ class _DesignGalleryScreenState extends State<DesignGalleryScreen> {
             ),
             const PermissionRow(
               iconAsset: AppAssets.bell,
-              title: '인사이트 알림',
+              title: 'AI 코멘트 알림',
               description: '관계의 변화가 감지되면 알려 드려요.',
             ),
           ]),

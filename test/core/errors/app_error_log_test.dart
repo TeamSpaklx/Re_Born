@@ -2,22 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reborn_app/core/errors/app_error_log.dart';
 import 'package:reborn_app/core/errors/error_handlers.dart';
+import 'package:reborn_app/features/ai_comment/data/ai_comment_service.dart';
+import 'package:reborn_app/features/ai_comment/models/ai_feedback.dart';
 import 'package:reborn_app/features/analysis/analysis_service.dart';
 import 'package:reborn_app/features/entries/data/in_memory_entries_repository.dart';
 import 'package:reborn_app/features/entries/models/emotion.dart';
 import 'package:reborn_app/features/entries/models/entry.dart';
-import 'package:reborn_app/features/insights/data/in_memory_insights_repository.dart';
-import 'package:reborn_app/features/people/data/in_memory_people_repository.dart';
 
-class _FailingEntries extends InMemoryEntriesRepository {
+class _FailingAi implements AiCommentService {
   @override
-  Future<void> update(Entry entry) async {
-    if (entry.analysis != null &&
-        entry.analysisStatus == AnalysisStatus.pending) {
-      throw StateError('저장 실패: 하은이가 고맙다는 말이 없어 서운했다');
-    }
-    return super.update(entry);
-  }
+  Future<AiFeedback> analyze(Entry entry, {required CommentTone tone}) async =>
+      throw StateError('AI 실패: 하은이가 고맙다는 말이 없어 서운했다');
 }
 
 void main() {
@@ -72,20 +67,21 @@ void main() {
 
   test('분석 중 오류는 기록에 남고 기록은 failed로 표시된다 (T-20, F-12)', () async {
     final log = AppErrorLog();
-    final entries = _FailingEntries();
     final service = AnalysisService(
-      entries: entries,
-      people: InMemoryPeopleRepository(),
-      indexHistory: InMemoryIndexHistoryRepository(),
-      insights: InMemoryInsightsRepository(),
+      entries: InMemoryEntriesRepository(),
+      aiComment: _FailingAi(),
       clock: () => fixed,
       onError: (e, s) => log.record(e, s, where: 'analysis'),
     );
 
-    final result = await service.saveEntry(
+    final saved = await service.saveEntry(
       body: '하은이가 고맙다는 말이 없어 서운했다',
       emotion: Emotion.sadness,
       intensity: 2,
+    );
+    final result = await service.requestFeedback(
+      saved.id,
+      tone: CommentTone.warm,
     );
 
     expect(result.analysisStatus, AnalysisStatus.failed);
