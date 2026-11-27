@@ -21,7 +21,7 @@
 
 ## 1. 색
 
-`AppColors.light`와 `AppColors.dark` (`lib/app/theme/app_colors.dart`). 아래 표의 값은 라이트이고, 다크 값은 1.8절에 있습니다. 화면은 항상 `context.colors.<이름>`으로 읽습니다. 설정의 "다크 모드" 토글이 두 팔레트 중 하나를 고릅니다(시스템 설정은 따르지 않음).
+`AppColors.light`와 `AppColors.dark` (`lib/app/theme/app_colors.dart`). 아래 표의 값은 라이트이고, 다크 값은 1.8절에 있습니다. 화면은 항상 `context.colors.<이름>`으로 읽습니다. 설정의 "화면 모드"가 두 팔레트 중 하나를 고릅니다. 기본값은 "기기 설정"이라 iOS·Android의 라이트·다크 전환을 바로 따르고, "라이트"·"다크"를 고르면 그 모드로 고정됩니다.
 
 ### 1.1 브랜드·행동
 | 용도 | 필드 | 값 | 출처 |
@@ -208,7 +208,7 @@ Figma "Dark Mode"(`8877:1778`) 시안에서 읽은 값과, 시안에 없는 화�
 
 ## 6. 아이콘·일러스트
 
-- **아이콘:** 하단 탭 투데이·관계·기록은 Phosphor, 전체는 Iconsax(`menu`). **앱에 새 아이콘이 필요하면 Iconsax(Linear)를 씁니다**: Iconsax 공개 저장소(`lusaxweb/iconsax`)의 SVG를 받아 `assets/icons/ui/ix_*.svg`로 넣고 `AppAssets`에 상수를 추가합니다(아이콘 패키지는 쓰지 않음). 지금 쓰는 것: add, edit, camera, gallery, eye, eye-off, trash. 크기 20(행 화살표·체크), 24(체크 원), 28(탭·벨).
+- **아이콘:** 하단 탭 투데이·관계·기록은 Phosphor, 전체는 Iconsax(`menu`). **앱에 새 아이콘이 필요하면 Iconsax(Linear)를 씁니다**: Iconsax 공개 저장소(`lusaxweb/iconsax`)의 SVG를 받아 `assets/icons/ui/ix_*.svg`로 넣고 `AppAssets`에 상수를 추가합니다(아이콘 패키지는 쓰지 않음). 지금 쓰는 것: add, edit, camera, gallery, eye, eye-off, trash, setting, 그리고 전체 탭 설정 행의 shield-tick, document-text, lock, notification, moon, logout, profile-delete, 설정 행 꺾쇠 arrow-right-1. 크기 20(행 화살표·체크), 24(체크 원), 28(탭·벨).
 - **마스코트(여우원숭이, `AppAssets.mascotLemur`):** 홈 기록 카드(버튼 뒤에서 얼굴만), 빈·오류 상태(120×120, `EmptyState(showMascot: true)`).
 - **감정 캐릭터 7종:** `assets/images/emotions/`의 PNG(`AppAssets.emotionImages`)를 `EmotionFace`로 그립니다(달력 20, 카드 44, 상세 64, 선택 격자 칸). 정식 에셋이 오면 같은 파일 이름으로 교체합니다.
 - 이모지는 쓰지 않습니다(8장 글자 규칙).
@@ -236,7 +236,7 @@ Figma "Dark Mode"(`8877:1778`) 시안에서 읽은 값과, 시안에 없는 화�
 | 카드 `AppCard` | `app_card.dart` | `white`(테두리 없음, 투명 2px 자리) · `outlined`(1px `cardBorder`, 기록 카드 Before) · `pink`(기록 완료). 모서리 24 | ✅ |
 | 목록 구획 머리글 `ListSectionHeader` | `list_section_header.dart` | 14 SemiBold `textSecondary`, 위 24 아래 8, 오른쪽 trailing | ✅ |
 | 프로필 행 `ProfileRow` | `profile_row.dart` | 아바타 56 + 이름(18) + 보조 문구(14) + 화살표(누를 수 있을 때) | ✅ |
-| 설정 목록 `SettingsGroup` · `SettingsRow` | `settings_group.dart` | 흰 카드에 행 묶음, 선택적 굵은 제목. 행 56: 토글 / 값 + 화살표 / 위험(빨강) | ✅ |
+| 설정 목록 `SettingsGroup` · `SettingsRow` · `SettingsGroupHeader` · `SettingsInfoCard` | `settings_group.dart` | 레퍼런스 설정 화면 구조(추정): 카드 **밖** 위에 회색 소제목(`sectionLabel` 14 SemiBold, `textSecondary`, 아래 8), 흰 카드에 행 묶음, 행 사이 1px `cardBorder` 구분선(아이콘이 있으면 글자 시작점부터). 행 60: 왼쪽 아이콘 24(선택, 글자색) + 간격 16 + 제목, 오른쪽 토글 / 회색 값 + 꺾쇠(`trailingEmphasis`면 값이 브랜드색) / 위험(빨강). 묶음 안 아이콘은 꺾쇠까지 모두 Iconsax Linear(꺾쇠는 `arrow-right-1` 20, `iconMuted`). 안내 카드: 브랜드색 아이콘 + 굵은 제목 + 회색 설명 + 화살표, 안쪽 20 | 추정 |
 | 뱃지 `AppBadge` · `Badged` | `app_badge.dart` | 점 8 / 숫자(99+) 높이 18, `danger` | ✅ |
 | 인물·기록 목록 카드 | `person_card.dart`, `entry_card.dart` | 화면별 임시 카드 | 🟡 레퍼런스 반영 필요 |
 | 날짜 그룹 기록 카드(감정색 카드 + 태그 칩 + 시각) | — | 레퍼런스: Mentry·감정 기록 앱 | ⬜ |
@@ -270,7 +270,7 @@ Figma "Dark Mode"(`8877:1778`) 시안에서 읽은 값과, 시안에 없는 화�
 | 회원가입 화면 `SignupScreen` | `lib/features/auth/presentation/signup_screen.dart` | `PageScaffold` 큰 제목 "리본에 오신 걸 환영해요", 이메일·닉네임·비밀번호·비밀번호 확인, 아래 약관 안내, 하단 `BottomCtaBar` "가입하기". Figma 없음 | ⚠️ (추정) |
 | 인트로 온보딩 `IntroScreen` | `lib/features/onboarding/presentation/intro_screen.dart` | Figma `8877:1945`: 흰 배경, 앱 화면 목업 314×490(`AppAssets.introPreview`, 이미지는 상자 안 위 4.1%·높이 132.9%, 아래 26 흰색 페이드), 제목 22 Bold −0.55 줄 높이 32(`introTitle`), 설명 16 Regular −0.4 `textSecondary`(`introBody`), CTA "시작하기" 높이 60(`CtaButton`), 안전 영역 위 20. 설치 후 최초 1회만 표시(`IntroStore`). A/B 시안은 제외 | ✅ (Figma) |
 | 인트로 끝 화면 `StartScreen` | `lib/features/onboarding/presentation/start_screen.dart` | Figma `8877:1965`: 검정 배경(`startBackground`), 제목 26 Bold −0.65 줄 높이 32 흰색(`startTitle`), 설명 16 Regular 줄 높이 24 `startBody`, 기울어진 목업 338×560(`AppAssets.startPreview`, 불투명 82%), 아래 254 그라데이션(52%부터 검정), CTA 높이 60 분홍에 글자 `onStartCta`(Figma 메모: 흰 글자 대비 2.36:1이라 어둡게). 첫 로그인 직후 1회(`IntroStore.startSeen`). 상태 바 글자는 밝게 | ✅ (Figma) |
-| 다크 모드 설정 행 | `lib/features/all/presentation/widgets/settings_section.dart` | 전체 탭 설정 "화면" 그룹의 토글(`Key('dark-mode-toggle')`, `SettingsRow.toggle`). 켜면 즉시 전체 화면이 `AppColors.dark`로 바뀌고 기기에 저장(`ThemeModeStore`). 모드 전환은 애니메이션 없이 한 번에(`themeAnimationDuration: Duration.zero`) | 추정 |
+| 화면 모드 설정 행 | `lib/features/all/presentation/widgets/settings_section.dart` | 설정 "앱 사용" 그룹의 행(달 아이콘, `Key('theme-mode')`, `SettingsRow.link`, 오른쪽에 지금 모드 이름). 누르면 바텀시트에서 기기 설정 / 라이트 / 다크(`SheetOptionRow`, 기기 설정에는 "자동으로 바뀌어요" 설명)를 고르고, 고르면 즉시 전체 화면에 적용되고 기기에 저장(`ThemeModeStore`의 `theme_mode`). 모드 전환은 애니메이션 없이 한 번에(`themeAnimationDuration: Duration.zero`) | 추정 |
 | 오류 상태 `ErrorState` | `empty_state.dart` | "불러오지 못했어요" + "잠시 뒤에 다시 시도해 주세요." + "다시 시도". 오류 원인(기술 문구)은 보이지 않음 | ✅ |
 | 당겨서 새로고침 `AppRefreshControl` | `app_refresh_control.dart` | iOS 스타일 하나로 통일(iOS·Android 모두 튀는 스크롤 + 회색 톱니 스피너 `textSecondary`, 머티리얼 원형 스피너는 쓰지 않음). `CustomScrollView`의 첫 sliver나 고정 헤더 바로 다음에 넣음. 기준만큼 당기면 `AppHaptics.tap`, 최소 `refreshMinDuration`(600ms, 추정) 보임, 스크린 리더 "새로고침 중". 지금은 투데이만 씀(상단 유리 바 높이의 투명 고정 헤더 아래에 나타남) | ✅ (추정) |
 

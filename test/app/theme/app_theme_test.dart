@@ -126,7 +126,7 @@ void main() {
       expect(ComponentLayout.toggleThumbWidth, 38);
       expect(ComponentLayout.toggleThumbHeight, 24);
       expect(ComponentLayout.segmentHeight, 36);
-      expect(ComponentLayout.settingsRowHeight, 56);
+      expect(ComponentLayout.settingsRowHeight, 60);
       expect(ComponentLayout.ctaButtonHeight, 60);
       expect(ComponentLayout.dialogButtonHeight, 52);
       expect(ComponentLayout.sheetHandleWidth, 40);

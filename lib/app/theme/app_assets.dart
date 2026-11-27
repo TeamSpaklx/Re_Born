@@ -42,6 +42,18 @@ abstract final class AppAssets {
   static const ixEye = '$_icons/ix_eye.svg';
   static const ixEyeOff = '$_icons/ix_eye_off.svg';
 
+  // 전체 탭 설정 행 아이콘 (Iconsax Linear).
+  static const ixShieldTick = '$_icons/ix_shield_tick.svg';
+  static const ixDocumentText = '$_icons/ix_document_text.svg';
+  static const ixLock = '$_icons/ix_lock.svg';
+  static const ixNotification = '$_icons/ix_notification.svg';
+  static const ixMoon = '$_icons/ix_moon.svg';
+  static const ixLogout = '$_icons/ix_logout.svg';
+  static const ixProfileDelete = '$_icons/ix_profile_delete.svg';
+
+  /// 설정 행 오른쪽 꺾쇠 `>` (Iconsax `arrow-right-1`). 설정 묶음 안 아이콘을 Iconsax로 통일한다.
+  static const ixArrowRight = '$_icons/ix_arrow_right.svg';
+
   /// 소셜 로그인 버튼 마크(단순화한 로고, 출시 전 브랜드 가이드 확인 필요).
   static const googleG = '$_icons/google_g.svg';
   static const kakaoBubble = '$_icons/kakao_bubble.svg';
