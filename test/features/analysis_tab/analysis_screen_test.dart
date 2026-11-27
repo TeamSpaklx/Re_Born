@@ -71,6 +71,15 @@ void main() {
       expect(find.text('${l.value} ${l.label}'), findsOneWidget);
     }
     expect(find.text('최근 AI 코멘트'), findsOneWidget);
+    // 막대는 가장 많은 단계 대비 비율만큼 실제로 채워진다(높이 10).
+    final bars = IntensityLevel.values
+        .map((l) => find.byKey(Key('level-bar-${l.value}')))
+        .where((f) => f.evaluate().isNotEmpty);
+    expect(bars, isNotEmpty);
+    for (final bar in bars) {
+      expect(tester.getSize(bar).height, 10);
+    }
+    expect(bars.any((b) => tester.getSize(b).width > 0), isTrue);
 
     await tester.tap(find.text('1달'));
     await tester.pumpAndSettle();

@@ -219,7 +219,10 @@ class _LevelBars extends StatelessWidget {
                           ),
                           if (most > 0)
                             FractionallySizedBox(
+                              key: Key('level-bar-${level.value}'),
+                              alignment: Alignment.centerLeft,
                               widthFactor: counts[level]! / most,
+                              heightFactor: 1,
                               child: ColoredBox(color: colors.barStrong),
                             ),
                         ],
