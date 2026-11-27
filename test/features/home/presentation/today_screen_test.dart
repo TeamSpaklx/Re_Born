@@ -748,7 +748,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('체크리스트'), findsOneWidget);
 
-      await tester.tap(find.text('투데이'));
+      await tester.tap(find.text('홈'));
       await tester.pumpAndSettle();
       await tester.tap(find.bySemanticsLabel('이번 주 감정 흐름, 기록 보기'));
       await tester.pumpAndSettle();

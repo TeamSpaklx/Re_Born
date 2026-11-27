@@ -67,7 +67,7 @@ void main() {
     await tester.tap(
       find.descendant(
         of: find.byType(AppBottomNavBar),
-        matching: find.text('전체'),
+        matching: find.text('마이'),
       ),
     );
     await tester.pumpAndSettle();

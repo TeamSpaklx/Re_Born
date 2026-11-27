@@ -24,11 +24,11 @@ abstract final class BottomNavTokens {
   static const selectionWidth = 92.0;
   static const selectionHeight = 56.0;
 
-  /// 선택 알약의 왼쪽 x (투데이, 관계, 기록, 전체).
+  /// 선택 알약의 왼쪽 x (홈, 관계, 기록, 마이).
   static const selectionLefts = [5.0, 89.0, 174.0, 258.0];
 
-  /// 탭 라벨 (Figma 노드 이름은 홈/관계/기록/마이지만 화면 글자는 아래와 같다).
-  static const labels = ['투데이', '관계', '기록', '전체'];
+  /// 탭 라벨 (Figma `ButtonNavigator` 749:1100: 홈 / 관계 / 기록 / 마이).
+  static const labels = ['홈', '관계', '기록', '마이'];
 
   /// 항목 4개를 균등 분할하는 좌우 안쪽 여백 (354 기준: 항목 중심이 Figma와 ±1.5px 안에서 일치).
   static const columnInset = 7.0;
