@@ -6,14 +6,14 @@ import 'widgets/checklist_section.dart';
 import 'widgets/profile_section.dart';
 import 'widgets/settings_section.dart';
 
-/// 전체 탭: 프로필·요약, 체크리스트(F-04), 설정·데이터 관리(F-10·F-11).
+/// 마이 탭(코드 이름은 all): 프로필·요약, 체크리스트(F-04), 설정·데이터 관리(F-10·F-11).
 class AllScreen extends StatelessWidget {
   const AllScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const TabPageScaffold(
-      title: '전체',
+      title: '마이',
       children: [
         SizedBox(height: AppSpacing.space8),
         Padding(

@@ -204,7 +204,7 @@ class _NavItem extends StatelessWidget {
               textAlign: TextAlign.center,
               maxLines: 1,
               style: AppTextStyles.navLabel.copyWith(
-                color: selected ? colors.brand : colors.textStrong,
+                color: selected ? colors.navActive : colors.textStrong,
               ),
             ),
           ],

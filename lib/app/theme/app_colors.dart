@@ -34,6 +34,7 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.navBorder,
     required this.navShadow,
     required this.navSelection,
+    required this.navActive,
     required this.recordCardSubtitle,
     required this.ctaSoft,
     required this.onCtaSoft,
@@ -124,6 +125,9 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color navBorder;
   final Color navShadow;
   final Color navSelection;
+
+  /// 하단 탭에서 선택된 탭의 아이콘·라벨 색 (Figma `ButtonNavigator` 749:1100의 #D94F79).
+  final Color navActive;
 
   /// 기록 카드(흰색, Before) 부제.
   final Color recordCardSubtitle;
@@ -271,6 +275,7 @@ class AppColors extends ThemeExtension<AppColors> {
     navBorder: Color(0xFFD0D0D0),
     navShadow: Color(0x1A000000), // rgba(0,0,0,0.1)
     navSelection: Color(0xFFEDEDED),
+    navActive: Color(0xFFD94F79),
     recordCardSubtitle: Color(0xFF7D8492),
     ctaSoft: Color(0xFFFFAFC7),
     onCtaSoft: Color(0xFF000000),
@@ -349,6 +354,7 @@ class AppColors extends ThemeExtension<AppColors> {
     navBorder: Color(0xFF3B3D47),
     navShadow: Color(0x66000000),
     navSelection: Color(0xFF2D2F39),
+    navActive: Color(0xFFD94F79),
     recordCardSubtitle: Color(0xFFB7BAC6),
     ctaSoft: Color(0xFFFFAFC7),
     onCtaSoft: Color(0xFF000000),
@@ -425,6 +431,7 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? navBorder,
     Color? navShadow,
     Color? navSelection,
+    Color? navActive,
     Color? recordCardSubtitle,
     Color? ctaSoft,
     Color? onCtaSoft,
@@ -499,6 +506,7 @@ class AppColors extends ThemeExtension<AppColors> {
       navBorder: navBorder ?? this.navBorder,
       navShadow: navShadow ?? this.navShadow,
       navSelection: navSelection ?? this.navSelection,
+      navActive: navActive ?? this.navActive,
       recordCardSubtitle: recordCardSubtitle ?? this.recordCardSubtitle,
       ctaSoft: ctaSoft ?? this.ctaSoft,
       onCtaSoft: onCtaSoft ?? this.onCtaSoft,
@@ -579,6 +587,7 @@ class AppColors extends ThemeExtension<AppColors> {
       navBorder: mix(navBorder, other.navBorder),
       navShadow: mix(navShadow, other.navShadow),
       navSelection: mix(navSelection, other.navSelection),
+      navActive: mix(navActive, other.navActive),
       recordCardSubtitle: mix(recordCardSubtitle, other.recordCardSubtitle),
       ctaSoft: mix(ctaSoft, other.ctaSoft),
       onCtaSoft: mix(onCtaSoft, other.onCtaSoft),

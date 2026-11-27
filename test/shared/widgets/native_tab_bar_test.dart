@@ -97,7 +97,7 @@ void main() {
     expect((params['icons'] as List).length, 4);
     expect((params['selectedIcons'] as List).length, 4);
     expect(params['normalColor'], AppColors.light.textStrong.toARGB32());
-    expect(params['selectedColor'], AppColors.light.brand.toARGB32());
+    expect(params['selectedColor'], AppColors.light.navActive.toARGB32());
     expect(params['fontName'], BottomNavTokens.nativeLabelFontName);
     expect(params['fontSize'], 10);
     expect(params['letterSpacing'], -0.1);

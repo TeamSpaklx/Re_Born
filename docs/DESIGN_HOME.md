@@ -18,7 +18,7 @@
 ## 0. 결정 사항과 전제
 
 - **디자인이 있는 화면은 홈뿐입니다.** 관계·기록·전체 탭은 디자인이 없어서 흰 배경의 빈 화면으로 둡니다. 홈만 Figma와 100% 일치를 목표로 합니다.
-- **하단 탭 4개:** 투데이(홈) / 관계 / 기록 / 전체. (Figma 컴포넌트의 상태 이름은 홈/관계/기록/마이이지만 화면에 보이는 글자는 투데이/관계/기록/전체입니다.)
+- **하단 탭 4개:** 홈 / 관계 / 기록 / 마이 (Figma `ButtonNavigator` 749:1100, 2026-11-28에 투데이/전체에서 바꿈. 코드의 라우트·화면 이름은 그대로 today·all). (예전 메모: Figma 컴포넌트의 상태 이름은 홈/관계/기록/마이이지만 화면에 보이는 글자는 투데이/관계/기록/전체입니다.)
 - **고정 규칙:** 글자 크기 배율 1.0(시스템 글자 크기 설정 무시), 세로 방향만. 라이트/다크는 설정의 다크 모드 토글로 고르고(DESIGN_SYSTEM 1.8절), 색은 `context.colors`로만 읽습니다.
 - **화면 크기:** 디자인 기준은 402×874(iPhone 16 Pro)입니다. 좌우 여백 24를 고정하고 카드가 남는 폭을 채웁니다(402에서 카드 폭 354).
 - **세로 스크롤 화면입니다.** Figma 프레임이 874보다 길어서(Before 최신 안 1270, After 1407) 내용이 스크롤됩니다. 하단 탭 바는 화면 아래에 고정되어 있습니다.
@@ -129,14 +129,14 @@
 ### 5.8 하단 탭 바 (`BottomNavTokens`)
 - 354×64, 가운데 정렬, 화면 아래에서 34 위(그 아래에 홈 인디케이터 34). 모서리 100(알약).
 - 항목 4개: 폭 68, 간격 17, 아이콘 28 + 라벨(`navLabel`), 항목 영역 323×40(위 12). 선택 알약 92×56(`tab_selection.svg`, 선택된 탭 뒤, 왼쪽 x 5 / 89 / 174 / 258).
-- 선택된 탭: 아이콘이 `*_active.svg`(분홍 `#FF6090`)로 바뀌고 라벨 색이 `brand`. 나머지는 검정 아이콘 + `textStrong` 라벨.
+- 선택된 탭: 아이콘이 `*_active.svg`(진한 분홍 `#D94F79`, Figma 749:1100)로 바뀌고 라벨 색이 `navActive`(`#D94F79`). 나머지는 검정 아이콘 + `textStrong` 라벨.
 
 | 탭 | 라벨 | 기본 아이콘 | 선택 아이콘 |
 |---|---|---|---|
-| 1 | 투데이 | `tab_home.svg` | `tab_home_active.svg` |
+| 1 | 홈 | `tab_home.svg` | `tab_home_active.svg` |
 | 2 | 관계 | `tab_relations.svg` | `tab_relations_active.svg` |
 | 3 | 기록 | `tab_record.svg` | `tab_record_active.svg` |
-| 4 | 전체 | `tab_all.svg` | `tab_all_active.svg` |
+| 4 | 마이 | `tab_my.svg` | `tab_my_active.svg` |
 
 - **iOS 26 이상 (네이티브 `UITabBar`, Liquid Glass):** 탭 바 전체를 시스템이 그립니다(`ios/Runner/NativeTabBarView.swift`를 `lib/shared/widgets/native_tab_bar.dart`가 `UiKitView`로 얹음). 유리 재질, 선택 알약, 알약 이동 애니메이션, VoiceOver는 시스템이 처리합니다. 앱이 정하는 값은 아래뿐이고 모두 이 문서와 `lib/app/theme/`의 값을 Flutter가 네이티브에 넘깁니다.
   - 아이콘: 위 표의 Figma SVG를 Flutter가 28×28(기기 배율) PNG로 그려 넘깁니다(기본=검정, 선택=분홍 파일을 각각 사용).
@@ -163,7 +163,7 @@
 | `tabHome` / `tabHomeActive` | `assets/icons/ui/tab_home(_active).svg` | 28 | 탭 1 (`house-fill`) |
 | `tabRelations` / `tabRelationsActive` | `tab_relations(_active).svg` | 28 | 탭 2 (`users-fill`) |
 | `tabRecord` / `tabRecordActive` | `tab_record(_active).svg` | 28 | 탭 3 (기록) |
-| `tabAll` / `tabAllActive` | `tab_all(_active).svg` | 28 | 탭 4 (Iconsax `menu`, 가로줄 3개). Figma는 마스크+선 SVG 두 장으로 내보내서 `flutter_svg`가 마스크를 못 그릴 수 있어, 선 SVG를 28×28 뷰박스의 Figma 위치(2.75, 7.4167)에 놓아 한 파일로 합쳤습니다 |
+| `tabMy` / `tabMyActive` | `tab_my(_active).svg` | 28 | 탭 4 마이 (Figma `account_circle`, 749:1100). Figma 내보내기에 들어 있던 28×28 전체를 덮는 마스크는 `flutter_svg`가 못 그릴 수 있고 모양에 영향이 없어 빼고, 경로는 그대로 뒀습니다 |
 | `tabSelection` | `tab_selection.svg` | 92×56 | 선택 알약 |
 | `forum` | `forum.svg` | 36 | 액션 카드 |
 | `bell` | `bell.svg` | 24 | 알림 버튼 |

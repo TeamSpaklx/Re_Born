@@ -10,8 +10,8 @@ abstract final class AppAssets {
   static const tabRelationsActive = '$_icons/tab_relations_active.svg';
   static const tabRecord = '$_icons/tab_record.svg';
   static const tabRecordActive = '$_icons/tab_record_active.svg';
-  static const tabAll = '$_icons/tab_all.svg';
-  static const tabAllActive = '$_icons/tab_all_active.svg';
+  static const tabMy = '$_icons/tab_my.svg';
+  static const tabMyActive = '$_icons/tab_my_active.svg';
 
   /// 선택된 탭 뒤의 알약 (92×56).
   static const tabSelection = '$_icons/tab_selection.svg';
@@ -101,8 +101,8 @@ abstract final class AppAssets {
     tabRelationsActive,
     tabRecord,
     tabRecordActive,
-    tabAll,
-    tabAllActive,
+    tabMy,
+    tabMyActive,
     tabSelection,
     forum,
     bell,
