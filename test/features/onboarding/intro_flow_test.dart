@@ -30,6 +30,20 @@ class _FailingIntroStore extends InMemoryIntroStore {
   Future<void> markSeen() async => throw StateError('disk full');
 }
 
+/// 로그인 화면에서 데모 계정으로 로그인한다.
+Future<void> logInAsDemo(WidgetTester tester) async {
+  await tester.enterText(
+    find.byKey(const Key('login-email')),
+    InMemoryAuthRepository.demoEmail,
+  );
+  await tester.enterText(
+    find.byKey(const Key('login-password')),
+    InMemoryAuthRepository.demoPassword,
+  );
+  await tester.tap(find.byKey(const Key('login-submit')));
+  await tester.pumpAndSettle();
+}
+
 void main() {
   Future<void> pumpApp(
     WidgetTester tester, {
@@ -126,8 +140,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('구글로 로그인'));
-    await tester.pumpAndSettle();
+    await logInAsDemo(tester);
 
     expect(find.byType(StartScreen), findsOneWidget);
     expect(find.text('시작할 준비가 끝났어요.'), findsOneWidget);
@@ -149,8 +162,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('구글로 로그인'));
-    await tester.pumpAndSettle();
+    await logInAsDemo(tester);
 
     expect(find.byType(TodayScreen), findsOneWidget);
     expect(find.byType(StartScreen), findsNothing);

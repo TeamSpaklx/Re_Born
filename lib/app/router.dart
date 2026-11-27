@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../features/all/presentation/all_screen.dart';
 import '../features/auth/presentation/account_delete_screen.dart';
 import '../features/auth/presentation/login_screen.dart';
+import '../features/auth/presentation/signup_screen.dart';
 import '../features/onboarding/presentation/intro_screen.dart';
 import '../features/onboarding/presentation/start_screen.dart';
 import '../features/home/presentation/today_screen.dart';
@@ -34,6 +35,7 @@ abstract final class AppRoutes {
 
   // 인증
   static const login = '/login';
+  static const signup = '/signup';
   static const intro = '/intro';
   static const start = '/start';
   static const accountDelete = '/account/delete';
@@ -86,6 +88,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.login,
         pageBuilder: (context, state) => _fade(state, const LoginScreen()),
+      ),
+      GoRoute(
+        path: AppRoutes.signup,
+        pageBuilder: (context, state) => _swipe(state, const SignupScreen()),
       ),
       GoRoute(
         path: AppRoutes.notifications,

@@ -207,7 +207,7 @@ Figma "Dark Mode"(`8877:1778`) 시안에서 읽은 값과, 시안에 없는 화�
 
 ## 6. 아이콘·일러스트
 
-- **아이콘:** 하단 탭 투데이·관계·기록은 Phosphor, 전체는 Iconsax(`menu`). **앱에 새 아이콘이 필요하면 Iconsax(Linear)를 씁니다**: Iconsax 공개 저장소(`lusaxweb/iconsax`)의 SVG를 받아 `assets/icons/ui/ix_*.svg`로 넣고 `AppAssets`에 상수를 추가합니다(아이콘 패키지는 쓰지 않음). 지금 쓰는 것: add, edit, camera, gallery, eye, eye-off, trash. 소셜 로그인 마크(`google_g` 24, `kakao_bubble` 24×23)는 Figma 로그인 화면(`8877:1934`·`8877:1938`)에서 받은 그대로이고, 출시 전 각 회사 브랜드 가이드 확인이 필요합니다. 크기 20(행 화살표·체크), 24(체크 원), 28(탭·벨).
+- **아이콘:** 하단 탭 투데이·관계·기록은 Phosphor, 전체는 Iconsax(`menu`). **앱에 새 아이콘이 필요하면 Iconsax(Linear)를 씁니다**: Iconsax 공개 저장소(`lusaxweb/iconsax`)의 SVG를 받아 `assets/icons/ui/ix_*.svg`로 넣고 `AppAssets`에 상수를 추가합니다(아이콘 패키지는 쓰지 않음). 지금 쓰는 것: add, edit, camera, gallery, eye, eye-off, trash. 크기 20(행 화살표·체크), 24(체크 원), 28(탭·벨).
 - **마스코트(여우원숭이, `AppAssets.mascotLemur`):** 홈 기록 카드(버튼 뒤에서 얼굴만), 빈·오류 상태(120×120, `EmptyState(showMascot: true)`).
 - **감정 캐릭터 7종:** `assets/images/emotions/`의 PNG(`AppAssets.emotionImages`)를 `EmotionFace`로 그립니다(달력 20, 카드 44, 상세 64, 선택 격자 칸). 정식 에셋이 오면 같은 파일 이름으로 교체합니다.
 - 이모지는 쓰지 않습니다(8장 글자 규칙).
@@ -265,7 +265,8 @@ Figma "Dark Mode"(`8877:1778`) 시안에서 읽은 값과, 시안에 없는 화�
 | 조용한 빈 상태 `QuietEmptyState` | `empty_state.dart` | Figma 알림 `834:1148`: 마스코트 151 + 한 줄(20 Regular `emptyText`). `ComponentLayout.quietEmptyAlignment`로 가운데보다 조금 위 | ✅ (Figma) |
 | 스켈레톤 `SkeletonPulse` · `SkeletonBox` · `SkeletonCard` · `SkeletonListCard` · `SkeletonList` | `skeleton.dart` | Figma 홈 스켈레톤 `834:2351`: 흰 카드(24) 위 `#E4E4E4` 막대(6). 한 화면을 `SkeletonPulse`로 감싸 1.2초 왕복으로 깜빡임(불투명도 1↔0.5, 추정), '동작 줄이기'면 정지, "불러오는 중"으로 한 번 읽힘. 홈은 `HomeSkeleton`(Figma 좌표 그대로), 기록·관계·알림 목록과 인물 그래프는 같은 조각으로 만든 추정 배치 | ✅ |
 | 앱 잠금 화면 `LockScreen` | `lib/features/security/presentation/lock_screen.dart` | Figma `834:1480`·`834:2141`: 흰 배경(`splashBackground`) 가운데 로고 160(스플래시와 같은 `SplashLayout` 값이라 이어져 보임), 시스템 인증 창은 OS가 위에 띄움. 실패 시 아래에 글자 버튼 "인증에 실패하거나 비밀번호를 잊으셨나요?" 314×45, 안전 영역 위 30, 14 SemiBold −0.35 `lockHelpText`(`rgba(76,83,95,0.8)`), 누르는 동안 알약 배경 `lockHelpPressed`(`rgba(160,167,180,0.2)`). 앱 전환 화면 덮개는 버튼 없이 로고만 | ✅ (Figma) |
-| 로그인 화면 `LoginScreen` | `lib/features/auth/presentation/login_screen.dart` | Figma `8877:1929`: 흰 배경(`splashBackground`), RE:BORN 워드마크 314×78(`AppAssets.logo`, Figma 위쪽 331을 기기 높이 비율로 `LoginLayout.logoAlignment`). 아래에 구글·카카오 버튼(`SocialLoginButtonPair`), 버튼 끝에서 57 아래 약관 안내 12 Regular −0.3 줄 높이 14 `loginLegalText`, 안전 영역 위 14. Figma 메모대로 "개인정보 보호 정책"·"서비스 약관"을 각각 링크로 나눠 시트로 엶(밑줄은 추정). 디버그 빌드에서만 워드마크를 길게 누르면 다음 로그인 결과를 고르는 패널(출시 빌드에는 없음) | ✅ (Figma) |
+| 로그인 화면 `LoginScreen` | `lib/features/auth/presentation/login_screen.dart` | 흰 배경(`splashBackground`), RE:BORN 워드마크 314×78(`AppAssets.logo`, Figma `8877:1929`), 그 아래 48(추정) 띄워 이메일·비밀번호 입력(`AppTextField`·`PasswordField`), 로그인 버튼(`CtaButton` 높이 55), "이메일로 회원가입" 텍스트 버튼. 좌우 44. 맨 아래 약관 안내(`LegalNotice`) 12 Regular `loginLegalText`, 안전 영역 위 14. 내용이 넘치면(키보드) 스크롤. 이메일 로그인은 Figma에 없어 위치는 추정 | ⚠️ (추정) |
+| 회원가입 화면 `SignupScreen` | `lib/features/auth/presentation/signup_screen.dart` | `PageScaffold` 큰 제목 "리본에 오신 걸 환영해요", 이메일·닉네임·비밀번호·비밀번호 확인, 아래 약관 안내, 하단 `BottomCtaBar` "가입하기". Figma 없음 | ⚠️ (추정) |
 | 인트로 온보딩 `IntroScreen` | `lib/features/onboarding/presentation/intro_screen.dart` | Figma `8877:1945`: 흰 배경, 앱 화면 목업 314×490(`AppAssets.introPreview`, 이미지는 상자 안 위 4.1%·높이 132.9%, 아래 26 흰색 페이드), 제목 22 Bold −0.55 줄 높이 32(`introTitle`), 설명 16 Regular −0.4 `textSecondary`(`introBody`), CTA "시작하기" 높이 60(`CtaButton`), 안전 영역 위 20. 설치 후 최초 1회만 표시(`IntroStore`). A/B 시안은 제외 | ✅ (Figma) |
 | 인트로 끝 화면 `StartScreen` | `lib/features/onboarding/presentation/start_screen.dart` | Figma `8877:1965`: 검정 배경(`startBackground`), 제목 26 Bold −0.65 줄 높이 32 흰색(`startTitle`), 설명 16 Regular 줄 높이 24 `startBody`, 기울어진 목업 338×560(`AppAssets.startPreview`, 불투명 82%), 아래 254 그라데이션(52%부터 검정), CTA 높이 60 분홍에 글자 `onStartCta`(Figma 메모: 흰 글자 대비 2.36:1이라 어둡게). 첫 로그인 직후 1회(`IntroStore.startSeen`). 상태 바 글자는 밝게 | ✅ (Figma) |
 | 다크 모드 설정 행 | `lib/features/all/presentation/widgets/settings_section.dart` | 전체 탭 설정 "화면" 그룹의 토글(`Key('dark-mode-toggle')`, `SettingsRow.toggle`). 켜면 즉시 전체 화면이 `AppColors.dark`로 바뀌고 기기에 저장(`ThemeModeStore`). 모드 전환은 애니메이션 없이 한 번에(`themeAnimationDuration: Duration.zero`) | 추정 |
@@ -277,7 +278,6 @@ Figma "Dark Mode"(`8877:1778`) 시안에서 읽은 값과, 시안에 없는 화�
 |---|---|---|
 | `EmotionFace` | `features/entries/.../emotion_face.dart` | 감정 캐릭터 이미지 7종 |
 | `CharacterAvatar` · `UserAvatar` | `shared/widgets/` | 캐릭터 기반 임시 프로필 · 사용자 사진/기본 캐릭터 |
-| `SocialLoginButton` · `SocialLoginButtonPair` | `features/auth/.../social_login_buttons.dart` | Figma `8877:1931`: 높이 55 알약(Figma 메모대로 두 버튼 높이 통일), 아이콘 24 + 간격 16 + 14 SemiBold −0.35, 버튼 사이 16. 구글(위) 흰 배경·`socialBorder` `#E5E5E5` 테두리, 카카오(아래) `kakaoYellow`. 한쪽을 누르면 끝날 때까지 두 버튼 모두 막고 누른 버튼에 로딩 표시(추정) |
 | `EmotionPicker`, `EmotionRatioBar` | `emotion_picker.dart` | 기록 작성의 감정 선택(4열×2행), 감정 비율 막대 |
 | `MonthCalendar` | `shared/widgets/month_calendar.dart` | 기록 탭 달력(날짜 아래 마커, 미래 날짜 비활성) |
 | `DonutChart` | `donut_chart.dart` | 인물 상세 감정 분포 |
