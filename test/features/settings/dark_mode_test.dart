@@ -98,7 +98,7 @@ void main() {
 
     final toggle = find.byKey(const Key('dark-mode-toggle'));
     // 전체 탭의 설정 구역까지 내려서 토글을 누른다.
-    final nav = find.text('전체');
+    final nav = find.text('마이');
     await tester.tap(nav.last);
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(

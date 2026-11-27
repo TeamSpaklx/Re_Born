@@ -70,7 +70,7 @@ void main() {
 
     expect(currentPath(container), AppRoutes.today);
     expect(find.byType(TodayScreen), findsOneWidget);
-    for (final label in ['투데이', '관계', '기록', '전체']) {
+    for (final label in ['홈', '관계', '기록', '마이']) {
       expect(find.text(label), findsOneWidget);
     }
   });
@@ -88,12 +88,12 @@ void main() {
     expect(currentPath(container), AppRoutes.record);
     expect(find.byType(RecordScreen), findsOneWidget);
 
-    await tester.tap(navTab('전체'));
+    await tester.tap(navTab('마이'));
     await tester.pumpAndSettle();
     expect(currentPath(container), AppRoutes.all);
     expect(find.byType(AllScreen), findsOneWidget);
 
-    await tester.tap(navTab('투데이'));
+    await tester.tap(navTab('홈'));
     await tester.pumpAndSettle();
     expect(currentPath(container), AppRoutes.today);
   });
@@ -105,7 +105,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(currentPath(container), AppRoutes.record);
 
-    await tester.tap(navTab('투데이'));
+    await tester.tap(navTab('홈'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('전체 보기'));
     await tester.pumpAndSettle();
@@ -131,7 +131,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(haptics, ['tap']);
 
-    await tester.tap(navTab('투데이'));
+    await tester.tap(navTab('홈'));
     await tester.pumpAndSettle();
     haptics.clear();
     await tester.tap(find.text('감정 기록하기'));
@@ -139,13 +139,13 @@ void main() {
     expect(haptics, ['tap']);
   });
 
-  testWidgets('관계·기록·전체 탭은 각자의 화면을 보여 준다', (tester) async {
+  testWidgets('관계·기록·마이 탭은 각자의 화면을 보여 준다', (tester) async {
     await pumpApp(tester);
 
     final screens = {
       '관계': find.byType(RelationsScreen),
       '기록': find.byType(RecordScreen),
-      '전체': find.byType(AllScreen),
+      '마이': find.byType(AllScreen),
     };
     for (final entry in screens.entries) {
       await tester.tap(navTab(entry.key));

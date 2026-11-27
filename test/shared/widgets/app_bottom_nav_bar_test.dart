@@ -61,7 +61,7 @@ void main() {
     for (final inactive in [
       AppAssets.tabHome,
       AppAssets.tabRecord,
-      AppAssets.tabAll,
+      AppAssets.tabMy,
     ]) {
       expect(
         find.byWidgetPredicate((w) => usesAsset(w, inactive)),
@@ -71,10 +71,10 @@ void main() {
 
     Color labelColor(String label) =>
         tester.widget<Text>(find.text(label)).style!.color!;
-    expect(labelColor('관계'), AppColors.light.brand);
-    expect(labelColor('투데이'), AppColors.light.textStrong);
+    expect(labelColor('관계'), AppColors.light.navActive);
+    expect(labelColor('홈'), AppColors.light.textStrong);
     expect(labelColor('기록'), AppColors.light.textStrong);
-    expect(labelColor('전체'), AppColors.light.textStrong);
+    expect(labelColor('마이'), AppColors.light.textStrong);
   });
 
   testWidgets('탭을 누르면 그 순서(index)로 알린다', (tester) async {
@@ -82,8 +82,8 @@ void main() {
     await pumpNav(tester, onTap: taps.add);
 
     await tester.tap(find.text('기록'));
-    await tester.tap(find.text('전체'));
-    await tester.tap(find.text('투데이'));
+    await tester.tap(find.text('마이'));
+    await tester.tap(find.text('홈'));
 
     expect(taps, [2, 3, 0]);
   });
@@ -149,7 +149,7 @@ void main() {
 
     expect(find.byType(NativeTabBar), findsOneWidget);
     expect(find.byType(BackdropFilter), findsNothing);
-    expect(find.text('투데이'), findsNothing);
+    expect(find.text('홈'), findsNothing);
   });
 
   testWidgets('플랫폼을 지정한 테스트에서는 네이티브 탭 바를 자동으로 쓰지 않는다', (tester) async {

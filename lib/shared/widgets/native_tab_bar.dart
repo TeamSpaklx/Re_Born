@@ -173,7 +173,7 @@ class _NativeTabBarState extends State<NativeTabBar> {
               'pixelRatio': _pixelRatio,
               'dark': _dark,
               'normalColor': colors.textStrong.toARGB32(),
-              'selectedColor': colors.brand.toARGB32(),
+              'selectedColor': colors.navActive.toARGB32(),
               'fontAsset': AppAssets.pretendardBold,
               'fontName': BottomNavTokens.nativeLabelFontName,
               'fontSize': label.fontSize,

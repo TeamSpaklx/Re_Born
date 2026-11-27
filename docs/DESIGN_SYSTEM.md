@@ -74,6 +74,7 @@
 | 바텀시트 손잡이 / 제목 / 행 글자 | `sheetHandle` / `sheetTitle` / `sheetRowText` | `#E4E4E4` / `#22252C` / `#4B5260` | Figma `834:1374` |
 | 알림 버튼 배경 | `bellButton` | `rgba(153,153,153,0.1)` | Figma |
 | 탭 바 배경/테두리/그림자/선택 | `navFill` / `navBorder` / `navShadow` / `navSelection` | `rgba(255,255,255,0.7)` / `#D0D0D0` / `rgba(0,0,0,0.1)` / `#EDEDED` | Figma |
+| 선택된 탭 아이콘·라벨 | `navActive` | `#D94F79` (다크 모드도 같음) | Figma `749:1100` |
 | 그래프 바닥선 | `gridLine` | `rgba(160,167,180,0.5)` | Figma |
 | 그래프 막대 3단계 | `barStrong` / `barMid` / `barLight` | `#D94F79` / `#FF80A6` / `#FFB3CA` | Figma 수정안 |
 | 출석 패널 / 그 위 글자 | `attendancePanel` / `onAttendancePanel` | `#FFB2CA` / `rgba(255,255,255,0.8)` | Figma |
