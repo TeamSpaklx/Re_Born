@@ -21,7 +21,7 @@
 
 ## 1. 색
 
-`AppColors.light`와 `AppColors.dark` (`lib/app/theme/app_colors.dart`). 아래 표의 값은 라이트이고, 다크 값은 1.8절에 있습니다. 화면은 항상 `context.colors.<이름>`으로 읽습니다. 설정의 "다크 모드" 토글이 두 팔레트 중 하나를 고릅니다(시스템 설정은 따르지 않음).
+`AppColors.light`와 `AppColors.dark` (`lib/app/theme/app_colors.dart`). 아래 표의 값은 라이트이고, 다크 값은 1.8절에 있습니다. 화면은 항상 `context.colors.<이름>`으로 읽습니다. 설정의 "화면 모드"가 두 팔레트 중 하나를 고릅니다. 기본값은 "기기 설정"이라 iOS·Android의 라이트·다크 전환을 바로 따르고, "라이트"·"다크"를 고르면 그 모드로 고정됩니다.
 
 ### 1.1 브랜드·행동
 | 용도 | 필드 | 값 | 출처 |
@@ -268,7 +268,7 @@ Figma "Dark Mode"(`8877:1778`) 시안에서 읽은 값과, 시안에 없는 화�
 | 로그인 화면 `LoginScreen` | `lib/features/auth/presentation/login_screen.dart` | Figma `8877:1929`: 흰 배경(`splashBackground`), RE:BORN 워드마크 314×78(`AppAssets.logo`, Figma 위쪽 331을 기기 높이 비율로 `LoginLayout.logoAlignment`). 아래에 구글·카카오 버튼(`SocialLoginButtonPair`), 버튼 끝에서 57 아래 약관 안내 12 Regular −0.3 줄 높이 14 `loginLegalText`, 안전 영역 위 14. Figma 메모대로 "개인정보 보호 정책"·"서비스 약관"을 각각 링크로 나눠 시트로 엶(밑줄은 추정). 디버그 빌드에서만 워드마크를 길게 누르면 다음 로그인 결과를 고르는 패널(출시 빌드에는 없음) | ✅ (Figma) |
 | 인트로 온보딩 `IntroScreen` | `lib/features/onboarding/presentation/intro_screen.dart` | Figma `8877:1945`: 흰 배경, 앱 화면 목업 314×490(`AppAssets.introPreview`, 이미지는 상자 안 위 4.1%·높이 132.9%, 아래 26 흰색 페이드), 제목 22 Bold −0.55 줄 높이 32(`introTitle`), 설명 16 Regular −0.4 `textSecondary`(`introBody`), CTA "시작하기" 높이 60(`CtaButton`), 안전 영역 위 20. 설치 후 최초 1회만 표시(`IntroStore`). A/B 시안은 제외 | ✅ (Figma) |
 | 인트로 끝 화면 `StartScreen` | `lib/features/onboarding/presentation/start_screen.dart` | Figma `8877:1965`: 검정 배경(`startBackground`), 제목 26 Bold −0.65 줄 높이 32 흰색(`startTitle`), 설명 16 Regular 줄 높이 24 `startBody`, 기울어진 목업 338×560(`AppAssets.startPreview`, 불투명 82%), 아래 254 그라데이션(52%부터 검정), CTA 높이 60 분홍에 글자 `onStartCta`(Figma 메모: 흰 글자 대비 2.36:1이라 어둡게). 첫 로그인 직후 1회(`IntroStore.startSeen`). 상태 바 글자는 밝게 | ✅ (Figma) |
-| 다크 모드 설정 행 | `lib/features/all/presentation/widgets/settings_section.dart` | 전체 탭 설정 "앱 사용" 그룹의 토글(달 아이콘)(`Key('dark-mode-toggle')`, `SettingsRow.toggle`). 켜면 즉시 전체 화면이 `AppColors.dark`로 바뀌고 기기에 저장(`ThemeModeStore`). 모드 전환은 애니메이션 없이 한 번에(`themeAnimationDuration: Duration.zero`) | 추정 |
+| 화면 모드 설정 행 | `lib/features/all/presentation/widgets/settings_section.dart` | 설정 "앱 사용" 그룹의 행(달 아이콘, `Key('theme-mode')`, `SettingsRow.link`, 오른쪽에 지금 모드 이름). 누르면 바텀시트에서 기기 설정 / 라이트 / 다크(`SheetOptionRow`, 기기 설정에는 "자동으로 바뀌어요" 설명)를 고르고, 고르면 즉시 전체 화면에 적용되고 기기에 저장(`ThemeModeStore`의 `theme_mode`). 모드 전환은 애니메이션 없이 한 번에(`themeAnimationDuration: Duration.zero`) | 추정 |
 | 오류 상태 `ErrorState` | `empty_state.dart` | "불러오지 못했어요" + "잠시 뒤에 다시 시도해 주세요." + "다시 시도". 오류 원인(기술 문구)은 보이지 않음 | ✅ |
 | 당겨서 새로고침 `AppRefreshControl` | `app_refresh_control.dart` | iOS 스타일 하나로 통일(iOS·Android 모두 튀는 스크롤 + 회색 톱니 스피너 `textSecondary`, 머티리얼 원형 스피너는 쓰지 않음). `CustomScrollView`의 첫 sliver나 고정 헤더 바로 다음에 넣음. 기준만큼 당기면 `AppHaptics.tap`, 최소 `refreshMinDuration`(600ms, 추정) 보임, 스크린 리더 "새로고침 중". 지금은 투데이만 씀(상단 유리 바 높이의 투명 고정 헤더 아래에 나타남) | ✅ (추정) |
 

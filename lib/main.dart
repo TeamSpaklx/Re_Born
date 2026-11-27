@@ -42,9 +42,11 @@ Future<void> main() async {
   final themeModeStore = await _loadThemeModeStore(errorLog);
   // 첫 프레임 전의 상태 바 글자색도 저장된 모드에 맞춘다(이후에는 앱이 화면별로 정한다).
   SystemChrome.setSystemUIOverlayStyle(
-    AppOverlayStyles.of(
-      themeModeStore.dark ? Brightness.dark : Brightness.light,
-    ),
+    AppOverlayStyles.of(switch (themeModeStore.mode) {
+      ThemeMode.dark => Brightness.dark,
+      ThemeMode.light => Brightness.light,
+      ThemeMode.system => PlatformDispatcher.instance.platformBrightness,
+    }),
   );
   // 잠긴 동안 뒤로 버튼을 막는 관찰자는 라우터보다 먼저 등록해야 먼저 불린다.
   AppLockBackGuard.instance.install();
@@ -107,7 +109,7 @@ Future<IntroStore> _loadIntroStore(AppErrorLog errorLog) async {
   }
 }
 
-/// 저장소를 못 읽으면 라이트로 시작한다. 오류는 기록에 남긴다.
+/// 저장소를 못 읽으면 기기 설정을 따른다. 오류는 기록에 남긴다.
 Future<ThemeModeStore> _loadThemeModeStore(AppErrorLog errorLog) async {
   try {
     return await PrefsThemeModeStore.create();

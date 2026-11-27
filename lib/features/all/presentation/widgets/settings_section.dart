@@ -18,7 +18,7 @@ import '../../../settings/presentation/settings_providers.dart';
 
 /// 전체 탭의 설정 (F-10·F-11). 레퍼런스 설정 화면처럼 카드 밖 소제목 + 아이콘 목록 카드로 묶는다.
 /// - 개인정보 보호 및 보안: 안내 카드(누르면 설명 시트), 동의 관리(하위 화면), 앱 잠금
-/// - 앱 사용: 알림, 알림 설정, 다크 모드
+/// - 앱 사용: 알림, 알림 설정, 화면 모드(기기 설정 / 라이트 / 다크)
 /// - 계정: 로그아웃, 기록 전체 삭제(확인 팝업), 계정 삭제(재인증 화면)
 /// 맨 아래에 의료 서비스 아님 안내.
 class SettingsSection extends ConsumerWidget {
@@ -47,6 +47,35 @@ class SettingsSection extends ConsumerWidget {
     if (!ok) return;
     await ref.read(authActionsProvider).signOut();
     if (context.mounted) context.go(AppRoutes.login);
+  }
+
+  /// 화면 모드 고르기: 기기 설정(자동 전환) / 라이트 / 다크. 고르면 바로 바뀌고 시트가 닫힌다.
+  Future<void> _pickThemeMode(BuildContext context, WidgetRef ref) async {
+    final current = ref.read(themeModeProvider);
+    final picked = await showAppBottomSheet<ThemeMode>(
+      context,
+      title: '화면 모드',
+      builder: (context) => Column(
+        children: [
+          for (final mode in const [
+            ThemeMode.system,
+            ThemeMode.light,
+            ThemeMode.dark,
+          ])
+            SheetOptionRow(
+              key: Key('theme-mode-${mode.name}'),
+              title: mode.label,
+              subtitle: mode == ThemeMode.system
+                  ? '기기의 라이트·다크 설정에 맞춰 자동으로 바뀌어요.'
+                  : null,
+              selected: mode == current,
+              onTap: () => Navigator.of(context).pop(mode),
+            ),
+        ],
+      ),
+    );
+    if (picked == null || picked == current) return;
+    await ref.read(themeModeProvider.notifier).setMode(picked);
   }
 
   void _openPrivacyInfo(BuildContext context) {
@@ -116,12 +145,12 @@ class SettingsSection extends ConsumerWidget {
               title: '알림 설정',
               onTap: () => context.push(AppRoutes.notificationSettings),
             ),
-            SettingsRow.toggle(
-              key: const Key('dark-mode-toggle'),
+            SettingsRow.link(
+              key: const Key('theme-mode'),
               iconAsset: AppAssets.ixMoon,
-              title: '다크 모드',
-              value: ref.watch(themeModeProvider) == ThemeMode.dark,
-              onChanged: (v) => ref.read(themeModeProvider.notifier).setDark(v),
+              title: '화면 모드',
+              trailingText: ref.watch(themeModeProvider).label,
+              onTap: () => _pickThemeMode(context, ref),
             ),
           ],
         ),
