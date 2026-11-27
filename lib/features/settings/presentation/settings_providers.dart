@@ -7,20 +7,29 @@ import '../../security/presentation/app_lock_controller.dart';
 import '../data/theme_mode_store.dart';
 import '../models/app_settings.dart';
 
-/// 화면 모드(라이트/다크). 켬/끔 토글 하나라 [ThemeMode.light]와 [ThemeMode.dark]만 쓴다.
+/// 화면 모드: 기기 설정 따르기([ThemeMode.system]) / 라이트 / 다크.
+/// 기기 설정을 따르면 iOS·Android의 라이트·다크 전환에 맞춰 앱도 바로 바뀐다(`MaterialApp.themeMode`).
 /// 초기값은 저장소에서 동기로 읽어, 첫 프레임부터 저장된 모드로 그린다.
 class ThemeModeController extends Notifier<ThemeMode> {
   @override
-  ThemeMode build() =>
-      ref.read(themeModeStoreProvider).dark ? ThemeMode.dark : ThemeMode.light;
+  ThemeMode build() => ref.read(themeModeStoreProvider).mode;
 
   /// 바로 화면에 반영하고, 저장은 뒤따른다(저장이 실패해도 이번 실행에서는 그대로 보인다).
-  Future<void> setDark(bool value) async {
-    state = value ? ThemeMode.dark : ThemeMode.light;
+  Future<void> setMode(ThemeMode value) async {
+    state = value;
     try {
-      await ref.read(themeModeStoreProvider).setDark(value);
+      await ref.read(themeModeStoreProvider).setMode(value);
     } catch (_) {}
   }
+}
+
+/// 설정 화면에 보이는 화면 모드 이름.
+extension ThemeModeLabel on ThemeMode {
+  String get label => switch (this) {
+    ThemeMode.system => '기기 설정',
+    ThemeMode.light => '라이트',
+    ThemeMode.dark => '다크',
+  };
 }
 
 final themeModeProvider = NotifierProvider<ThemeModeController, ThemeMode>(

@@ -389,8 +389,21 @@ abstract final class ComponentLayout {
   static const centerTitleToSegment = 33.0;
   static const stateButtonWidth = 200.0;
 
-  // 설정 목록
-  static const settingsRowHeight = 56.0;
+  // 설정 목록 (토스·레퍼런스 설정 화면을 참고한 추정값)
+  static const settingsRowHeight = 60.0;
   static const settingsGroupPaddingH = 20.0;
-  static const settingsGroupTitleHeight = 52.0;
+
+  /// 카드 밖 회색 소제목과 카드 사이.
+  static const settingsGroupTitleGap = 8.0;
+
+  /// 행 왼쪽 아이콘 24와 글자 사이 16.
+  static const settingsIconSize = 24.0;
+  static const settingsIconGap = 16.0;
+
+  /// 행 사이 구분선 두께.
+  static const settingsDividerWidth = 1.0;
+
+  /// 안내 카드 안쪽 여백과 제목·설명 사이.
+  static const settingsInfoPadding = 20.0;
+  static const settingsInfoTextGap = 4.0;
 }

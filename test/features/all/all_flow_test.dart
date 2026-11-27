@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:reborn_app/features/settings/presentation/consent_settings_screen.dart';
 import 'package:reborn_app/features/auth/presentation/login_screen.dart';
 import 'package:reborn_app/app/app.dart';
 import 'package:reborn_app/app/data_providers.dart';
@@ -81,7 +82,25 @@ void main() {
     expect(find.text('지민님에게 가볍게 안부 묻기'), findsOneWidget);
     expect(find.text('이번 주 일기 3번 쓰기'), findsOneWidget);
     expect(find.text('1/2 완료 · 50%'), findsOneWidget);
-    expect(find.text('설정'), findsOneWidget);
+    // 설정은 카드 밖 소제목으로 묶인다(레퍼런스 설정 화면 구조).
+    expect(find.text('개인정보 보호 및 보안'), findsOneWidget);
+    expect(find.text('앱 사용'), findsOneWidget);
+    expect(find.text('계정'), findsOneWidget);
+  });
+
+  testWidgets('개인정보 안내 카드를 누르면 보호 방식 설명이 열린다', (tester) async {
+    await pumpAll(tester);
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('privacy-info')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+
+    await tester.tap(find.byKey(const Key('privacy-info')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('내 기록은 이렇게 지켜요'), findsOneWidget);
+    expect(find.textContaining('외부 AI에 기록을 보내지 않아요'), findsOneWidget);
   });
 
   testWidgets('T-15: 항목을 추가하고 체크하면 상태가 저장되고 완료율이 바뀐다', (tester) async {
@@ -172,13 +191,16 @@ void main() {
     expect(opened!.read, isTrue, reason: '열어 보면 읽음 처리');
   });
 
-  testWidgets('T-30: 동의를 끄면 설정에 저장된다', (tester) async {
+  testWidgets('T-30: 동의 관리 화면에서 동의를 끄면 설정에 저장된다', (tester) async {
     final container = await pumpAll(tester);
     await tester.scrollUntilVisible(
-      find.byKey(const Key('consent-ai')),
+      find.byKey(const Key('open-consents')),
       200,
       scrollable: find.byType(Scrollable).first,
     );
+    await tester.tap(find.byKey(const Key('open-consents')));
+    await tester.pumpAndSettle();
+    expect(find.byType(ConsentSettingsScreen), findsOneWidget);
 
     await tester.tap(
       find.descendant(
@@ -191,6 +213,11 @@ void main() {
     final settings = await container.read(settingsRepositoryProvider).get();
     expect(settings.consents.aiAnalysis, isFalse);
     expect(settings.consents.privacy, isTrue);
+
+    // 자세히 보기는 내용 시트를 연다.
+    await tester.tap(find.byKey(const Key('consent-detail-ai')));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('외부 AI 서비스로 보내지 않아요'), findsOneWidget);
   });
 
   testWidgets('F-11: 기록 전체 삭제는 확인 후 기록·지수·인사이트를 지우고 인물은 남긴다', (tester) async {

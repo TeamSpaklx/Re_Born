@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:reborn_app/app/theme/app_assets.dart';
 import 'package:reborn_app/app/theme/app_colors.dart';
 import 'package:reborn_app/app/theme/app_radii.dart';
 import 'package:reborn_app/app/theme/app_spacing.dart';
 import 'package:reborn_app/app/theme/app_theme.dart';
+import 'package:reborn_app/shared/widgets/app_card.dart';
 import 'package:reborn_app/shared/widgets/app_dialogs.dart';
 import 'package:reborn_app/shared/widgets/app_toggle.dart';
 import 'package:reborn_app/shared/widgets/settings_group.dart';
+import 'package:reborn_app/shared/widgets/tinted_svg.dart';
 
 import '../../helpers/load_fonts.dart';
 
@@ -341,7 +344,7 @@ void main() {
   });
 
   group('설정 목록', () {
-    testWidgets('묶음은 흰 카드, 행은 높이 56, 토글 행은 토글을 눌러 바꾼다', (tester) async {
+    testWidgets('묶음은 흰 카드, 행은 높이 60, 토글 행은 토글을 눌러 바꾼다', (tester) async {
       var on = true;
       var tapped = 0;
       await pump(
@@ -399,6 +402,87 @@ void main() {
         tester.widget<Text>(find.text('로그아웃')).style!.color,
         colors.danger,
       );
+    });
+
+    testWidgets('소제목은 카드 밖 위에 회색으로, 아이콘 행 사이 구분선은 글자 시작점부터', (tester) async {
+      await pump(
+        tester,
+        SizedBox(
+          width: 354,
+          child: SettingsGroup(
+            title: '앱 사용',
+            children: [
+              SettingsRow.link(
+                key: const Key('row-a'),
+                iconAsset: AppAssets.ixNotification,
+                title: '알림',
+                trailingText: '2개 안 읽음',
+                trailingEmphasis: true,
+                onTap: () {},
+              ),
+              SettingsRow.link(
+                key: const Key('row-b'),
+                iconAsset: AppAssets.ixSetting,
+                title: '언어',
+                trailingText: '한국어',
+                onTap: () {},
+              ),
+            ],
+          ),
+        ),
+      );
+
+      // 소제목은 카드(흰 배경) 밖, 회색.
+      final header = tester.widget<Text>(find.text('앱 사용'));
+      expect(header.style!.color, colors.textSecondary);
+      final card = tester.getRect(find.byType(AppCard));
+      expect(tester.getRect(find.text('앱 사용')).bottom, lessThan(card.top));
+
+      // 행 왼쪽에 아이콘 24, 값 글자는 기본 회색·강조는 브랜드색.
+      expect(find.byType(TintedSvg), findsNWidgets(4)); // 아이콘 2 + 화살표 2
+      expect(
+        tester.widget<Text>(find.text('한국어')).style!.color,
+        colors.textSecondary,
+      );
+      expect(
+        tester.widget<Text>(find.text('2개 안 읽음')).style!.color,
+        colors.brand,
+      );
+
+      // 구분선 하나: 글자 시작점(아이콘 24 + 간격 16)부터 카드 안쪽 끝까지.
+      final title = tester.getRect(find.text('알림'));
+      final divider = tester.getRect(
+        find.byWidgetPredicate(
+          (w) =>
+              w is Container &&
+              w.constraints?.maxHeight == ComponentLayout.settingsDividerWidth,
+        ),
+      );
+      expect(divider.left, closeTo(title.left, 0.5));
+    });
+
+    testWidgets('안내 카드는 제목·설명을 보여 주고 누르면 콜백을 부른다', (tester) async {
+      var tapped = 0;
+      await pump(
+        tester,
+        SizedBox(
+          width: 354,
+          child: SettingsInfoCard(
+            iconAsset: AppAssets.ixShieldTick,
+            title: '기록은 이 기기 안에서만 분석해요',
+            description: '기록 내용을 밖으로 보내지 않아요.',
+            onTap: () => tapped++,
+          ),
+        ),
+      );
+
+      expect(find.text('기록은 이 기기 안에서만 분석해요'), findsOneWidget);
+      expect(
+        tester.widget<Text>(find.text('기록 내용을 밖으로 보내지 않아요.')).style!.color,
+        colors.textSecondary,
+      );
+      await tester.tap(find.byType(SettingsInfoCard));
+      expect(tapped, 1);
     });
   });
 }
