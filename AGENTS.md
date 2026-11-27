@@ -24,7 +24,7 @@ PR을 올리기 전에 로컬에서 `flutter analyze`와 `flutter test`가 통�
 ## 코드 규칙
 
 - 기능 코드는 `lib/features/<기능>/`에, 여러 기능이 같이 쓰는 코드는 `lib/shared/`, 공통 설정은 `lib/core/`에 둡니다.
-- 감정 분석·관계 지수·패턴 감지(F-05~F-07)는 UI·DB와 분리된 순수 Dart 함수로 작성하고 단위 테스트를 붙입니다.
+- 감정 점수·키워드·감정 수치 통계(F-05·F-09)는 UI·DB와 분리된 순수 Dart 함수로 작성하고 단위 테스트를 붙입니다. 감정 강도는 1~5단계 기준표(`IntensityLevel`)만 씁니다.
 - `frontend-integration`에는 Flutter 화면·메모리 저장소와 Supabase SDK 초기화만 둡니다. 서버 코드, API 클라이언트, Auth/DB 연동, 마이그레이션은 올리지 않습니다.
 
 ## UI 규칙
@@ -34,13 +34,13 @@ PR을 올리기 전에 로컬에서 `flutter analyze`와 `flutter test`가 통�
 - 지원 OS는 iOS와 Android 둘 다입니다. 확인은 기기에 따라 나눕니다(Windows → Android만, Mac → 둘 다). iOS 전용 코드는 `ios/`와 플랫폼 분기 안에만 두어 Android 빌드가 깨지지 않게 합니다.
 - 글자 크기 배율 1.0·세로 방향 고정입니다. 라이트/다크는 설정의 화면 모드(기기 설정 따르기·라이트·다크)가 고르므로 색은 반드시 `context.colors`로 읽습니다.
 - 머티리얼(구글) 위젯을 화면에서 직접 쓰지 않습니다. `Switch`, `SnackBar`, `AlertDialog`/`Dialog`+`TextButton`, `InkWell` 번짐 효과 대신 `lib/shared/widgets/`의 `AppToggle`, `showAppToast`, `showAppConfirmDialog`/`showAppDialog`, `SettingsGroup`, `AppTextButton`, `Pressable`을 씁니다([docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) 7·9장).
-- 하단 탭은 4개(홈/관계/기록/마이)입니다. Figma가 없는 화면은 레퍼런스(`docs/design/references/INDEX.md`)를 해석해 공통 컴포넌트로 만들고, 추정 값은 문서에 표시합니다.
+- 하단 탭은 4개(홈/분석/기록/마이)입니다. Figma가 없는 화면은 레퍼런스(`docs/design/references/INDEX.md`)를 해석해 공통 컴포넌트로 만들고, 추정 값은 문서에 표시합니다.
 - 새 화면의 데이터 모양과 Repository 규칙은 [docs/FRONTEND.md](docs/FRONTEND.md)를 따릅니다.
 
 ## 하지 말 것
 
 - **Firebase / Firestore를 쓰지 않습니다.** SPEC의 `users/{uid}/entries/...` 같은 경로는 PostgreSQL 테이블로 읽습니다.
-- **외부 AI API를 쓰지 않고**, 기록 본문을 외부로 보내지 않습니다.
+- **앱에서 외부 AI API를 직접 부르지 않습니다.** AI 코멘트는 백엔드 API를 거쳐 받고(`AiCommentService`), **AI API 키는 앱 코드·커밋에 넣지 않습니다**(SPEC 6.7).
 - **Supabase `service_role` / secret 키를 코드나 커밋에 넣지 않습니다.** 앱에는 publishable key만 둡니다.
 - **RLS 없는 테이블을 만들지 않습니다.** 모든 사용자 데이터 테이블은 본인 `user_id`의 행만 접근하게 합니다.
 - **TECH_STACK.md에 없는 패키지를 마음대로 추가하지 않습니다.** 필요하면 PR에서 이유를 적고 TECH_STACK.md도 함께 고칩니다.

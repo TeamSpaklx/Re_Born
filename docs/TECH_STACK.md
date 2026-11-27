@@ -20,14 +20,15 @@
 | 라우팅 | `go_router` ^18.1.1 | `lib/app/router.dart`, 하단 탭은 `StatefulShellRoute.indexedStack`(탭마다 상태 유지) |
 | 화면 데이터 | 메모리 저장소와 샘플 데이터 | 앱 재시작 시 초기화 |
 | 클라이언트 SDK | `supabase_flutter` 2.17.2 | 초기화: `lib/main.dart`, 설정: `lib/core/config/supabase_config.dart` |
-| 감정 분석·관계 지수 | Flutter 앱 내부 규칙 기반 계산 | 외부 AI·분석 API 없음 |
+| 감정 점수·키워드 | Flutter 앱 내부 규칙 기반 계산 | 강도 1~5단계 × 감정 방향 |
+| AI 코멘트 | 백엔드가 외부 AI API 호출(SPEC 6.7) | 앱은 `AiCommentService`로 백엔드만 부른다. 지금은 앱 안 가짜 구현(`FakeAiCommentService`) |
 | 린트 | `flutter_lints` 6 | `analysis_options.yaml` |
 | 검증 | 로컬 `flutter analyze` + `flutter test` | 자동 Flutter CI가 없어 PR에 실행 결과를 기록 |
 
 ## 쓰지 않는 것
 
 - **Firebase / Firestore**: SPEC의 `users/{uid}/entries/{entryId}` 같은 경로는 Firestore 시절 표기입니다. PostgreSQL 테이블 + `user_id` 컬럼 + RLS로 읽어 주세요.
-- **외부 AI API**: 기록 본문을 외부로 보내지 않습니다 (SPEC 6.7).
+- **앱에서 외부 AI API 직접 호출**: AI 코멘트는 백엔드를 거칩니다. AI API 키는 앱에 넣지 않습니다 (SPEC 6.7).
 - **서버/API 연결**: 이 브랜치의 화면 데이터는 메모리에 보관합니다.
 - **SwiftUI, WidgetKit, ActivityKit**: SPEC 6장 스택에 적혀 있지만 MVP 범위가 아닙니다.
 
