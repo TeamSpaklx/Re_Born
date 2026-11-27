@@ -68,7 +68,6 @@ abstract final class HomeLayout {
   static const double? recordCardHeightAfter = showAttendance ? 399.0 : null;
   static const ctaButtonHeightBefore = 52.0;
   static const ctaButtonHeightAfter = 48.0;
-  static const signalCardHeight = 104.0;
   static const graphCardHeight = 180.0;
   static const actionCardHeight = 90.0;
 
@@ -78,18 +77,15 @@ abstract final class HomeLayout {
   static const dateHeight = 17.0;
   static const dateToGreeting = 4.0;
   static const greetingToRecordCard = 24.0;
-  static const recordCardToSignalTitle = 22.0;
+  static const recordCardToGraph = 22.0;
   static const sectionTitleHeight = 32.0;
   static const sectionTitleToCard = 12.0;
-  static const signalCardToGraph = 22.0;
   static const graphToActionTitle = 27.0;
 
   // 참고 y 좌표 (Before)
   static const dateY = 128.0;
   static const greetingY = 149.0;
   static const recordCardY = 237.0;
-  static const signalTitleY = 527.0;
-  static const signalCardY = 571.0;
   static const graphCardY = 697.0;
   static const actionTitleY = 904.0;
   static const actionCardY1 = 948.0;
@@ -247,30 +243,19 @@ abstract final class StartLayout {
 
 /// 공통 컴포넌트 치수. 토글·세그먼트·토스트·바텀시트·CTA·알림 버튼·스켈레톤은
 /// Figma 컴포넌트 섹션(`749:337`) 값이고, 모달·설정 목록·애니메이션 시간은 Figma에 없어 추정이다.
-/// 로그인 화면 (Figma 8877:1929, 402×874 기준).
+/// 이메일 로그인 화면. 워드마크·좌우 여백·약관 아래 여백은 Figma 로그인(8877:1929, 402×874) 값이고,
+/// 입력 폼 자리는 Figma에 없어 추정이다.
 abstract final class LoginLayout {
   /// RE:BORN 워드마크 314×78.
   static const logoWidth = 314.0;
   static const logoHeight = 78.0;
 
-  /// 워드마크 세로 위치: Figma에서 위쪽이 화면 위에서 331px(874 높이, 상태 바 포함).
-  /// 기기 높이가 달라도 같은 비율에 오도록 정렬값으로 바꿨다: 331 = (874 − 78) × (y + 1) / 2 → y ≈ −0.168.
-  static const logoAlignment = Alignment(0, -0.168);
+  /// 워드마크 아래에서 이메일 입력까지(추정).
+  static const logoToForm = 48.0;
 
-  /// 소셜 버튼: 높이 55(Figma 메모대로 두 버튼을 같은 높이로), 사이 16, 좌우 44.
+  /// 로그인 버튼 높이 55(예전 소셜 버튼과 같은 높이), 좌우 44.
   static const buttonHeight = 55.0;
-  static const buttonGap = 16.0;
   static const horizontalMargin = 44.0;
-
-  /// 버튼 안 아이콘 24와 글자 사이 16.
-  static const iconSize = 24.0;
-  static const iconGap = 16.0;
-
-  /// 버튼 아래에서 약관 안내까지 57.
-  static const buttonsToLegal = 57.0;
-
-  /// 약관 안내 아래 여백: Figma에서 글자 아래가 화면 아래에서 48px, 홈 인디케이터(34)를 빼면 안전 영역 위로 14px.
-  static const legalBottom = 14.0;
 }
 
 abstract final class ComponentLayout {
@@ -389,8 +374,24 @@ abstract final class ComponentLayout {
   static const centerTitleToSegment = 33.0;
   static const stateButtonWidth = 200.0;
 
-  // 설정 목록
-  static const settingsRowHeight = 56.0;
+  // 설정 목록 (토스·레퍼런스 설정 화면을 참고한 추정값)
+  static const settingsRowHeight = 60.0;
   static const settingsGroupPaddingH = 20.0;
-  static const settingsGroupTitleHeight = 52.0;
+
+  /// 카드 밖 회색 소제목과 카드 사이.
+  static const settingsGroupTitleGap = 8.0;
+
+  /// 행 왼쪽 아이콘 24와 글자 사이 16.
+  static const settingsIconSize = 24.0;
+  static const settingsIconGap = 16.0;
+
+  /// 행 오른쪽 꺾쇠(Iconsax `arrow-right-1`) 크기. 예전 Figma 꺾쇠와 같은 20.
+  static const settingsChevronSize = 20.0;
+
+  /// 행 사이 구분선 두께.
+  static const settingsDividerWidth = 1.0;
+
+  /// 안내 카드 안쪽 여백과 제목·설명 사이.
+  static const settingsInfoPadding = 20.0;
+  static const settingsInfoTextGap = 4.0;
 }

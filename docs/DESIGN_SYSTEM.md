@@ -7,7 +7,7 @@
 - **값의 우선순위:** Figma 프레임 > 이 문서 > 레퍼런스([references/INDEX.md](./design/references/INDEX.md)). 레퍼런스(다른 앱 화면)는 **구조·위계만** 참고하고 색·글자·모서리는 이 문서의 토큰으로 다시 입힙니다.
 - **출처 표시:** **Figma** = Figma에서 읽은 값 / **레퍼런스** = 참고 화면에서 정한 값 / **추정** = 근거가 없어 정한 값(확인 필요).
 - **코드 위치:** 토큰은 `lib/app/theme/`(`AppColors`·`AppTextStyles`·`AppSpacing`·`ComponentLayout`·`AppRadii`·`AppShadows`·`AppMotion`·`AppAssets`), 공통 컴포넌트는 `lib/shared/widgets/`입니다. 화면 코드는 토큰만 쓰고(`Color(0x…)`·글자 크기·`Duration(…)`·경로 문자열 직접 사용 금지) 머티리얼 위젯을 직접 쓰지 않습니다(9장).
-- **눈으로 확인:** 디버그 빌드에서 전체 탭 설정 맨 아래 "디자인 갤러리 (개발용)" 또는 `flutter run --dart-define=INITIAL_ROUTE=/dev/gallery`로 모든 토큰·컴포넌트를 한 화면에서 볼 수 있습니다(`lib/shared/dev/design_gallery_screen.dart`). 컴포넌트를 바꾸면 갤러리와 이 문서 7장을 같이 고칩니다.
+- **눈으로 확인:** 디버그 빌드에서 마이 탭 설정 맨 아래 "디자인 갤러리 (개발용)" 또는 `flutter run --dart-define=INITIAL_ROUTE=/dev/gallery`로 모든 토큰·컴포넌트를 한 화면에서 볼 수 있습니다(`lib/shared/dev/design_gallery_screen.dart`). 컴포넌트를 바꾸면 갤러리와 이 문서 7장을 같이 고칩니다.
 
 ## 0. 원칙
 
@@ -21,7 +21,7 @@
 
 ## 1. 색
 
-`AppColors.light`와 `AppColors.dark` (`lib/app/theme/app_colors.dart`). 아래 표의 값은 라이트이고, 다크 값은 1.8절에 있습니다. 화면은 항상 `context.colors.<이름>`으로 읽습니다. 설정의 "다크 모드" 토글이 두 팔레트 중 하나를 고릅니다(시스템 설정은 따르지 않음).
+`AppColors.light`와 `AppColors.dark` (`lib/app/theme/app_colors.dart`). 아래 표의 값은 라이트이고, 다크 값은 1.8절에 있습니다. 화면은 항상 `context.colors.<이름>`으로 읽습니다. 설정의 "화면 모드"가 두 팔레트 중 하나를 고릅니다. 기본값은 "기기 설정"이라 iOS·Android의 라이트·다크 전환을 바로 따르고, "라이트"·"다크"를 고르면 그 모드로 고정됩니다.
 
 ### 1.1 브랜드·행동
 | 용도 | 필드 | 값 | 출처 |
@@ -74,6 +74,7 @@
 | 바텀시트 손잡이 / 제목 / 행 글자 | `sheetHandle` / `sheetTitle` / `sheetRowText` | `#E4E4E4` / `#22252C` / `#4B5260` | Figma `834:1374` |
 | 알림 버튼 배경 | `bellButton` | `rgba(153,153,153,0.1)` | Figma |
 | 탭 바 배경/테두리/그림자/선택 | `navFill` / `navBorder` / `navShadow` / `navSelection` | `rgba(255,255,255,0.7)` / `#D0D0D0` / `rgba(0,0,0,0.1)` / `#EDEDED` | Figma |
+| 선택된 탭 아이콘·라벨 | `navActive` | `#D94F79` (다크 모드도 같음) | Figma `749:1100` |
 | 그래프 바닥선 | `gridLine` | `rgba(160,167,180,0.5)` | Figma |
 | 그래프 막대 3단계 | `barStrong` / `barMid` / `barLight` | `#D94F79` / `#FF80A6` / `#FFB3CA` | Figma 수정안 |
 | 출석 패널 / 그 위 글자 | `attendancePanel` / `onAttendancePanel` | `#FFB2CA` / `rgba(255,255,255,0.8)` | Figma |
@@ -91,7 +92,7 @@
 
 코드: `emotionColor(emotion, colors)`, `EmotionDot`, `EmotionChip`(`emotion_chip.dart`), `EmotionFace`(캐릭터 이미지, `emotion_face.dart`). 극성은 팀 확인 전 제안값입니다(SPEC 11장 4번). 시안 원본은 `docs/design/references/user/RebornMood_source.png`(git 제외, 번들 밖)이며 알파에 번짐 잡음이 있어 그대로 쓰지 않습니다.
 
-**임시 프로필 이미지:** 인물·사용자 아바타는 같은 캐릭터 7종을 `CharacterAvatar(seed)`로 고정 배정해 씁니다(인물 id가 seed). 사용자 본인은 사진을 고르면 `UserAvatar`가 사진, 없으면 캐릭터를 보여 줍니다.
+**임시 프로필 이미지:** 사용자 아바타는 캐릭터 7종을 `CharacterAvatar(seed)`로 고정 배정해 씁니다. 사용자 본인은 사진을 고르면 `UserAvatar`가 사진, 없으면 캐릭터를 보여 줍니다.
 
 ### 1.7 사용 규칙
 - 핑크(`brand`)는 **행동·선택·강조**에만 씁니다(버튼, 선택된 칩, 체크, 활성 탭, 막대). 본문 글자를 핑크로 칠하지 않습니다(링크처럼 눌리는 글자와 선택 상태만 예외).
@@ -207,7 +208,7 @@ Figma "Dark Mode"(`8877:1778`) 시안에서 읽은 값과, 시안에 없는 화�
 
 ## 6. 아이콘·일러스트
 
-- **아이콘:** 하단 탭 투데이·관계·기록은 Phosphor, 전체는 Iconsax(`menu`). **앱에 새 아이콘이 필요하면 Iconsax(Linear)를 씁니다**: Iconsax 공개 저장소(`lusaxweb/iconsax`)의 SVG를 받아 `assets/icons/ui/ix_*.svg`로 넣고 `AppAssets`에 상수를 추가합니다(아이콘 패키지는 쓰지 않음). 지금 쓰는 것: add, edit, camera, gallery, eye, eye-off, trash. 소셜 로그인 마크(`google_g` 24, `kakao_bubble` 24×23)는 Figma 로그인 화면(`8877:1934`·`8877:1938`)에서 받은 그대로이고, 출시 전 각 회사 브랜드 가이드 확인이 필요합니다. 크기 20(행 화살표·체크), 24(체크 원), 28(탭·벨).
+- **아이콘:** 하단 탭 홈·분석(`chart-line-up`)·기록은 Phosphor(fill), 마이는 Figma `account_circle`. **앱에 새 아이콘이 필요하면 Iconsax(Linear)를 씁니다**: Iconsax 공개 저장소(`lusaxweb/iconsax`)의 SVG를 받아 `assets/icons/ui/ix_*.svg`로 넣고 `AppAssets`에 상수를 추가합니다(아이콘 패키지는 쓰지 않음). 지금 쓰는 것: add, edit, camera, gallery, eye, eye-off, trash, setting, 그리고 마이 탭 설정 행의 lock, notification, moon, message-text(AI 코멘트 말투), logout, profile-delete, call(도움받을 곳), 설정 행 꺾쇠 arrow-right-1. 크기 20(행 화살표·체크), 24(체크 원), 28(탭·벨).
 - **마스코트(여우원숭이, `AppAssets.mascotLemur`):** 홈 기록 카드(버튼 뒤에서 얼굴만), 빈·오류 상태(120×120, `EmptyState(showMascot: true)`).
 - **감정 캐릭터 7종:** `assets/images/emotions/`의 PNG(`AppAssets.emotionImages`)를 `EmotionFace`로 그립니다(달력 20, 카드 44, 상세 64, 선택 격자 칸). 정식 에셋이 오면 같은 파일 이름으로 교체합니다.
 - 이모지는 쓰지 않습니다(8장 글자 규칙).
@@ -235,9 +236,9 @@ Figma "Dark Mode"(`8877:1778`) 시안에서 읽은 값과, 시안에 없는 화�
 | 카드 `AppCard` | `app_card.dart` | `white`(테두리 없음, 투명 2px 자리) · `outlined`(1px `cardBorder`, 기록 카드 Before) · `pink`(기록 완료). 모서리 24 | ✅ |
 | 목록 구획 머리글 `ListSectionHeader` | `list_section_header.dart` | 14 SemiBold `textSecondary`, 위 24 아래 8, 오른쪽 trailing | ✅ |
 | 프로필 행 `ProfileRow` | `profile_row.dart` | 아바타 56 + 이름(18) + 보조 문구(14) + 화살표(누를 수 있을 때) | ✅ |
-| 설정 목록 `SettingsGroup` · `SettingsRow` | `settings_group.dart` | 흰 카드에 행 묶음, 선택적 굵은 제목. 행 56: 토글 / 값 + 화살표 / 위험(빨강) | ✅ |
+| 설정 목록 `SettingsGroup` · `SettingsRow` · `SettingsGroupHeader` · `SettingsInfoCard` | `settings_group.dart` | 레퍼런스 설정 화면 구조(추정): 카드 **밖** 위에 회색 소제목(`sectionLabel` 14 SemiBold, `textSecondary`, 아래 8), 흰 카드에 행 묶음, 행 사이 1px `cardBorder` 구분선(아이콘이 있으면 글자 시작점부터). 행 60: 왼쪽 아이콘 24(선택, 글자색) + 간격 16 + 제목, 오른쪽 토글 / 회색 값 + 꺾쇠(`trailingEmphasis`면 값이 브랜드색) / 위험(빨강). 묶음 안 아이콘은 꺾쇠까지 모두 Iconsax Linear(꺾쇠는 `arrow-right-1` 20, `iconMuted`). 안내 카드: 브랜드색 아이콘 + 굵은 제목 + 회색 설명 + 화살표, 안쪽 20 | 추정 |
 | 뱃지 `AppBadge` · `Badged` | `app_badge.dart` | 점 8 / 숫자(99+) 높이 18, `danger` | ✅ |
-| 인물·기록 목록 카드 | `person_card.dart`, `entry_card.dart` | 화면별 임시 카드 | 🟡 레퍼런스 반영 필요 |
+| 기록 목록 카드 | `entry_card.dart` | 화면별 임시 카드(강도 점 5개 + 단계 이름) | 🟡 레퍼런스 반영 필요 |
 | 날짜 그룹 기록 카드(감정색 카드 + 태그 칩 + 시각) | — | 레퍼런스: Mentry·감정 기록 앱 | ⬜ |
 
 ### 7.3 상단 바 · 내비게이션
@@ -245,7 +246,7 @@ Figma "Dark Mode"(`8877:1778`) 시안에서 읽은 값과, 시안에 없는 화�
 |---|---|---|---|
 | 페이지 틀 `PageScaffold` | `page_scaffold.dart` | 뒤로가기 + 가운데 제목(20) + 오른쪽 `PageAction`. `largeTitle: true`면 제목을 바 아래 26 ExtraBold로(토스식), `centerTitle: true`면 높이 44 바 가운데 22 Bold + 오른쪽 `PageIconAction`(24 아이콘, Figma 알림 `834:1149`). 뒤로 가기는 두 바 모두 `PageBackButton`(회색 꺾쇠 `chevronSignal`, 터치 44, 왼쪽 16)이고, 화면을 오른쪽으로 밀어도 뒤로 감(5장), `bottom:`에 `BottomCtaBar`(높이 60) | ✅ |
 | 알림 종 버튼 `NotificationBellButton` | `notification_bell_button.dart` | Figma `828:959`: 회색 10% 원 44 + 종 24, 안 읽은 알림이 있으면 분홍 점 종(`bellUnread`). 읽지 않은 수를 접근성 라벨로 | ✅ (Figma) |
-| 탭 화면 틀 `TabPageScaffold` | `tab_page_scaffold.dart` | 홈형 고정 블러 상단 바 + 큰 제목. 관계·기록·전체가 임시로 씀 | 🟡 큰 제목형으로 정리 필요 |
+| 탭 화면 틀 `TabPageScaffold` | `tab_page_scaffold.dart` | 홈형 고정 블러 상단 바 + 큰 제목. 분석·기록·마이가 임시로 씀 | 🟡 큰 제목형으로 정리 필요 |
 | 홈 상단 바 | `home_top_bar.dart` | 블러 + 로고(누르면 맨 위로) + 벨 | ✅ (Figma) |
 | 하단 탭 바 | `app_bottom_nav_bar.dart` | iOS 26+ 네이티브, 그 외 Flutter(블러). [DESIGN_HOME.md](./DESIGN_HOME.md) 5.8 | ✅ (Figma) |
 
@@ -253,7 +254,7 @@ Figma "Dark Mode"(`8877:1778`) 시안에서 읽은 값과, 시안에 없는 화�
 | 컴포넌트 | 함수·파일 | 규칙 | 상태 |
 |---|---|---|---|
 | 모달 | `showAppDialog` · `showAppConfirmDialog` (`app_dialogs.dart`) | 흰 둥근 창(28, 안쪽 24, 좌우 24), 왼쪽 정렬 제목·본문, 버튼 높이 52. 2개 이하 가로(취소 `secondary` + 확인 `brand`), 3개 이상 세로. `destructive`는 연한 빨강 + 빨간 글자. 페이드 + 0.96→1 | ✅ |
-| 나가기 확인 | `LeaveConfirmScope` (`leave_confirm_scope.dart`) | 입력 화면을 감싼다. 입력이 처음과 달라졌으면 뒤로 버튼·화면 밀기·Android 뒤로 가기 때 "작성 중인 내용을 버릴까요?"(계속 쓰기 / 나가기) 확인 창. 저장 후 `pop()`은 막지 않는다. 기록·인물 작성 화면에 적용 | ✅ |
+| 나가기 확인 | `LeaveConfirmScope` (`leave_confirm_scope.dart`) | 입력 화면을 감싼다. 입력이 처음과 달라졌으면 뒤로 버튼·화면 밀기·Android 뒤로 가기 때 "작성 중인 내용을 버릴까요?"(계속 쓰기 / 나가기) 확인 창. 저장 후 `pop()`은 막지 않는다. 기록 작성 화면에 적용 | ✅ |
 | 바텀시트 | `showAppBottomSheet` · `SheetActionRow` · `SheetOptionRow` (`app_bottom_sheet.dart`) | Figma `834:1374`·`828:115`: 화면 좌우 24 띄운 떠 있는 카드(34), 아래는 안전 영역(없으면 24)만큼 띄움, 안쪽 위 12·좌우 20·아래 20, 손잡이 40×4(아래 24), 제목 20 Bold. 행동 행 56(아이콘 24 + 간격 16 + 16 Medium `sheetRowText`, 위험 행은 빨강·추정). 선택 행은 같은 높이·글자 + 선택되면 핑크 + 체크(추정). 가림막 검정 50%, 최대 높이 90%, 열기 300ms·닫기 200ms. **끌기(토스식, 추정 값):** 시트 어디를 잡아도 손가락을 따라 움직이고, 놓았을 때 높이의 25% 넘게 내렸거나 아래로 초당 700 넘게 튕기면 닫힘, 아니면 스프링(`AppMotion.sheetSpring`)으로 제자리. 위로는 고무줄처럼 최대 24. 끌어내린 만큼 가림막이 옅어짐. 긴 내용은 맨 위에서 더 끌어내리면 시트가 내려가고, 내려간 상태에서 위로 밀면 시트가 먼저 올라온 뒤 스크롤 | ✅ (Figma) |
 | 토스트 | `showAppToast(context, 문구, success:)` (`app_dialogs.dart`) | Figma `834:2088`: 흰 알약(테두리 1 `toastBorder`, 그림자 6%), 좌우 16, 간격 12, 문구 14 Medium, 오른쪽 '확인'(14 SemiBold `toastAccent`, 누르면 바로 닫힘). `success: true`(저장·완료)면 왼쪽에 체크 원 28, 오류·안내 문구는 체크 없음. 탭 바 위 16, 3초(추정), 새 토스트가 이전 것을 대체, 토스트 바깥 터치는 통과 | ✅ (Figma) |
 | 날짜 선택 휠 시트 · 내보내기 시트 | — | 레퍼런스: 분석 컨셉 시안 | ⬜ |
@@ -263,12 +264,13 @@ Figma "Dark Mode"(`8877:1778`) 시안에서 읽은 값과, 시안에 없는 화�
 |---|---|---|---|
 | 빈 상태 `EmptyState` | `empty_state.dart` | (마스코트 120) + 제목(18) + 설명(14) + (소프트 버튼 48). 한 줄 문구는 8장 | ✅ |
 | 조용한 빈 상태 `QuietEmptyState` | `empty_state.dart` | Figma 알림 `834:1148`: 마스코트 151 + 한 줄(20 Regular `emptyText`). `ComponentLayout.quietEmptyAlignment`로 가운데보다 조금 위 | ✅ (Figma) |
-| 스켈레톤 `SkeletonPulse` · `SkeletonBox` · `SkeletonCard` · `SkeletonListCard` · `SkeletonList` | `skeleton.dart` | Figma 홈 스켈레톤 `834:2351`: 흰 카드(24) 위 `#E4E4E4` 막대(6). 한 화면을 `SkeletonPulse`로 감싸 1.2초 왕복으로 깜빡임(불투명도 1↔0.5, 추정), '동작 줄이기'면 정지, "불러오는 중"으로 한 번 읽힘. 홈은 `HomeSkeleton`(Figma 좌표 그대로), 기록·관계·알림 목록과 인물 그래프는 같은 조각으로 만든 추정 배치 | ✅ |
+| 스켈레톤 `SkeletonPulse` · `SkeletonBox` · `SkeletonCard` · `SkeletonListCard` · `SkeletonList` | `skeleton.dart` | Figma 홈 스켈레톤 `834:2351`: 흰 카드(24) 위 `#E4E4E4` 막대(6). 한 화면을 `SkeletonPulse`로 감싸 1.2초 왕복으로 깜빡임(불투명도 1↔0.5, 추정), '동작 줄이기'면 정지, "불러오는 중"으로 한 번 읽힘. 홈은 `HomeSkeleton`(Figma 좌표 그대로), 기록·분석·알림 목록은 같은 조각으로 만든 추정 배치 | ✅ |
 | 앱 잠금 화면 `LockScreen` | `lib/features/security/presentation/lock_screen.dart` | Figma `834:1480`·`834:2141`: 흰 배경(`splashBackground`) 가운데 로고 160(스플래시와 같은 `SplashLayout` 값이라 이어져 보임), 시스템 인증 창은 OS가 위에 띄움. 실패 시 아래에 글자 버튼 "인증에 실패하거나 비밀번호를 잊으셨나요?" 314×45, 안전 영역 위 30, 14 SemiBold −0.35 `lockHelpText`(`rgba(76,83,95,0.8)`), 누르는 동안 알약 배경 `lockHelpPressed`(`rgba(160,167,180,0.2)`). 앱 전환 화면 덮개는 버튼 없이 로고만 | ✅ (Figma) |
-| 로그인 화면 `LoginScreen` | `lib/features/auth/presentation/login_screen.dart` | Figma `8877:1929`: 흰 배경(`splashBackground`), RE:BORN 워드마크 314×78(`AppAssets.logo`, Figma 위쪽 331을 기기 높이 비율로 `LoginLayout.logoAlignment`). 아래에 구글·카카오 버튼(`SocialLoginButtonPair`), 버튼 끝에서 57 아래 약관 안내 12 Regular −0.3 줄 높이 14 `loginLegalText`, 안전 영역 위 14. Figma 메모대로 "개인정보 보호 정책"·"서비스 약관"을 각각 링크로 나눠 시트로 엶(밑줄은 추정). 디버그 빌드에서만 워드마크를 길게 누르면 다음 로그인 결과를 고르는 패널(출시 빌드에는 없음) | ✅ (Figma) |
+| 로그인 화면 `LoginScreen` | `lib/features/auth/presentation/login_screen.dart` | 흰 배경(`splashBackground`), RE:BORN 워드마크 314×78(`AppAssets.logo`, Figma `8877:1929`), 그 아래 48(추정) 띄워 이메일·비밀번호 입력(`AppTextField`·`PasswordField`), 로그인 버튼(`CtaButton` 높이 55), "이메일로 회원가입" 텍스트 버튼. 좌우 44. 맨 아래 약관 안내(`LegalNotice`) 12 Regular `loginLegalText`, 안전 영역 위 14. 내용이 넘치면(키보드) 스크롤. 이메일 로그인은 Figma에 없어 위치는 추정 | ⚠️ (추정) |
+| 회원가입 화면 `SignupScreen` | `lib/features/auth/presentation/signup_screen.dart` | `PageScaffold` 큰 제목 "리본에 오신 걸 환영해요", 이메일·닉네임·비밀번호·비밀번호 확인, 아래 약관 안내, 하단 `BottomCtaBar` "가입하기". Figma 없음 | ⚠️ (추정) |
 | 인트로 온보딩 `IntroScreen` | `lib/features/onboarding/presentation/intro_screen.dart` | Figma `8877:1945`: 흰 배경, 앱 화면 목업 314×490(`AppAssets.introPreview`, 이미지는 상자 안 위 4.1%·높이 132.9%, 아래 26 흰색 페이드), 제목 22 Bold −0.55 줄 높이 32(`introTitle`), 설명 16 Regular −0.4 `textSecondary`(`introBody`), CTA "시작하기" 높이 60(`CtaButton`), 안전 영역 위 20. 설치 후 최초 1회만 표시(`IntroStore`). A/B 시안은 제외 | ✅ (Figma) |
 | 인트로 끝 화면 `StartScreen` | `lib/features/onboarding/presentation/start_screen.dart` | Figma `8877:1965`: 검정 배경(`startBackground`), 제목 26 Bold −0.65 줄 높이 32 흰색(`startTitle`), 설명 16 Regular 줄 높이 24 `startBody`, 기울어진 목업 338×560(`AppAssets.startPreview`, 불투명 82%), 아래 254 그라데이션(52%부터 검정), CTA 높이 60 분홍에 글자 `onStartCta`(Figma 메모: 흰 글자 대비 2.36:1이라 어둡게). 첫 로그인 직후 1회(`IntroStore.startSeen`). 상태 바 글자는 밝게 | ✅ (Figma) |
-| 다크 모드 설정 행 | `lib/features/all/presentation/widgets/settings_section.dart` | 전체 탭 설정 "화면" 그룹의 토글(`Key('dark-mode-toggle')`, `SettingsRow.toggle`). 켜면 즉시 전체 화면이 `AppColors.dark`로 바뀌고 기기에 저장(`ThemeModeStore`). 모드 전환은 애니메이션 없이 한 번에(`themeAnimationDuration: Duration.zero`) | 추정 |
+| 화면 모드 설정 행 | `lib/features/all/presentation/widgets/settings_section.dart` | 설정 "앱 사용" 그룹의 행(달 아이콘, `Key('theme-mode')`, `SettingsRow.link`, 오른쪽에 지금 모드 이름). 누르면 바텀시트에서 기기 설정 / 라이트 / 다크(`SheetOptionRow`, 기기 설정에는 "자동으로 바뀌어요" 설명)를 고르고, 고르면 즉시 전체 화면에 적용되고 기기에 저장(`ThemeModeStore`의 `theme_mode`). 모드 전환은 애니메이션 없이 한 번에(`themeAnimationDuration: Duration.zero`) | 추정 |
 | 오류 상태 `ErrorState` | `empty_state.dart` | "불러오지 못했어요" + "잠시 뒤에 다시 시도해 주세요." + "다시 시도". 오류 원인(기술 문구)은 보이지 않음 | ✅ |
 | 당겨서 새로고침 `AppRefreshControl` | `app_refresh_control.dart` | iOS 스타일 하나로 통일(iOS·Android 모두 튀는 스크롤 + 회색 톱니 스피너 `textSecondary`, 머티리얼 원형 스피너는 쓰지 않음). `CustomScrollView`의 첫 sliver나 고정 헤더 바로 다음에 넣음. 기준만큼 당기면 `AppHaptics.tap`, 최소 `refreshMinDuration`(600ms, 추정) 보임, 스크린 리더 "새로고침 중". 지금은 투데이만 씀(상단 유리 바 높이의 투명 고정 헤더 아래에 나타남) | ✅ (추정) |
 
@@ -277,26 +279,25 @@ Figma "Dark Mode"(`8877:1778`) 시안에서 읽은 값과, 시안에 없는 화�
 |---|---|---|
 | `EmotionFace` | `features/entries/.../emotion_face.dart` | 감정 캐릭터 이미지 7종 |
 | `CharacterAvatar` · `UserAvatar` | `shared/widgets/` | 캐릭터 기반 임시 프로필 · 사용자 사진/기본 캐릭터 |
-| `SocialLoginButton` · `SocialLoginButtonPair` | `features/auth/.../social_login_buttons.dart` | Figma `8877:1931`: 높이 55 알약(Figma 메모대로 두 버튼 높이 통일), 아이콘 24 + 간격 16 + 14 SemiBold −0.35, 버튼 사이 16. 구글(위) 흰 배경·`socialBorder` `#E5E5E5` 테두리, 카카오(아래) `kakaoYellow`. 한쪽을 누르면 끝날 때까지 두 버튼 모두 막고 누른 버튼에 로딩 표시(추정) |
 | `EmotionPicker`, `EmotionRatioBar` | `emotion_picker.dart` | 기록 작성의 감정 선택(4열×2행), 감정 비율 막대 |
 | `MonthCalendar` | `shared/widgets/month_calendar.dart` | 기록 탭 달력(날짜 아래 마커, 미래 날짜 비활성) |
-| `DonutChart` | `donut_chart.dart` | 인물 상세 감정 분포 |
-| `IndexLineChart` | `features/relations/.../index_line_chart.dart` | 관계 지수 곡선 + 영역 + 오늘 점 |
+| `DonutChart` | `donut_chart.dart` | 감정 분포(지금은 갤러리에서만) |
+| `EmotionLineChart` | `shared/widgets/emotion_line_chart.dart` | 분석 탭 감정 수치 곡선(−5~+5, 0 기준선) + 영역 + 마지막 점 |
+| `AiFeedbackCard` | `features/ai_comment/presentation/ai_feedback_card.dart` | AI 코멘트(받는 중·실패/다시 분석·코멘트+제안 담기). 결과 화면·기록 상세 |
 | `StepProgressBar` | `step_progress_bar.dart` | 가입 4단계 |
 | `SelectCard` | `select_card.dart` | 온보딩 관계 유형 |
-| `ConsentRow` | `consent_row.dart` | 확인 체크(계정 삭제), 전체 동의 강조형 포함 |
 | `PermissionRow` | `permission_row.dart` | 권한·기능 안내 행(지금은 디자인 갤러리에서만, 가입 단계 화면을 지워서) |
-| `SummaryCard` | `summary_card.dart` | 전체 탭·관계 탭·인사이트 상세의 수치 2~3칸 |
+| `SummaryCard` | `summary_card.dart` | 마이 탭 요약(총 기록·연속 기록·최장 연속) |
 | `NotificationRow` | `notification_row.dart` | 알림 목록(읽지 않음 강조) |
 | `SwipeToDelete` | `swipe_to_delete.dart` | 기록·체크리스트 밀어서 삭제(확인 팝업 선택) |
 | `AppFab` | `app_fab.dart` | 기록 탭 "기록하기"(`TabPageScaffold.floating`) |
-| `IntensitySelector` | `features/record/.../intensity_selector.dart` | 감정 강도 1~3 |
+| `IntensitySelector` | `features/record/.../intensity_selector.dart` | 감정 강도 1~5단계 기준표: 단계마다 번호 원·이름·기준 설명을 세로로(추정 디자인) |
 
 아직 없는 것: 날짜 휠 시트.
 
 ## 8. 화면 패턴
 
-1. **탭 화면(투데이·관계·기록·전체):** 고정 상단 바(블러) + 세로 스크롤 + 아래 탭 바 여백 148. 큰 제목은 `greeting`(26). 좌우 24.
+1. **탭 화면(홈·분석·기록·마이):** 고정 상단 바(블러) + 세로 스크롤 + 아래 탭 바 여백 148. 큰 제목은 `greeting`(26). 좌우 24.
 2. **푸시 화면(작성·상세·설정 하위):** `PageScaffold`. 정보가 많은 상세는 가운데 제목형, **질문·입력·선택 화면은 큰 제목형 + 하단 고정 CTA**(`largeTitle` + `bottom: BottomCtaBar`). 뒤로가기는 항상 왼쪽 위.
 3. **목록:** 구획 머리글(`ListSectionHeader`: 오늘 / 어제 / 날짜) 아래에 흰 카드 또는 행을 12 간격으로. 항목이 없으면 빈 상태, 많으면 스크롤.
 4. **폼:** 큰 제목(질문) → 입력/선택 → 하단 고정 버튼. 입력 오류는 해당 입력창 아래에 빨간 문구로 바로 보여 주고, 저장 실패는 토스트. 키보드가 올라오면 하단 버튼이 위로 밀립니다(`PageScaffold`가 처리).
@@ -312,7 +313,7 @@ Figma "Dark Mode"(`8877:1778`) 시안에서 읽은 값과, 시안에 없는 화�
 - 버튼은 동사형 2~6자("저장", "감정 기록하기", "다시 시도"). 취소는 "취소" 또는 "나중에".
 - 오류는 원인보다 **다음 행동**: "불러오지 못했어요 / 잠시 뒤에 다시 시도해 주세요".
 - 부정 감정이나 위기 표현은 평가하지 않고 곁에 있는 말투로("마음이 많이 힘드신 것 같아요").
-- 알림·잠금 화면 문구에는 기록 본문·인물 이름을 넣지 않습니다. 의료·상담 서비스가 아니라는 안내를 설정 화면 하단과 위기 안내에 둡니다.
+- 알림·잠금 화면 문구에는 일기 본문을 넣지 않습니다. 의료·상담 서비스가 아니라는 안내를 설정 화면 하단과 위기 안내(마이 > 도움받을 곳)에 둡니다.
 
 ### 접근성
 - 눌리는 모든 요소는 44×44 이상. 시각 크기가 작으면 투명 영역으로 확장(`AppToggle`, `AppTextButton`).
@@ -343,7 +344,7 @@ Figma "Dark Mode"(`8877:1778`) 시안에서 읽은 값과, 시안에 없는 화�
 6. 앱 잠금: 언제 다시 잠글지(지금은 백그라운드에 다녀오면 바로), 인증 사유 문구("기록을 보려면 잠금을 풀어 주세요")는 Figma에 없어 정한 값.
 7. 홈 외 화면의 Figma 프레임과 이 문서의 컴포넌트 규칙이 어긋나는 부분.
 8. Home After(`466:2704`)의 최신 안.
-9. 아직 레퍼런스가 없는 화면: 체크리스트, 기록 작성 폼, 인물 목록·추가·상세(밝은 화면), 약관 동의, 이메일 가입(한국어), 인사이트 상세, 위기 안내, 한국어 오류·빈 상태, 계정 삭제 흐름([INDEX.md](./design/references/INDEX.md) C).
+9. 아직 레퍼런스가 없는 화면: 체크리스트, 기록 작성 폼(강도 기준표), 저장 결과(AI 코멘트), 분석 탭, 이메일 가입(한국어), 위기 안내, 한국어 오류·빈 상태, 계정 삭제 흐름([INDEX.md](./design/references/INDEX.md) C).
 
 ## 11. 규칙 요약 (코드 작성 시)
 

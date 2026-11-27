@@ -18,12 +18,12 @@ import '../../../../shared/widgets/user_avatar.dart';
 import '../../../auth/models/auth_validator.dart';
 import '../../../auth/presentation/auth_providers.dart';
 import '../../../entries/presentation/entries_providers.dart';
-import '../../../people/presentation/people_providers.dart';
+import '../../../analysis/record_streak_calculator.dart';
+import '../../../../core/providers/clock_provider.dart';
 import '../../../security/presentation/app_lock_controller.dart';
 import '../../../settings/presentation/settings_providers.dart';
-import '../../../todos/presentation/todos_providers.dart';
 
-/// 전체 탭 맨 위: 프로필 행(닉네임·이메일, 누르면 닉네임 변경)과 요약 카드(기록·인물·체크리스트 완료).
+/// 마이 탭 맨 위: 프로필 행(닉네임·이메일, 누르면 닉네임 변경)과 요약 카드(총 기록·연속 기록·최장 연속).
 class ProfileSection extends ConsumerWidget {
   const ProfileSection({super.key});
 
@@ -58,10 +58,14 @@ class ProfileSection extends ConsumerWidget {
     final nickname = ref.watch(settingsProvider).value?.nickname ?? '';
     final photo = ref.watch(settingsProvider).value?.profileImagePath;
     final email = ref.watch(sessionProvider)?.email;
-    final entries = ref.watch(entriesProvider).value?.length ?? 0;
-    final people = ref.watch(peopleProvider).value?.length ?? 0;
-    final todos = ref.watch(todosProvider).value ?? const [];
-    final done = todos.where((t) => t.done).length;
+    final entries = ref.watch(entriesProvider).value ?? const [];
+    final streak = calculateRecordStreak(
+      entries.map((e) => e.createdAt),
+      ref.watch(clockProvider)(),
+    );
+    final longest = streak.longest < streak.current
+        ? streak.current
+        : streak.longest;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -78,9 +82,9 @@ class ProfileSection extends ConsumerWidget {
         const SizedBox(height: AppSpacing.space12),
         SummaryCard(
           items: [
-            SummaryItem(value: '$entries', label: '기록'),
-            SummaryItem(value: '$people', label: '인물'),
-            SummaryItem(value: '$done/${todos.length}', label: '체크 완료'),
+            SummaryItem(value: '${entries.length}', label: '총 기록'),
+            SummaryItem(value: '${streak.current}일', label: '연속 기록'),
+            SummaryItem(value: '$longest일', label: '최장 연속'),
           ],
         ),
       ],

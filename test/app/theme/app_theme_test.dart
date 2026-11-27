@@ -126,7 +126,7 @@ void main() {
       expect(ComponentLayout.toggleThumbWidth, 38);
       expect(ComponentLayout.toggleThumbHeight, 24);
       expect(ComponentLayout.segmentHeight, 36);
-      expect(ComponentLayout.settingsRowHeight, 56);
+      expect(ComponentLayout.settingsRowHeight, 60);
       expect(ComponentLayout.ctaButtonHeight, 60);
       expect(ComponentLayout.dialogButtonHeight, 52);
       expect(ComponentLayout.sheetHandleWidth, 40);
@@ -293,7 +293,7 @@ void main() {
     test('하단 탭 바', () {
       expect(BottomNavTokens.width, 354);
       expect(BottomNavTokens.height, 64);
-      expect(BottomNavTokens.labels, ['투데이', '관계', '기록', '전체']);
+      expect(BottomNavTokens.labels, ['홈', '분석', '기록', '마이']);
       expect(BottomNavTokens.selectionLefts, hasLength(4));
       // 항목 4개(68) + 간격 3개(17)가 탭 바 안쪽 323에 들어간다.
       expect(BottomNavTokens.itemWidth * 4 + BottomNavTokens.itemGap * 3, 323);

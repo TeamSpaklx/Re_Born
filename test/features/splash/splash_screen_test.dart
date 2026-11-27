@@ -25,17 +25,16 @@ class _SlowEntries extends InMemoryEntriesRepository {
   final Duration delay;
 
   @override
-  Future<List<Entry>> list({String? personId}) async {
+  Future<List<Entry>> list() async {
     await Future<void>.delayed(delay);
-    return super.list(personId: personId);
+    return super.list();
   }
 }
 
 /// 기록 목록을 불러오다 실패하는 저장소.
 class _FailingEntries extends InMemoryEntriesRepository {
   @override
-  Future<List<Entry>> list({String? personId}) async =>
-      throw StateError('network');
+  Future<List<Entry>> list() async => throw StateError('network');
 }
 
 void main() {
@@ -183,6 +182,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(SplashScreen), findsNothing);
     expect(find.byType(TodayScreen), findsOneWidget);
+    // 홈의 알림 뱃지가 일기를 한 번 더 읽는다(느린 저장소라 그만큼 더 기다린다).
+    await tester.pump(delay);
   });
 
   testWidgets('홈 데이터가 너무 늦으면 최대 대기 시간 뒤에 넘어간다', (tester) async {

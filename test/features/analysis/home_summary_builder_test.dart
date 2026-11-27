@@ -1,30 +1,29 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reborn_app/features/analysis/data/sample_data.dart';
 import 'package:reborn_app/features/analysis/home_summary_builder.dart';
-import 'package:reborn_app/features/analysis/suggestion_pool.dart';
 import 'package:reborn_app/features/analysis/weekly_emotion_builder.dart';
+import 'package:reborn_app/features/home/models/home_summary.dart';
 import 'package:reborn_app/features/entries/models/emotion.dart';
 import 'package:reborn_app/features/entries/models/entry.dart';
 import 'package:reborn_app/features/todos/models/todo.dart';
 
 void main() {
   final now = DateTime(2026, 10, 22, 12); // 목요일
-  Entry entry(DateTime at, int score, {String? personId}) => Entry(
+  Entry entry(DateTime at, int score) => Entry(
     id: '$at$score',
     body: '본문',
     emotion: score < 0 ? Emotion.sadness : Emotion.joy,
-    intensity: score.abs().clamp(1, 3),
+    intensity: score.abs().clamp(1, 5),
     score: score,
     createdAt: at,
-    personId: personId,
   );
 
   group('이번 주 감정 흐름', () {
-    test('월~일 7칸, 요일별 평균 점수를 (평균+3)/6으로 바꾼다', () {
+    test('월~일 7칸, 요일별 평균 점수를 (평균+5)/10으로 바꾼다', () {
       final flow = buildWeeklyEmotion([
-        entry(DateTime(2026, 10, 19, 9), 3), // 월 → 1.0
-        entry(DateTime(2026, 10, 20, 9), -3), // 화 → 0.0
-        entry(DateTime(2026, 10, 20, 20), 3), // 화 평균 0 → 0.5
+        entry(DateTime(2026, 10, 19, 9), 5), // 월 → 1.0
+        entry(DateTime(2026, 10, 20, 9), -5), // 화 → 0.0
+        entry(DateTime(2026, 10, 20, 20), 5), // 화 평균 0 → 0.5
       ], now);
 
       expect(flow.days, hasLength(7));
@@ -60,84 +59,72 @@ void main() {
 
   group('홈 요약 조립', () {
     final data = buildSampleData(now);
-    test('오늘 기록이 없으면 Before, 연속 5일·최장 20일, 관계 신호 1개, 제안 2개', () {
-      final s = buildHomeSummary(
-        nickname: '규리',
-        now: now,
-        entries: data.entries,
-        people: data.people,
-        insights: data.insights,
-        todos: data.todos,
-      );
+    HomeSummary summary({List<Entry>? entries, List<Todo>? todos}) =>
+        buildHomeSummary(
+          nickname: '규리',
+          now: now,
+          entries: entries ?? data.entries,
+          todos: todos ?? data.todos,
+        );
+
+    test('오늘 기록이 없으면 Before, 연속 5일·최장 20일, 최근 일기의 AI 제안 중 안 담은 것', () {
+      final s = summary();
       expect(s.todayRecorded, isFalse);
       expect(s.todayEntryId, isNull);
+      expect(s.todayComment, isNull);
       expect(s.streak.current, 5);
       expect(s.streak.longest, 20);
-      expect(s.relationSignals.single.personName, '지민');
-      expect(s.relationSignals.single.daysSinceLastRecord, 1);
-      // 샘플 체크리스트에는 첫 제안이 이미 담겨 있어, 담은 것은 빼고 다음 두 제안이 나온다.
-      expect(s.suggestions, hasLength(2));
-      expect(s.suggestions.map((e) => e.title), [
-        '오늘은 거리를 두고, 내일 가벼운 간식과 함께 말을 건네 보세요.',
-        '지민님과의 일을 잠시 적어 보며 마음을 정리해 보세요.',
-      ]);
-      expect(s.suggestions.every((e) => !e.added), isTrue);
+      final latest =
+          (data.entries.toList()
+                ..sort((a, b) => b.createdAt.compareTo(a.createdAt)))
+              .first;
+      final added = data.todos.where((t) => t.entryId == latest.id);
+      expect(s.suggestions.every((e) => e.entryId == latest.id), isTrue);
+      expect(
+        s.suggestions.map((e) => e.title),
+        isNot(contains(anyOf(added.map((t) => t.title).toList()))),
+      );
+      expect(
+        s.suggestions.every((e) => e.reason == latest.feedback!.comment),
+        isTrue,
+      );
       expect(s.suggestionsDone, isFalse);
     });
 
     test('제안을 모두 담으면(완료한 것 포함) 제안은 비고 suggestionsDone이 켜진다', () {
-      final insight = data.insights.first;
-      final person = data.people.firstWhere((p) => p.id == insight.personId);
-      final titles = SuggestionPool.forInsight(insight.type, person.name);
+      final latest =
+          (data.entries.toList()
+                ..sort((a, b) => b.createdAt.compareTo(a.createdAt)))
+              .first;
+      final titles = latest.feedback!.suggestions;
       final todos = [
         for (var i = 0; i < titles.length; i++)
           Todo(
             id: 't$i',
             title: titles[i],
             createdAt: now,
-            insightId: insight.id,
+            entryId: latest.id,
             source: TodoSource.suggestion,
             done: i.isEven,
           ),
       ];
-      final s = buildHomeSummary(
-        nickname: '규리',
-        now: now,
-        entries: data.entries,
-        people: data.people,
-        insights: data.insights,
-        todos: todos,
-      );
+      final s = summary(todos: todos);
       expect(s.suggestions, isEmpty);
       expect(s.suggestionsDone, isTrue);
     });
 
-    test('오늘 기록이 생기면 After, 연속 6일, 오늘 기록 id와 인물 수가 채워진다', () {
-      final today = entry(now, 2, personId: 'p2');
-      final s = buildHomeSummary(
-        nickname: '규리',
-        now: now,
-        entries: [...data.entries, today],
-        people: data.people,
-        insights: data.insights,
-        todos: data.todos,
-      );
+    test('오늘 기록이 생기면 After, 연속 6일, 오늘 기록 id·코멘트 받는 중', () {
+      final today = entry(now, 2);
+      final s = summary(entries: [...data.entries, today]);
       expect(s.todayRecorded, isTrue);
       expect(s.todayEntryId, today.id);
-      expect(s.todayPeopleCount, 1);
+      expect(s.todayCommentPending, isTrue);
+      expect(s.todayComment, isNull);
       expect(s.streak.current, 6);
     });
 
-    test('기록·인사이트가 없으면 신호와 제안은 비어 있다', () {
-      final s = buildHomeSummary(
-        nickname: '규리',
-        now: now,
-        entries: const [],
-        people: data.people,
-        insights: const [],
-        todos: const [],
-      );
-      expect(s.relationSignals, isEmpty);
+    test('기록이 없으면 제안은 비어 있다', () {
+      final s = summary(entries: const [], todos: const []);
       expect(s.suggestions, isEmpty);
       expect(s.suggestionsDone, isFalse);
       expect(s.streak.current, 0);

@@ -18,9 +18,8 @@ class TodoActions {
 
   Future<Todo> add({
     required String title,
-    String? personId,
     TodoSource source = TodoSource.manual,
-    String? insightId,
+    String? entryId,
     required DateTime now,
   }) async {
     final todo = await _ref
@@ -28,9 +27,8 @@ class TodoActions {
         .create(
           title: title.trim(),
           createdAt: now,
-          personId: personId,
           source: source,
-          insightId: insightId,
+          entryId: entryId,
         );
     _ref.read(dataRevisionProvider.notifier).bump();
     return todo;

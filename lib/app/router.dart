@@ -4,20 +4,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/all/presentation/all_screen.dart';
+import '../features/analysis_tab/presentation/analysis_screen.dart';
 import '../features/auth/presentation/account_delete_screen.dart';
 import '../features/auth/presentation/login_screen.dart';
+import '../features/auth/presentation/signup_screen.dart';
 import '../features/onboarding/presentation/intro_screen.dart';
 import '../features/onboarding/presentation/start_screen.dart';
 import '../features/home/presentation/today_screen.dart';
-import '../features/insights/presentation/insight_detail_screen.dart';
 import '../features/notifications/presentation/notification_settings_screen.dart';
 import '../features/notifications/presentation/notifications_screen.dart';
 import '../features/record/presentation/record_detail_screen.dart';
 import '../features/record/presentation/record_form_screen.dart';
+import '../features/record/presentation/record_result_screen.dart';
 import '../features/record/presentation/record_screen.dart';
-import '../features/relations/presentation/person_detail_screen.dart';
-import '../features/relations/presentation/person_form_screen.dart';
-import '../features/relations/presentation/relations_screen.dart';
 import '../features/splash/presentation/splash_screen.dart';
 import '../shared/dev/design_gallery_screen.dart';
 import 'main_shell.dart';
@@ -25,7 +24,7 @@ import 'swipe_back_page.dart';
 import 'theme/app_spacing.dart';
 
 /// 화면 경로. 화면 이동은 문자열 대신 이 상수를 사용한다.
-/// 순서는 하단 탭 순서(투데이 / 관계 / 기록 / 전체)와 같다.
+/// 탭 경로 순서는 하단 탭 순서(홈 / 분석 / 기록 / 마이)와 같다. today·all은 예전 이름(투데이·전체) 그대로다.
 abstract final class AppRoutes {
   static const splash = '/splash';
 
@@ -34,6 +33,7 @@ abstract final class AppRoutes {
 
   // 인증
   static const login = '/login';
+  static const signup = '/signup';
   static const intro = '/intro';
   static const start = '/start';
   static const accountDelete = '/account/delete';
@@ -41,18 +41,20 @@ abstract final class AppRoutes {
   static const notificationSettings = '/notifications/settings';
 
   static const today = '/today';
-  static const relations = '/relations';
+  static const analysis = '/analysis';
   static const record = '/record';
   static const all = '/all';
+
+  /// 기록 탭의 체크리스트 칸.
+  static const checklist = '/record?view=checklist';
 
   // 탭 위로 쌓이는 전체 화면
   static const recordNew = '/record/new';
   static String recordDetail(String id) => '/record/$id';
   static String recordEdit(String id) => '/record/$id/edit';
-  static String insightDetail(String id) => '/insight/$id';
-  static const relationsNew = '/relations/new';
-  static String relationsDetail(String id) => '/relations/$id';
-  static String relationsEdit(String id) => '/relations/$id/edit';
+
+  /// 저장 직후 AI 코멘트를 보여 주는 결과 화면.
+  static String recordResult(String id) => '/record/$id/result';
 }
 
 /// 앱이 처음 여는 경로. 실제 앱은 `main.dart`에서 스플래시로 바꾸고,
@@ -88,6 +90,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) => _fade(state, const LoginScreen()),
       ),
       GoRoute(
+        path: AppRoutes.signup,
+        pageBuilder: (context, state) => _swipe(state, const SignupScreen()),
+      ),
+      GoRoute(
         path: AppRoutes.notifications,
         pageBuilder: (context, state) =>
             _swipe(state, const NotificationsScreen()),
@@ -108,13 +114,6 @@ final routerProvider = Provider<GoRouter>((ref) {
             _swipe(state, const RecordFormScreen()),
       ),
       GoRoute(
-        path: '/insight/:id',
-        pageBuilder: (context, state) => _swipe(
-          state,
-          InsightDetailScreen(insightId: state.pathParameters['id']!),
-        ),
-      ),
-      GoRoute(
         path: '/record/:id/edit',
         pageBuilder: (context, state) => _swipe(
           state,
@@ -122,22 +121,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(
-        path: AppRoutes.relationsNew,
-        pageBuilder: (context, state) =>
-            _swipe(state, const PersonFormScreen()),
-      ),
-      GoRoute(
-        path: '/relations/:id/edit',
+        path: '/record/:id/result',
         pageBuilder: (context, state) => _swipe(
           state,
-          PersonFormScreen(personId: state.pathParameters['id']),
-        ),
-      ),
-      GoRoute(
-        path: '/relations/:id',
-        pageBuilder: (context, state) => _swipe(
-          state,
-          PersonDetailScreen(personId: state.pathParameters['id']!),
+          RecordResultScreen(entryId: state.pathParameters['id']!),
         ),
       ),
       GoRoute(
@@ -152,10 +139,17 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state, navigationShell) =>
             _fade(state, MainShell(navigationShell: navigationShell)),
         branches: [
-          _branch(AppRoutes.today, const TodayScreen()),
-          _branch(AppRoutes.relations, const RelationsScreen()),
-          _branch(AppRoutes.record, const RecordScreen()),
-          _branch(AppRoutes.all, const AllScreen()),
+          _branch(AppRoutes.today, (_) => const TodayScreen()),
+          _branch(AppRoutes.analysis, (_) => const AnalysisScreen()),
+          _branch(
+            AppRoutes.record,
+            (state) => RecordScreen(
+              initialView: RecordView.fromQuery(
+                state.uri.queryParameters['view'],
+              ),
+            ),
+          ),
+          _branch(AppRoutes.all, (_) => const AllScreen()),
         ],
       ),
     ],
@@ -182,8 +176,11 @@ Page<void> _fade(GoRouterState state, Widget child) =>
 Page<void> _swipe(GoRouterState state, Widget child) =>
     SwipeBackPage<void>(key: state.pageKey, name: state.uri.path, child: child);
 
-StatefulShellBranch _branch(String path, Widget screen) {
+StatefulShellBranch _branch(
+  String path,
+  Widget Function(GoRouterState state) screen,
+) {
   return StatefulShellBranch(
-    routes: [GoRoute(path: path, builder: (context, state) => screen)],
+    routes: [GoRoute(path: path, builder: (context, state) => screen(state))],
   );
 }

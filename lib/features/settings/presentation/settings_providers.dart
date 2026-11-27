@@ -5,44 +5,54 @@ import '../../../app/data_providers.dart';
 import '../../../app/data_revision.dart';
 import '../../security/presentation/app_lock_controller.dart';
 import '../data/theme_mode_store.dart';
+import '../../ai_comment/models/ai_feedback.dart';
 import '../models/app_settings.dart';
 
-/// 화면 모드(라이트/다크). 켬/끔 토글 하나라 [ThemeMode.light]와 [ThemeMode.dark]만 쓴다.
+/// 화면 모드: 기기 설정 따르기([ThemeMode.system]) / 라이트 / 다크.
+/// 기기 설정을 따르면 iOS·Android의 라이트·다크 전환에 맞춰 앱도 바로 바뀐다(`MaterialApp.themeMode`).
 /// 초기값은 저장소에서 동기로 읽어, 첫 프레임부터 저장된 모드로 그린다.
 class ThemeModeController extends Notifier<ThemeMode> {
   @override
-  ThemeMode build() =>
-      ref.read(themeModeStoreProvider).dark ? ThemeMode.dark : ThemeMode.light;
+  ThemeMode build() => ref.read(themeModeStoreProvider).mode;
 
   /// 바로 화면에 반영하고, 저장은 뒤따른다(저장이 실패해도 이번 실행에서는 그대로 보인다).
-  Future<void> setDark(bool value) async {
-    state = value ? ThemeMode.dark : ThemeMode.light;
+  Future<void> setMode(ThemeMode value) async {
+    state = value;
     try {
-      await ref.read(themeModeStoreProvider).setDark(value);
+      await ref.read(themeModeStoreProvider).setMode(value);
     } catch (_) {}
   }
+}
+
+/// 설정 화면에 보이는 화면 모드 이름.
+extension ThemeModeLabel on ThemeMode {
+  String get label => switch (this) {
+    ThemeMode.system => '기기 설정',
+    ThemeMode.light => '라이트',
+    ThemeMode.dark => '다크',
+  };
 }
 
 final themeModeProvider = NotifierProvider<ThemeModeController, ThemeMode>(
   ThemeModeController.new,
 );
 
-/// 닉네임·동의 설정.
+/// 닉네임·알림·AI 코멘트 말투 설정.
 final settingsProvider = FutureProvider<AppSettings>((ref) {
   ref.watch(dataRevisionProvider);
   return ref.watch(settingsRepositoryProvider).get();
 });
 
-/// 동의 변경과 데이터 삭제 (SPEC F-11).
+/// 설정 변경과 데이터 삭제 (SPEC F-11).
 class SettingsActions {
   SettingsActions(this._ref);
 
   final Ref _ref;
 
-  Future<void> saveConsents(Consents consents) async {
+  Future<void> saveCommentTone(CommentTone tone) async {
     final repo = _ref.read(settingsRepositoryProvider);
     final current = await repo.get();
-    await repo.save(current.copyWith(consents: consents));
+    await repo.save(current.copyWith(commentTone: tone));
     _ref.read(dataRevisionProvider.notifier).bump();
   }
 
@@ -124,24 +134,22 @@ class SettingsActions {
     }
   }
 
-  /// 가입 마지막 "알림 켜기": OS 권한을 요청하고, 허용되면 인사이트 알림과 리마인드를 켠다.
-  /// 거부되면 인사이트 알림(앱 안 목록)만 켜고 false를 돌려준다.
+  /// 가입 마지막 "알림 켜기": OS 권한을 요청하고, 허용되면 AI 코멘트 알림과 리마인드를 켠다.
+  /// 거부되면 AI 코멘트 알림(앱 안 목록)만 켜고 false를 돌려준다.
   Future<bool> enableNotifications() async {
     final allowed = await _ref
         .read(appLockControllerProvider.notifier)
         .suspendWhile(_ref.read(notificationServiceProvider).requestPermission);
     final repo = _ref.read(settingsRepositoryProvider);
     final prefs = (await repo.get()).notifications;
-    await saveNotifications(prefs.copyWith(insight: true));
+    await saveNotifications(prefs.copyWith(aiComment: true));
     if (allowed) return setReminder(true);
     return false;
   }
 
-  /// 기록 전체 삭제: 기록과 거기서 만들어진 지수 이력·인사이트를 지운다. 인물·체크리스트는 남긴다.
+  /// 기록 전체 삭제: 일기와 거기 붙은 AI 코멘트를 지운다. 체크리스트는 남긴다.
   Future<void> deleteAllRecords() async {
     await _ref.read(entriesRepositoryProvider).deleteAll();
-    await _ref.read(indexHistoryRepositoryProvider).deleteAll();
-    await _ref.read(insightsRepositoryProvider).deleteAll();
     _ref.read(dataRevisionProvider.notifier).bump();
   }
 }

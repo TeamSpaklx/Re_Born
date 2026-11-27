@@ -2,10 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:reborn_app/features/analysis/crisis_checker.dart';
 import 'package:reborn_app/features/analysis/emotion_analyzer.dart';
 import 'package:reborn_app/features/analysis/record_streak_calculator.dart';
-import 'package:reborn_app/features/analysis/suggestion_pool.dart';
 import 'package:reborn_app/features/entries/models/emotion.dart';
 import 'package:reborn_app/features/entries/models/entry_validator.dart';
-import 'package:reborn_app/features/insights/models/insight.dart';
 
 void main() {
   group('감정 점수·분석 (T-10, T-18)', () {
@@ -43,16 +41,6 @@ void main() {
         isTrue,
       );
       expect(CrisisChecker.containsCrisisExpression('오늘 친구와 즐겁게 놀았다'), isFalse);
-    });
-  });
-
-  group('제안 문구 (T-26)', () {
-    test('모든 인사이트 유형에 제안이 1개 이상 있고 권유 표현이다', () {
-      for (final type in InsightType.values) {
-        final list = SuggestionPool.forInsight(type, '지민');
-        expect(list, isNotEmpty);
-        expect(list.any((s) => s.contains('지민')), isTrue);
-      }
     });
   });
 
@@ -100,7 +88,9 @@ void main() {
 
     test('강도 선택 필수, 미래 날짜 불가', () {
       expect(EntryValidator.validateIntensity(null), isNotNull);
-      expect(EntryValidator.validateIntensity(4), isNotNull);
+      expect(EntryValidator.validateIntensity(0), isNotNull);
+      expect(EntryValidator.validateIntensity(6), isNotNull);
+      expect(EntryValidator.validateIntensity(5), isNull);
       expect(EntryValidator.validateIntensity(2), isNull);
       final now = DateTime(2026, 10, 22);
       expect(

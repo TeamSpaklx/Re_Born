@@ -3,15 +3,15 @@
 abstract final class AppAssets {
   static const _icons = 'assets/icons/ui';
 
-  // 하단 탭 (기본 / 선택[분홍]). 투데이·관계·기록은 Phosphor Icons, 전체는 Iconsax(menu).
+  // 하단 탭 (기본 / 선택[분홍]). 홈·분석·기록은 Phosphor Icons(fill), 마이는 Figma account_circle.
   static const tabHome = '$_icons/tab_home.svg';
   static const tabHomeActive = '$_icons/tab_home_active.svg';
-  static const tabRelations = '$_icons/tab_relations.svg';
-  static const tabRelationsActive = '$_icons/tab_relations_active.svg';
+  static const tabAnalysis = '$_icons/tab_analysis.svg';
+  static const tabAnalysisActive = '$_icons/tab_analysis_active.svg';
   static const tabRecord = '$_icons/tab_record.svg';
   static const tabRecordActive = '$_icons/tab_record_active.svg';
-  static const tabAll = '$_icons/tab_all.svg';
-  static const tabAllActive = '$_icons/tab_all_active.svg';
+  static const tabMy = '$_icons/tab_my.svg';
+  static const tabMyActive = '$_icons/tab_my_active.svg';
 
   /// 선택된 탭 뒤의 알약 (92×56).
   static const tabSelection = '$_icons/tab_selection.svg';
@@ -41,6 +41,18 @@ abstract final class AppAssets {
   static const ixGallery = '$_icons/ix_gallery.svg';
   static const ixEye = '$_icons/ix_eye.svg';
   static const ixEyeOff = '$_icons/ix_eye_off.svg';
+
+  // 전체 탭 설정 행 아이콘 (Iconsax Linear).
+  static const ixMessageText = '$_icons/ix_message_text.svg';
+  static const ixCall = '$_icons/ix_call.svg';
+  static const ixLock = '$_icons/ix_lock.svg';
+  static const ixNotification = '$_icons/ix_notification.svg';
+  static const ixMoon = '$_icons/ix_moon.svg';
+  static const ixLogout = '$_icons/ix_logout.svg';
+  static const ixProfileDelete = '$_icons/ix_profile_delete.svg';
+
+  /// 설정 행 오른쪽 꺾쇠 `>` (Iconsax `arrow-right-1`). 설정 묶음 안 아이콘을 Iconsax로 통일한다.
+  static const ixArrowRight = '$_icons/ix_arrow_right.svg';
 
   /// 소셜 로그인 버튼 마크(단순화한 로고, 출시 전 브랜드 가이드 확인 필요).
   static const googleG = '$_icons/google_g.svg';
@@ -97,12 +109,12 @@ abstract final class AppAssets {
   static const all = [
     tabHome,
     tabHomeActive,
-    tabRelations,
-    tabRelationsActive,
+    tabAnalysis,
+    tabAnalysisActive,
     tabRecord,
     tabRecordActive,
-    tabAll,
-    tabAllActive,
+    tabMy,
+    tabMyActive,
     tabSelection,
     forum,
     bell,

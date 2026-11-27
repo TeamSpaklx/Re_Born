@@ -12,7 +12,7 @@
 | 폰트 | Pretendard (400·500·600·700·800) | `assets/fonts/`, 라이선스 SIL OFL 1.1 (`OFL-LICENSE.txt`) |
 | 아이콘 | `flutter_svg` ^2.3.0 + Figma에서 내려받은 SVG | `assets/icons/ui/`, 경로는 `lib/app/theme/app_assets.dart`. 원본 라이브러리: 탭 바 투데이·관계·기록 = Phosphor Icons, 전체 = Iconsax, 임시 디자인 화면의 새 아이콘(check, trash)도 Phosphor(MIT)에서 SVG로 받음 (아이콘 패키지는 쓰지 않음) |
 | 디자인 기준 | Figma 홈 화면 (100% 일치 목표) | [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md), 값은 `lib/app/theme/` 상수만 사용 |
-| 인증 | 메모리 구현 | 이메일·비밀번호와 구글·카카오 로그인 화면은 시연용이며 앱 재시작 시 초기화 |
+| 인증 | 메모리 구현 | 이메일·비밀번호 가입·로그인은 시연용 메모리 구현이며 앱 재시작 시 계정 초기화(로그인 상태만 유지) |
 | 프로필 사진 | `image_picker` ^1.2.4 | 갤러리·카메라에서 사진 한 장(긴 변 1024로 축소). iOS `Info.plist`에 사진·카메라 사용 문구. 사진은 지금 메모리에만 저장 |
 | 알림 권한·리마인드 | `flutter_local_notifications` ^22.3.2, `timezone` ^0.11.2, `flutter_timezone` ^5.1.1 | iOS·Android 13+ OS 알림 권한 요청과 매일 정시 로컬 알림(기록 리마인드). 기기 시간대는 `flutter_timezone`, 예약은 `timezone`. 서버·FCM 푸시는 아님. Android는 desugaring·`POST_NOTIFICATIONS`·부팅 receiver 설정(`android/app`), iOS는 `AppDelegate`에서 알림 델리게이트 설정. 알림음은 커스텀 WAV 1개(`android/app/src/main/res/raw/reborn_notification.wav`, `ios/Runner/reborn_notification.wav`)이며 안드로이드 채널은 `daily_reminder_v2`. Android 상태바 알림 아이콘은 흰색 단색 로고(`drawable-*/ic_notification.png`)이고, 아이콘·소리가 릴리스 리소스 축소로 지워지지 않게 `res/raw/keep.xml`로 지킨다 |
 | 앱 잠금 | `local_auth` ^3.0.2, `shared_preferences` ^2.5.6 | 둘 다 flutter.dev 공식 패키지. 로그인 없이도 기록을 지키려고 기기 인증(Face ID·Touch ID·지문·기기 암호)으로 앱 진입을 막는다(`lib/core/platform/device_auth_service.dart`, `lib/features/security/`). `shared_preferences`는 잠금 켜짐 여부 하나만 저장한다(다른 설정은 아직 메모리라 재시작하면 사라지지만 잠금은 그러면 의미가 없음). iOS `Info.plist`에 `NSFaceIDUsageDescription`, Android는 `MainActivity`가 `FlutterFragmentActivity`이고 `LaunchTheme`이 `Theme.AppCompat` 계열(`androidx.appcompat` 의존성 추가, local_auth 요구 사항). Android 13+는 `reborn/app_lock` 채널로 최근 앱 미리보기를 끈다 |
@@ -20,14 +20,15 @@
 | 라우팅 | `go_router` ^18.1.1 | `lib/app/router.dart`, 하단 탭은 `StatefulShellRoute.indexedStack`(탭마다 상태 유지) |
 | 화면 데이터 | 메모리 저장소와 샘플 데이터 | 앱 재시작 시 초기화 |
 | 클라이언트 SDK | `supabase_flutter` 2.17.2 | 초기화: `lib/main.dart`, 설정: `lib/core/config/supabase_config.dart` |
-| 감정 분석·관계 지수 | Flutter 앱 내부 규칙 기반 계산 | 외부 AI·분석 API 없음 |
+| 감정 점수·키워드 | Flutter 앱 내부 규칙 기반 계산 | 강도 1~5단계 × 감정 방향 |
+| AI 코멘트 | 백엔드가 외부 AI API 호출(SPEC 6.7) | 앱은 `AiCommentService`로 백엔드만 부른다. 지금은 앱 안 가짜 구현(`FakeAiCommentService`) |
 | 린트 | `flutter_lints` 6 | `analysis_options.yaml` |
 | 검증 | 로컬 `flutter analyze` + `flutter test` | 자동 Flutter CI가 없어 PR에 실행 결과를 기록 |
 
 ## 쓰지 않는 것
 
 - **Firebase / Firestore**: SPEC의 `users/{uid}/entries/{entryId}` 같은 경로는 Firestore 시절 표기입니다. PostgreSQL 테이블 + `user_id` 컬럼 + RLS로 읽어 주세요.
-- **외부 AI API**: 기록 본문을 외부로 보내지 않습니다 (SPEC 6.7).
+- **앱에서 외부 AI API 직접 호출**: AI 코멘트는 백엔드를 거칩니다. AI API 키는 앱에 넣지 않습니다 (SPEC 6.7).
 - **서버/API 연결**: 이 브랜치의 화면 데이터는 메모리에 보관합니다.
 - **SwiftUI, WidgetKit, ActivityKit**: SPEC 6장 스택에 적혀 있지만 MVP 범위가 아닙니다.
 
@@ -51,7 +52,7 @@ docs/                명세서, 디자인 시스템, 프론트 문서 (design/ �
 ## 화면 규칙
 
 - **하단 탭 4개:** 투데이(홈) / 관계 / 기록 / 전체. Figma가 있는 화면은 홈뿐이고(2026-11-17 리디자인, 배경 `#F2F2F4`), 관계·기록·전체 탭과 로그인·가입·알림 등은 레퍼런스를 해석해 만들었습니다(FRONTEND.md 2장). 토글·모달·토스트·설정 목록은 Figma에 없어 Reborn 공통 컴포넌트로 만들어 쓰고 머티리얼 위젯은 쓰지 않습니다(DESIGN_SYSTEM.md 7장).
-- **고정 규칙:** 글자 크기 배율 1.0(시스템 글자 크기 설정 무시), 세로 방향만. 라이트/다크는 설정의 다크 모드 토글로 고르며(`AppColors.light`/`AppColors.dark`, 시스템 설정은 따르지 않음) 색은 `AppColors` 팔레트로만 씁니다. 네이티브 런치 화면은 흰색 고정이라 다크 사용자는 켤 때 한 번 깜빡입니다.
+- **고정 규칙:** 글자 크기 배율 1.0(시스템 글자 크기 설정 무시), 세로 방향만. 라이트/다크는 설정의 화면 모드(기본 기기 설정 따르기 / 라이트 / 다크)로 고르며(`AppColors.light`/`AppColors.dark`) 색은 `AppColors` 팔레트로만 씁니다. 네이티브 런치 화면은 흰색 고정이라 다크 사용자는 켤 때 한 번 깜빡입니다.
 - 앱은 스플래시(`/splash`, Figma `805:953`)에서 시작해 투데이(`/today`)로 넘어갑니다. 로그인 화면은 지웠고 새 디자인이 나오면 추가합니다. 시작 경로는 `initialLocationProvider`이며, Supabase 초기화는 첫 프레임 뒤에 시작합니다(화면이 Supabase를 쓰기 시작하면 그 전에 끝나도록 바꿀 것).
 - iOS와 Android는 첫 Flutter 프레임을 준비하는 동안 보이는 네이티브 시작 화면(`LaunchScreen.storyboard`, `launch_background.xml`)에도 흰 배경 + 가운데 로고(160) + 아래 "TeamSpaklx"(Pretendard 글자를 이미지로 만들어 `LaunchBrand`·`launch_brand.png`로 넣음)를 두어 Flutter 스플래시와 이어서 보이게 합니다. Android 12+는 시스템 스플래시가 따로 있어 위 설정이 그대로 보이지 않을 수 있습니다(미확인).
 - 하단 탭 바는 플랫폼별로 다릅니다: **iOS 26 이상 = 네이티브 `UITabBar`(Liquid Glass)**, iOS 26 미만·Android = Flutter가 그린 탭 바(블러). 분기는 `lib/shared/widgets/app_bottom_nav_bar.dart` 한 곳이고, 네이티브 쪽은 `ios/Runner/NativeTabBarView.swift`(플랫폼 뷰)와 `lib/shared/widgets/native_tab_bar.dart`입니다. 새 패키지는 쓰지 않습니다.

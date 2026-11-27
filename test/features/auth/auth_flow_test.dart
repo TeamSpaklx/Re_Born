@@ -5,11 +5,10 @@ import 'package:reborn_app/app/app.dart';
 import 'package:reborn_app/app/data_providers.dart';
 import 'package:reborn_app/app/router.dart';
 import 'package:reborn_app/features/auth/data/in_memory_auth_repository.dart';
-import 'package:reborn_app/features/auth/models/auth_user.dart';
 import 'package:reborn_app/features/auth/models/auth_validator.dart';
 import 'package:reborn_app/features/auth/presentation/auth_providers.dart';
 import 'package:reborn_app/features/auth/presentation/login_screen.dart';
-import 'package:reborn_app/features/people/presentation/people_providers.dart';
+import 'package:reborn_app/features/entries/presentation/entries_providers.dart';
 
 import '../../helpers/fakes.dart';
 
@@ -91,27 +90,10 @@ void main() {
 
     expect(find.text('계정을 삭제했어요'), findsOneWidget);
     expect(c.read(sessionProvider), isNull);
-    expect(await c.read(peopleProvider.future), isEmpty);
+    expect(await c.read(entriesProvider.future), isEmpty);
 
     await tester.tap(find.text('처음으로'));
     await tester.pumpAndSettle();
     expect(find.byType(LoginScreen), findsOneWidget);
-  });
-
-  testWidgets('소셜 계정 삭제는 비밀번호 없이 확인 체크만으로 된다', (tester) async {
-    final c = await pumpAt(tester, AppRoutes.login);
-    await c.read(authActionsProvider).signInWithSocial(SocialProvider.google);
-    c.read(routerProvider).go(AppRoutes.accountDelete);
-    await tester.pumpAndSettle();
-    expect(find.byKey(const Key('delete-password')), findsNothing);
-
-    await tester.tap(find.byKey(const Key('delete-confirm')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('계정 삭제'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('삭제'));
-    await tester.pumpAndSettle();
-    expect(find.text('계정을 삭제했어요'), findsOneWidget);
-    expect(c.read(sessionProvider), isNull);
   });
 }

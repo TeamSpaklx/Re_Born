@@ -9,7 +9,7 @@ import 'package:reborn_app/shared/widgets/app_bottom_nav_bar.dart';
 import 'package:reborn_app/features/all/presentation/all_screen.dart';
 import 'package:reborn_app/features/home/presentation/today_screen.dart';
 import 'package:reborn_app/features/record/presentation/record_screen.dart';
-import 'package:reborn_app/features/relations/presentation/relations_screen.dart';
+import 'package:reborn_app/features/analysis_tab/presentation/analysis_screen.dart';
 
 void main() {
   /// 하단 탭 바의 라벨 (탭 화면의 제목과 글자가 같을 수 있어 탭 바 안에서만 찾는다).
@@ -70,7 +70,7 @@ void main() {
 
     expect(currentPath(container), AppRoutes.today);
     expect(find.byType(TodayScreen), findsOneWidget);
-    for (final label in ['투데이', '관계', '기록', '전체']) {
+    for (final label in ['홈', '분석', '기록', '마이']) {
       expect(find.text(label), findsOneWidget);
     }
   });
@@ -78,74 +78,61 @@ void main() {
   testWidgets('탭을 누르면 해당 화면으로 이동한다', (tester) async {
     final container = await pumpApp(tester);
 
-    await tester.tap(navTab('관계'));
+    await tester.tap(navTab('분석'));
     await tester.pumpAndSettle();
-    expect(currentPath(container), AppRoutes.relations);
-    expect(find.byType(RelationsScreen), findsOneWidget);
+    expect(currentPath(container), AppRoutes.analysis);
+    expect(find.byType(AnalysisScreen), findsOneWidget);
 
     await tester.tap(navTab('기록'));
     await tester.pumpAndSettle();
     expect(currentPath(container), AppRoutes.record);
     expect(find.byType(RecordScreen), findsOneWidget);
 
-    await tester.tap(navTab('전체'));
+    await tester.tap(navTab('마이'));
     await tester.pumpAndSettle();
     expect(currentPath(container), AppRoutes.all);
     expect(find.byType(AllScreen), findsOneWidget);
 
-    await tester.tap(navTab('투데이'));
+    await tester.tap(navTab('홈'));
     await tester.pumpAndSettle();
     expect(currentPath(container), AppRoutes.today);
   });
 
-  testWidgets('"감정 기록하기"는 기록 탭으로, "전체 보기"는 관계 탭으로 이동한다', (tester) async {
+  testWidgets('"감정 기록하기"는 기록 탭으로 이동한다', (tester) async {
     final container = await pumpApp(tester);
 
     await tester.tap(find.text('감정 기록하기'));
     await tester.pumpAndSettle();
     expect(currentPath(container), AppRoutes.record);
-
-    await tester.tap(navTab('투데이'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('전체 보기'));
-    await tester.pumpAndSettle();
-    expect(currentPath(container), AppRoutes.relations);
   });
 
   testWidgets('다른 탭으로 바꿀 때만 선택 햅틱이 울린다', (tester) async {
     await pumpApp(tester);
 
-    await tester.tap(navTab('관계'));
+    await tester.tap(navTab('분석'));
     await tester.pumpAndSettle();
     expect(haptics, ['selection']);
 
-    await tester.tap(navTab('관계')); // 같은 탭을 다시 누르면 울리지 않는다
+    await tester.tap(navTab('분석')); // 같은 탭을 다시 누르면 울리지 않는다
     await tester.pumpAndSettle();
     expect(haptics, hasLength(1));
   });
 
-  testWidgets('버튼과 "전체 보기"를 누르면 가벼운 햅틱이 울린다', (tester) async {
+  testWidgets('버튼을 누르면 가벼운 햅틱이 울린다', (tester) async {
     await pumpApp(tester);
 
-    await tester.tap(find.text('전체 보기'));
-    await tester.pumpAndSettle();
-    expect(haptics, ['tap']);
-
-    await tester.tap(navTab('투데이'));
-    await tester.pumpAndSettle();
-    haptics.clear();
     await tester.tap(find.text('감정 기록하기'));
     await tester.pumpAndSettle();
     expect(haptics, ['tap']);
   });
 
-  testWidgets('관계·기록·전체 탭은 각자의 화면을 보여 준다', (tester) async {
+  testWidgets('분석·기록·마이 탭은 각자의 화면을 보여 준다', (tester) async {
     await pumpApp(tester);
 
     final screens = {
-      '관계': find.byType(RelationsScreen),
+      '분석': find.byType(AnalysisScreen),
       '기록': find.byType(RecordScreen),
-      '전체': find.byType(AllScreen),
+      '마이': find.byType(AllScreen),
     };
     for (final entry in screens.entries) {
       await tester.tap(navTab(entry.key));

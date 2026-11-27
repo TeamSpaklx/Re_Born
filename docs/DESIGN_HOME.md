@@ -17,9 +17,9 @@
 
 ## 0. 결정 사항과 전제
 
-- **디자인이 있는 화면은 홈뿐입니다.** 관계·기록·전체 탭은 디자인이 없어서 흰 배경의 빈 화면으로 둡니다. 홈만 Figma와 100% 일치를 목표로 합니다.
-- **하단 탭 4개:** 투데이(홈) / 관계 / 기록 / 전체. (Figma 컴포넌트의 상태 이름은 홈/관계/기록/마이이지만 화면에 보이는 글자는 투데이/관계/기록/전체입니다.)
-- **고정 규칙:** 글자 크기 배율 1.0(시스템 글자 크기 설정 무시), 세로 방향만. 라이트/다크는 설정의 다크 모드 토글로 고르고(DESIGN_SYSTEM 1.8절), 색은 `context.colors`로만 읽습니다.
+- **디자인이 있는 화면은 홈뿐입니다.** 분석·기록·마이 탭은 디자인이 없어서 흰 배경의 빈 화면으로 둡니다. 홈만 Figma와 100% 일치를 목표로 합니다.
+- **하단 탭 4개:** 홈 / 분석 / 기록 / 마이 (Figma `ButtonNavigator` 749:1100은 홈/관계/기록/마이. 2026-11-28 회의로 인물 기능을 없애 관계 자리를 분석으로 바꿨고 Figma에는 아직 반영되지 않음. 같은 날 투데이/전체에서 홈/마이로도 바꿈. 코드의 라우트·화면 이름은 그대로 today·all). (예전 메모: Figma 컴포넌트의 상태 이름은 홈/관계/기록/마이이지만 화면에 보이는 글자는 투데이/관계/기록/전체입니다.)
+- **고정 규칙:** 글자 크기 배율 1.0(시스템 글자 크기 설정 무시), 세로 방향만. 라이트/다크는 설정의 화면 모드(기기 설정 / 라이트 / 다크)로 고르고(DESIGN_SYSTEM 1.8절), 색은 `context.colors`로만 읽습니다.
 - **화면 크기:** 디자인 기준은 402×874(iPhone 16 Pro)입니다. 좌우 여백 24를 고정하고 카드가 남는 폭을 채웁니다(402에서 카드 폭 354).
 - **세로 스크롤 화면입니다.** Figma 프레임이 874보다 길어서(Before 최신 안 1270, After 1407) 내용이 스크롤됩니다. 하단 탭 바는 화면 아래에 고정되어 있습니다.
 - 최신 Before 프레임 높이는 1270(마지막 카드 끝 1140 + 아래 130)이지만, 구현은 다른 탭과 같은 아래 여백 148(`scrollBottomPadding`)을 유지해 스크롤 끝이 1288입니다(차이 18, 확인 필요).
@@ -61,7 +61,7 @@
 | 날짜 (14 Regular) | 128 | 17 | |
 | 인사말 (2줄, 줄 32) | 149 | 64 | 날짜와 4 |
 | 기록 카드 (Before 최신 안, 일러스트 포함) | 237 | **268** | 인사말과 24 |
-| "최근 관계 신호" 제목 | 527 | 32 | 기록 카드와 **22** (이전 안 35) |
+| ~~"최근 관계 신호" 제목~~ | 527 | 32 | **2026-11-28 삭제.** 아래 신호 카드·"전체 보기"도 함께 없앴고, 그래프부터는 170(32+12+104+22)만큼 위로 당겨짐(`recordCardToGraph` 22) |
 | "전체 보기 >" (x 오른쪽 끝 378) | 536 | 14 | |
 | 신호 카드 | 571 | 104 | 제목과 12 |
 | 감정 그래프 카드 | 697 | 180 | 신호 카드와 22 |
@@ -73,9 +73,10 @@
 ### 4.2 Before와 After의 차이
 
 - **기록 카드만 다릅니다.** Before는 높이 **268**(안내문 + 여우원숭이 일러스트 + 버튼), After는 높이 399(아바타·완료 문구·버튼·출석 체크). 아래 섹션은 그만큼 밀립니다.
-- ⚠️ **디자인 불일치 (확인 필요):** After는 기록 카드와 "최근 관계 신호" 제목 사이 간격이 23(카드 끝 636 → 제목 659)이고 Before 최신 안은 **22**(카드 끝 505 → 제목 527)입니다. 구현은 둘 다 22(`recordCardToSignalTitle`)로 통일합니다(After 최신 안 확인 필요).
+- 기록 카드 아래 간격은 Before·After 모두 22(`recordCardToGraph`)이고 바로 감정 그래프 카드가 옵니다(관계 신호 섹션 삭제, 2026-11-28).
 - ⚠️ **디자인 불일치 (확인 필요):** "오늘 해볼까요?" 옆 `>` 화살표가 Before에만 있습니다. 액션 카드 오른쪽 원 색도 Before `#D0D0D0`, After `#EEE6E9`로 다릅니다. 앱은 Before 원(`radioCircle`)만 쓰고, After 원 파일은 쓰지 않아 지웠습니다.
-- 샘플 아바타 사진 3장(After)은 더미 이미지라 에셋에 넣지 않았습니다. 실제로는 오늘 기록한 인물의 프로필(없으면 캐릭터 아바타 `CharacterAvatar`)을 보여줍니다(추정).
+- 샘플 아바타 사진 3장(After)은 더미 이미지라 에셋에 넣지 않았습니다. 인물 기능을 없앴으므로 캐릭터 아바타(`CharacterAvatar`) 하나만 보여 줍니다.
+- **After 카드의 AI 코멘트(추정 디자인, Figma 없음):** 완료 문구와 버튼 사이에 흰 말풍선(모서리 16, 안쪽 16×12)으로 "AI 코멘트"(caption, brand) + 오늘 마지막 일기의 코멘트(body, 최대 2줄)를 넣습니다. 코멘트를 받는 중이면 "오늘 일기를 읽고 코멘트를 쓰고 있어요…". 출석 패널을 숨겨 둔 상태라 카드 높이는 내용에 맞춰 늘어납니다.
 
 ## 5. 컴포넌트
 
@@ -101,12 +102,9 @@
 - 출석 패널(314×110, `attendancePanel`, 모서리 12): 왼쪽 15에서 "**6** 일"(`attendanceNumber` brand + `attendanceUnit`), 패널 안 y 약 31 중심. 2026-10-21 디자인부터 **오른쪽 불꽃 아이콘(`fire.svg`)은 없습니다.** 설명 "최장 기록 20일 · 6/20일"(`body` 14 Medium, `onAttendancePanel`) y 약 65 중심, 왼쪽 15. 진행 알약 6개 왼쪽 15·패널 안 y 약 86(43×13, `brand`, 간격 5). 연속 일수는 기록 작성 날짜로 앱에서 계산합니다([FRONTEND.md](./FRONTEND.md)).
 - 알약 6개는 모두 `brand`로 채워져 있고(연속 기록 6일일 때의 모습), 연속 일수가 6 미만일 때 빈 알약 모양은 Figma에 없습니다(추정: 앞에서부터 `min(current, 6)`개만 채우고 나머지는 비움, 확인 필요).
 
-### 5.4 신호 카드 ("최근 관계 신호")
-- 354×104, 배경 `cardWhite`, 모서리 24. **수정안은 테두리가 없습니다.** 안쪽 좌표를 그대로 쓰도록 `AppCard.white`가 투명한 2px 자리를 남겨 둡니다(좌표는 테두리 안쪽 기준 그대로).
-- 아바타 원 48 @(18,26). Figma는 `avatar` 색 원 안에 사람 아이콘(36)이지만, 앱은 캐릭터 아바타(`CharacterAvatar`)를 쓰므로 `person.svg`는 지웠습니다.
-- 이름 "지민"(`sectionTitle`) x 87·y 18, 오른쪽에 간격 6으로 칩(38×22, `chip`, 모서리 100, 글자 `chipLabel` "친구").
-- 문장 `signalText`(textStrong) 중심 y 57, 캡션 `caption` 중심 y 76 (둘 다 x 87).
-- 오른쪽 끝 `chevron_signal.svg`(20) 세로 가운데, x 314.
+### 5.4 신호 카드 (삭제)
+
+2026-11-28 회의로 인물 기능을 없애면서 "최근 관계 신호" 섹션과 신호 카드를 지웠습니다(에셋 `chevron_signal.svg`는 기록 화면에서 계속 씀).
 
 ### 5.5 감정 그래프 카드 ("이번 주 감정 흐름")
 - 354×180, 배경 `cardWhite`, 모서리 24(수정안은 테두리 없음, 투명 2px 자리 유지). 좌표는 카드 안쪽 기준.
@@ -124,19 +122,19 @@
 - 오른쪽 `radio_circle.svg`(20). After 색(`#EEE6E9`) 파일은 쓰지 않아 지웠습니다.
 
 ### 5.7 섹션 제목 줄
-- 제목 `sectionTitle`. "최근 관계 신호" 오른쪽 끝에 "전체 보기"(`seeAll`) + `chevron_see_all.svg`(11.3×14), "오늘 해볼까요?" 오른쪽에 `chevron_section.svg`(20)(Before만).
+- 제목 `sectionTitle`. "오늘 해볼까요?" 오른쪽에 `chevron_section.svg`(20)(Before만). 누르면 기록 탭 체크리스트 칸으로 갑니다. ("최근 관계 신호"의 "전체 보기"는 섹션과 함께 삭제)
 
 ### 5.8 하단 탭 바 (`BottomNavTokens`)
 - 354×64, 가운데 정렬, 화면 아래에서 34 위(그 아래에 홈 인디케이터 34). 모서리 100(알약).
 - 항목 4개: 폭 68, 간격 17, 아이콘 28 + 라벨(`navLabel`), 항목 영역 323×40(위 12). 선택 알약 92×56(`tab_selection.svg`, 선택된 탭 뒤, 왼쪽 x 5 / 89 / 174 / 258).
-- 선택된 탭: 아이콘이 `*_active.svg`(분홍 `#FF6090`)로 바뀌고 라벨 색이 `brand`. 나머지는 검정 아이콘 + `textStrong` 라벨.
+- 선택된 탭: 아이콘이 `*_active.svg`(진한 분홍 `#D94F79`, Figma 749:1100)로 바뀌고 라벨 색이 `navActive`(`#D94F79`). 나머지는 검정 아이콘 + `textStrong` 라벨.
 
 | 탭 | 라벨 | 기본 아이콘 | 선택 아이콘 |
 |---|---|---|---|
-| 1 | 투데이 | `tab_home.svg` | `tab_home_active.svg` |
-| 2 | 관계 | `tab_relations.svg` | `tab_relations_active.svg` |
+| 1 | 홈 | `tab_home.svg` | `tab_home_active.svg` |
+| 2 | 분석 | `tab_analysis.svg` | `tab_analysis_active.svg` |
 | 3 | 기록 | `tab_record.svg` | `tab_record_active.svg` |
-| 4 | 전체 | `tab_all.svg` | `tab_all_active.svg` |
+| 4 | 마이 | `tab_my.svg` | `tab_my_active.svg` |
 
 - **iOS 26 이상 (네이티브 `UITabBar`, Liquid Glass):** 탭 바 전체를 시스템이 그립니다(`ios/Runner/NativeTabBarView.swift`를 `lib/shared/widgets/native_tab_bar.dart`가 `UiKitView`로 얹음). 유리 재질, 선택 알약, 알약 이동 애니메이션, VoiceOver는 시스템이 처리합니다. 앱이 정하는 값은 아래뿐이고 모두 이 문서와 `lib/app/theme/`의 값을 Flutter가 네이티브에 넘깁니다.
   - 아이콘: 위 표의 Figma SVG를 Flutter가 28×28(기기 배율) PNG로 그려 넘깁니다(기본=검정, 선택=분홍 파일을 각각 사용).
@@ -161,9 +159,9 @@
 | 상수 | 파일 | 크기 | 쓰이는 곳 |
 |---|---|---|---|
 | `tabHome` / `tabHomeActive` | `assets/icons/ui/tab_home(_active).svg` | 28 | 탭 1 (`house-fill`) |
-| `tabRelations` / `tabRelationsActive` | `tab_relations(_active).svg` | 28 | 탭 2 (`users-fill`) |
+| `tabAnalysis` / `tabAnalysisActive` | `tab_analysis(_active).svg` | 28 | 탭 2 분석 (Phosphor `chart-line-up-fill`, 2026-11-28. Figma에 없음) |
 | `tabRecord` / `tabRecordActive` | `tab_record(_active).svg` | 28 | 탭 3 (기록) |
-| `tabAll` / `tabAllActive` | `tab_all(_active).svg` | 28 | 탭 4 (Iconsax `menu`, 가로줄 3개). Figma는 마스크+선 SVG 두 장으로 내보내서 `flutter_svg`가 마스크를 못 그릴 수 있어, 선 SVG를 28×28 뷰박스의 Figma 위치(2.75, 7.4167)에 놓아 한 파일로 합쳤습니다 |
+| `tabMy` / `tabMyActive` | `tab_my(_active).svg` | 28 | 탭 4 마이 (Figma `account_circle`, 749:1100). Figma 내보내기에 들어 있던 28×28 전체를 덮는 마스크는 `flutter_svg`가 못 그릴 수 있고 모양에 영향이 없어 빼고, 경로는 그대로 뒀습니다 |
 | `tabSelection` | `tab_selection.svg` | 92×56 | 선택 알약 |
 | `forum` | `forum.svg` | 36 | 액션 카드 |
 | `bell` | `bell.svg` | 24 | 알림 버튼 |

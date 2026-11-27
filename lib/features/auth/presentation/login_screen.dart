@@ -1,202 +1,180 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../../app/data_providers.dart';
+import '../../../app/router.dart';
 import '../../../app/theme/app_assets.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_spacing.dart';
-import '../../../app/theme/app_text_styles.dart';
-import '../../../shared/widgets/app_bottom_sheet.dart';
-import '../../../shared/widgets/app_toggle.dart';
-import '../../../shared/widgets/pressable.dart';
-import '../../../shared/widgets/select_card.dart';
-import '../data/in_memory_auth_repository.dart';
-import 'consent_texts.dart';
-import 'social_login_buttons.dart';
+import '../../../core/errors/app_error_log.dart';
+import '../../../shared/widgets/app_dialogs.dart';
+import '../../../shared/widgets/app_text_button.dart';
+import '../../../shared/widgets/app_text_field.dart';
+import '../../../shared/widgets/cta_button.dart';
+import '../../onboarding/data/intro_store.dart';
+import '../models/auth_user.dart';
+import '../models/auth_validator.dart';
+import 'auth_providers.dart';
+import 'password_field.dart';
 
-/// 로그인 (F-01, Figma 8877:1929): 흰 배경 가운데 RE:BORN 워드마크, 아래에 구글·카카오 버튼과 약관 안내.
-/// 로그인하면 신규·기존 회원 모두 바로 투데이로 간다([handleSocialSignIn]).
+/// 로그인·가입이 끝난 뒤 갈 곳: 설치 후 처음이면 "시작할 준비가 끝났어요" 화면을 한 번 거치고, 아니면 투데이.
+void goHomeAfterAuth(GoRouter router, WidgetRef ref) {
+  final startSeen = ref.read(introStoreProvider).startSeen;
+  router.go(startSeen ? AppRoutes.today : AppRoutes.start);
+}
+
+/// 이메일 로그인 (F-01). 흰 배경 위쪽에 RE:BORN 워드마크, 아래에 이메일·비밀번호와 로그인 버튼,
+/// "이메일로 회원가입" 링크, 약관 안내. Figma에 이메일 로그인 화면이 없어 공통 컴포넌트로 구성했다.
 ///
-/// 디버그 빌드에서는 워드마크를 길게 누르면 다음 로그인 결과(취소·오류·지연)를 고르는 패널이 뜬다.
-class LoginScreen extends ConsumerWidget {
+/// - 형식이 틀리면 입력창 아래에 바로 안내한다(서버에 보내지 않음).
+/// - 이메일·비밀번호가 맞지 않으면 비밀번호 아래에, 네트워크·알 수 없는 오류는 토스트로 알린다.
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends ConsumerState<LoginScreen> {
+  final _email = TextEditingController();
+  final _password = TextEditingController();
+  String? _emailError;
+  String? _passwordError;
+  bool _busy = false;
+
+  @override
+  void dispose() {
+    _email.dispose();
+    _password.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (_busy) return;
+    setState(() {
+      _emailError = AuthValidator.validateEmail(_email.text);
+      _passwordError = _password.text.isEmpty ? '비밀번호를 입력해 주세요.' : null;
+    });
+    if (_emailError != null || _passwordError != null) return;
+
+    FocusScope.of(context).unfocus();
+    final router = GoRouter.of(context);
+    setState(() => _busy = true);
+    try {
+      await ref
+          .read(authActionsProvider)
+          .signIn(_email.text.trim(), _password.text);
+      if (!mounted) return;
+      goHomeAfterAuth(router, ref);
+    } on AuthFailure catch (failure) {
+      if (!mounted) return;
+      if (failure.type == AuthFailureType.invalidCredentials) {
+        setState(() => _passwordError = failure.message);
+      } else {
+        showAppToast(context, failure.message);
+      }
+    } catch (error, stack) {
+      ref.read(appErrorLogProvider).record(error, stack, where: 'login');
+      if (mounted) {
+        showAppToast(
+          context,
+          const AuthFailure(AuthFailureType.unknown).message,
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final colors = context.colors;
-    final logo = Image.asset(
-      AppAssets.logo,
-      width: LoginLayout.logoWidth,
-      height: LoginLayout.logoHeight,
-      semanticLabel: 'Re:Born',
-    );
-    // Scaffold 없이 그리므로 기본 글자 스타일을 직접 준다(없으면 글자에 노란 밑줄이 생긴다).
-    return DefaultTextStyle(
-      style: AppTextStyles.loginLegal.copyWith(color: colors.loginLegalText),
-      child: ColoredBox(
-        color: colors.splashBackground,
-        child: Stack(
-          children: [
-            Align(
-              alignment: LoginLayout.logoAlignment,
-              child: kDebugMode
-                  ? GestureDetector(
-                      key: const Key('login-debug-trigger'),
-                      onLongPress: () => _showDebugPanel(context, ref),
-                      child: logo,
-                    )
-                  : logo,
+    void clear(String? current, VoidCallback reset) {
+      if (current != null) setState(reset);
+    }
+
+    return Scaffold(
+      backgroundColor: colors.splashBackground,
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: const EdgeInsets.symmetric(
+              horizontal: LoginLayout.horizontalMargin,
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: SafeArea(
-                top: false,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    LoginLayout.horizontalMargin,
-                    0,
-                    LoginLayout.horizontalMargin,
-                    LoginLayout.legalBottom,
-                  ),
-                  child: const Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SocialLoginButtonPair(),
-                      SizedBox(height: LoginLayout.buttonsToLegal),
-                      _LegalNotice(),
-                    ],
-                  ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Spacer(),
+                    Center(
+                      child: Image.asset(
+                        AppAssets.logo,
+                        width: LoginLayout.logoWidth,
+                        height: LoginLayout.logoHeight,
+                        semanticLabel: 'Re:Born',
+                      ),
+                    ),
+                    const SizedBox(height: LoginLayout.logoToForm),
+                    AutofillGroup(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          AppTextField(
+                            fieldKey: const Key('login-email'),
+                            controller: _email,
+                            label: '이메일',
+                            hint: 'example@email.com',
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next,
+                            errorText: _emailError,
+                            onChanged: (_) =>
+                                clear(_emailError, () => _emailError = null),
+                          ),
+                          const SizedBox(height: AppSpacing.space16),
+                          PasswordField(
+                            fieldKey: const Key('login-password'),
+                            controller: _password,
+                            label: '비밀번호',
+                            hint: '비밀번호',
+                            textInputAction: TextInputAction.done,
+                            errorText: _passwordError,
+                            onChanged: (_) => clear(
+                              _passwordError,
+                              () => _passwordError = null,
+                            ),
+                            onSubmitted: (_) => _submit(),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.space24),
+                    CtaButton(
+                      key: const Key('login-submit'),
+                      label: _busy ? '로그인 중…' : '로그인',
+                      height: LoginLayout.buttonHeight,
+                      onPressed: _busy ? null : _submit,
+                    ),
+                    const SizedBox(height: AppSpacing.space8),
+                    Center(
+                      child: AppTextButton(
+                        key: const Key('login-signup'),
+                        label: '이메일로 회원가입',
+                        color: colors.textSecondary,
+                        onTap: () => context.push(AppRoutes.signup),
+                      ),
+                    ),
+                    const Spacer(),
+                    const SizedBox(height: AppSpacing.space24),
+                  ],
                 ),
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// 디버그 전용: 백엔드가 없어 항상 성공하는 로그인을 원하는 결과로 바꿔 본다.
-  void _showDebugPanel(BuildContext context, WidgetRef ref) {
-    final repo = ref.read(authRepositoryProvider);
-    if (repo is! InMemoryAuthRepository) return;
-    showAppBottomSheet<void>(
-      context,
-      title: '다음 로그인 결과 (디버그)',
-      message: '출시 빌드에는 없는 테스트용 패널이에요.',
-      builder: (context) => _DebugAuthPanel(repo: repo),
-    );
-  }
-}
-
-/// "로그인은 개인정보 보호 정책 및 서비스 약관에 동의하는 것으로 간주됩니다."
-/// Figma 메모대로 두 문서를 각각 열 수 있는 링크로 나눴다(밑줄은 추정 스타일).
-/// 링크는 글자 인식기 대신 문장 안에 넣은 작은 탭 위젯이라, 탭과 스크린 리더 "링크"가 확실히 잡힌다.
-class _LegalNotice extends StatelessWidget {
-  const _LegalNotice();
-
-  void _open(BuildContext context, String title, String body) {
-    final colors = context.colors;
-    showAppBottomSheet<void>(
-      context,
-      title: title,
-      builder: (context) => Text(
-        body,
-        style: AppTextStyles.body.copyWith(
-          color: colors.textSecondary,
-          height: 1.6,
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final style = AppTextStyles.loginLegal.copyWith(
-      color: context.colors.loginLegalText,
-    );
-    InlineSpan link(String label, String title, String body) => WidgetSpan(
-      alignment: PlaceholderAlignment.baseline,
-      baseline: TextBaseline.alphabetic,
-      child: Semantics(
-        link: true,
-        label: label,
-        excludeSemantics: true,
-        onTap: () => _open(context, title, body),
-        child: Pressable(
-          key: Key('login-legal-$title'),
-          onTap: () => _open(context, title, body),
-          child: Text(
-            label,
-            style: style.copyWith(decoration: TextDecoration.underline),
           ),
         ),
       ),
-    );
-    return Text.rich(
-      key: const Key('login-legal'),
-      TextSpan(
-        style: style,
-        children: [
-          const TextSpan(text: '로그인은 '),
-          link('개인정보 보호 정책', ConsentTexts.privacyTitle, ConsentTexts.privacy),
-          const TextSpan(text: ' 및 '),
-          link('서비스 약관', ConsentTexts.termsTitle, ConsentTexts.terms),
-          const TextSpan(text: '에\n동의하는 것으로 간주됩니다.'),
-        ],
-      ),
-      textAlign: TextAlign.center,
-    );
-  }
-}
-
-class _DebugAuthPanel extends StatefulWidget {
-  const _DebugAuthPanel({required this.repo});
-
-  final InMemoryAuthRepository repo;
-
-  @override
-  State<_DebugAuthPanel> createState() => _DebugAuthPanelState();
-}
-
-class _DebugAuthPanelState extends State<_DebugAuthPanel> {
-  static const _delay = Duration(seconds: 2);
-
-  @override
-  Widget build(BuildContext context) {
-    final repo = widget.repo;
-    final colors = context.colors;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        for (final outcome in SocialOutcome.values) ...[
-          SelectCard(
-            key: Key('debug-outcome-${outcome.name}'),
-            title: outcome.label,
-            selected: repo.nextOutcome == outcome,
-            onTap: () => setState(() => repo.nextOutcome = outcome),
-          ),
-          const SizedBox(height: AppSpacing.space8),
-        ],
-        const SizedBox(height: AppSpacing.space8),
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                '2초 지연(로딩 확인)',
-                style: AppTextStyles.rowTitle.copyWith(color: colors.textBlack),
-              ),
-            ),
-            AppToggle(
-              key: const Key('debug-latency'),
-              value: repo.latency > Duration.zero,
-              onChanged: (on) =>
-                  setState(() => repo.latency = on ? _delay : Duration.zero),
-            ),
-          ],
-        ),
-      ],
     );
   }
 }

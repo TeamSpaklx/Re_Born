@@ -5,23 +5,21 @@ import '../core/platform/device_auth_service.dart';
 import '../core/platform/image_picker_service.dart';
 import '../core/platform/notification_service.dart';
 import '../core/providers/clock_provider.dart';
+import '../features/ai_comment/data/ai_comment_service.dart';
+import '../features/ai_comment/data/fake_ai_comment_service.dart';
 import '../features/analysis/analysis_service.dart';
 import '../features/analysis/data/sample_data.dart';
 import '../features/auth/data/auth_repository.dart';
 import '../features/auth/data/in_memory_auth_repository.dart';
 import '../features/entries/data/entries_repository.dart';
 import '../features/entries/data/in_memory_entries_repository.dart';
-import '../features/insights/data/in_memory_insights_repository.dart';
-import '../features/insights/data/insights_repository.dart';
-import '../features/people/data/in_memory_people_repository.dart';
-import '../features/people/data/people_repository.dart';
 import '../features/settings/data/in_memory_settings_repository.dart';
 import '../features/settings/data/settings_repository.dart';
 import '../features/todos/data/in_memory_todos_repository.dart';
 import '../features/todos/data/todos_repository.dart';
 
-/// **저장소 교체 지점.** 백엔드가 Supabase 구현을 만들면 아래 provider 7개의 한 줄씩만 바꾼다
-/// (예: `InMemoryPeopleRepository(...)` → `SupabasePeopleRepository(...)`). 화면과 분석 코드는 그대로다.
+/// **저장소 교체 지점.** 백엔드가 Supabase 구현을 만들면 아래 저장소 provider와 [aiCommentServiceProvider]의
+/// 한 줄씩만 바꾼다(예: `InMemoryEntriesRepository(...)` → `SupabaseEntriesRepository(...)`). 화면과 분석 코드는 그대로다.
 /// 지금은 메모리 저장소 + 샘플 데이터이고, 앱을 다시 켜면 샘플로 돌아간다.
 final sampleDataProvider = Provider<SampleData>(
   (ref) => buildSampleData(ref.watch(clockProvider)()),
@@ -29,11 +27,6 @@ final sampleDataProvider = Provider<SampleData>(
 
 final authRepositoryProvider = Provider<AuthRepository>(
   (ref) => InMemoryAuthRepository(),
-);
-
-final peopleRepositoryProvider = Provider<PeopleRepository>(
-  (ref) =>
-      InMemoryPeopleRepository(initial: ref.watch(sampleDataProvider).people),
 );
 
 final entriesRepositoryProvider = Provider<EntriesRepository>(
@@ -46,29 +39,21 @@ final todosRepositoryProvider = Provider<TodosRepository>(
       InMemoryTodosRepository(initial: ref.watch(sampleDataProvider).todos),
 );
 
-final insightsRepositoryProvider = Provider<InsightsRepository>(
-  (ref) => InMemoryInsightsRepository(
-    initial: ref.watch(sampleDataProvider).insights,
-  ),
-);
-
-final indexHistoryRepositoryProvider = Provider<IndexHistoryRepository>(
-  (ref) => InMemoryIndexHistoryRepository(
-    initial: ref.watch(sampleDataProvider).indexPoints,
-  ),
-);
-
 final settingsRepositoryProvider = Provider<SettingsRepository>(
   (ref) => InMemorySettingsRepository(ref.watch(sampleDataProvider).settings),
 );
 
-/// 기록 저장 → 분석 → 지수 → 인사이트 체인. 저장소만 바뀌면 그대로 쓴다.
+/// 일기 AI 코멘트. 지금은 앱 안 가짜 구현이고, 백엔드 API가 나오면 그 구현으로 바꾼다.
+/// 외부 AI API 키는 서버에만 둔다(앱 코드·커밋에 넣지 않는다).
+final aiCommentServiceProvider = Provider<AiCommentService>(
+  (ref) => FakeAiCommentService(clock: ref.watch(clockProvider)),
+);
+
+/// 일기 저장 → 규칙 분석 → AI 코멘트 체인. 저장소·AI 구현만 바뀌면 그대로 쓴다.
 final analysisServiceProvider = Provider<AnalysisService>(
   (ref) => AnalysisService(
     entries: ref.watch(entriesRepositoryProvider),
-    people: ref.watch(peopleRepositoryProvider),
-    indexHistory: ref.watch(indexHistoryRepositoryProvider),
-    insights: ref.watch(insightsRepositoryProvider),
+    aiComment: ref.watch(aiCommentServiceProvider),
     clock: ref.watch(clockProvider),
     onError: (error, stack) =>
         ref.read(appErrorLogProvider).record(error, stack, where: 'analysis'),

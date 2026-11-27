@@ -30,38 +30,22 @@ class AuthActions {
     _ref.read(sessionProvider.notifier).set(user);
   }
 
-  /// 소셜 로그인이 이 시간 안에 끝나지 않으면 네트워크 문제로 본다.
-  static const socialSignInTimeout = Duration(seconds: 30);
-
-  /// 구글·카카오 로그인. 끝나면 신규·기존 회원 모두 바로 투데이로 간다.
-  /// 처음 들어온 사용자는 로그인 화면 문구("로그인은 … 동의하는 것으로 간주")대로
-  /// 필수 동의(개인정보·감정 분석)를 켜고, 닉네임은 "카카오 사용자" 같은 임시값으로 시작한다.
-  /// 시간이 너무 걸리면 [AuthFailureType.network]로 실패한다.
-  Future<void> signInWithSocial(SocialProvider provider) async {
-    final repo = _ref.read(authRepositoryProvider);
-    final result = await repo
-        .signInWithSocial(provider)
-        .timeout(
-          socialSignInTimeout,
-          onTimeout: () => throw const AuthFailure(AuthFailureType.network),
-        );
-    if (result.isNewUser) {
-      final settings = _ref.read(settingsRepositoryProvider);
-      final current = await settings.get();
-      await settings.save(
-        current.copyWith(
-          nickname: '${provider.label} 사용자',
-          consents: const Consents(
-            privacy: true,
-            aiAnalysis: true,
-            analytics: false,
-          ),
-        ),
-      );
-      await repo.completeSocialSignup();
-      _ref.read(dataRevisionProvider.notifier).bump();
-    }
-    _ref.read(sessionProvider.notifier).set(result.user);
+  /// 이메일 가입. 가입하면 바로 로그인 상태가 되어 투데이로 간다.
+  /// 가입 화면 문구("가입은 … 동의하는 것으로 간주")대로 필수 동의(개인정보·감정 분석)를 켜고
+  /// 선택 동의(사용 분석)는 끈 채로 시작한다. 닉네임은 가입 화면에서 받은 값이다.
+  Future<void> signUp({
+    required String email,
+    required String password,
+    required String nickname,
+  }) async {
+    final user = await _ref
+        .read(authRepositoryProvider)
+        .signUp(email: email, password: password);
+    final settings = _ref.read(settingsRepositoryProvider);
+    final current = await settings.get();
+    await settings.save(current.copyWith(nickname: nickname.trim()));
+    _ref.read(dataRevisionProvider.notifier).bump();
+    _ref.read(sessionProvider.notifier).set(user);
   }
 
   Future<void> signOut() async {
@@ -70,12 +54,9 @@ class AuthActions {
   }
 
   /// 비밀번호로 다시 확인한 뒤 계정과 모든 데이터를 지운다(F-11).
-  Future<void> deleteAccount(String? password) async {
+  Future<void> deleteAccount(String password) async {
     await _ref.read(authRepositoryProvider).deleteAccount(password: password);
     await _ref.read(entriesRepositoryProvider).deleteAll();
-    await _ref.read(indexHistoryRepositoryProvider).deleteAll();
-    await _ref.read(insightsRepositoryProvider).deleteAll();
-    await _ref.read(peopleRepositoryProvider).deleteAll();
     await _ref.read(todosRepositoryProvider).deleteAll();
     _ref.read(sessionProvider.notifier).set(null);
     _ref.read(dataRevisionProvider.notifier).bump();

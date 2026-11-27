@@ -24,7 +24,7 @@ class ActionSuggestionCard extends StatelessWidget {
 
   final ActionSuggestion suggestion;
 
-  /// 카드를 누르면 인사이트 상세로.
+  /// 카드를 누르면 제안이 나온 일기 상세로.
   final VoidCallback onTap;
 
   /// 오른쪽 원을 누르면 체크리스트에 담는다(이미 담았으면 눌러도 그대로).

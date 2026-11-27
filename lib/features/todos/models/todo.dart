@@ -1,4 +1,4 @@
-/// 체크리스트 항목의 출처: 직접 입력 / 행동 제안(F-08)에서 담음.
+/// 체크리스트 항목의 출처: 직접 입력 / AI 행동 제안(F-08)에서 담음.
 enum TodoSource { manual, suggestion }
 
 /// 체크리스트 항목 (SPEC F-04, 테이블 `todos`).
@@ -7,35 +7,32 @@ class Todo {
     required this.id,
     required this.title,
     required this.createdAt,
-    this.personId,
     this.done = false,
     this.doneAt,
     this.source = TodoSource.manual,
-    this.insightId,
+    this.entryId,
   });
 
   final String id;
 
   /// 제목 1~100자.
   final String title;
-  final String? personId;
   final bool done;
   final DateTime? doneAt;
   final TodoSource source;
 
-  /// 제안을 담았다면 그 인사이트.
-  final String? insightId;
+  /// AI 제안을 담았다면 그 제안이 나온 일기.
+  final String? entryId;
   final DateTime createdAt;
 
   Todo copyWith({String? title, bool? done, DateTime? doneAt}) {
     return Todo(
       id: id,
       title: title ?? this.title,
-      personId: personId,
       done: done ?? this.done,
       doneAt: (done ?? this.done) ? (doneAt ?? this.doneAt) : null,
       source: source,
-      insightId: insightId,
+      entryId: entryId,
       createdAt: createdAt,
     );
   }

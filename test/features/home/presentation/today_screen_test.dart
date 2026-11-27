@@ -20,10 +20,11 @@ import 'package:reborn_app/features/entries/data/in_memory_entries_repository.da
 import 'package:reborn_app/app/data_revision.dart';
 import 'package:reborn_app/features/entries/models/emotion.dart';
 import 'package:reborn_app/features/entries/models/entry.dart';
-import 'package:reborn_app/features/analysis/suggestion_pool.dart';
+import 'package:reborn_app/features/entries/presentation/entries_providers.dart';
+import 'package:reborn_app/features/analysis/data/sample_data.dart';
+import 'package:reborn_app/features/notifications/presentation/notifications_providers.dart';
 import 'package:reborn_app/features/home/models/greeting_pool.dart';
 import 'package:reborn_app/features/home/presentation/today_screen.dart';
-import 'package:reborn_app/features/insights/models/insight.dart';
 import 'package:reborn_app/features/todos/models/todo.dart';
 import 'package:reborn_app/features/home/presentation/widgets/action_suggestion_card.dart';
 import 'package:reborn_app/features/home/models/home_summary.dart';
@@ -34,7 +35,6 @@ import 'package:reborn_app/shared/widgets/skeleton.dart';
 import 'package:reborn_app/features/home/presentation/widgets/home_top_bar.dart';
 import 'package:reborn_app/features/home/presentation/widgets/record_card_after.dart';
 import 'package:reborn_app/features/home/presentation/widgets/record_card_before.dart';
-import 'package:reborn_app/features/home/presentation/widgets/relation_signal_card.dart';
 import 'package:reborn_app/features/home/presentation/widgets/weekly_emotion_card.dart';
 import 'package:reborn_app/shared/widgets/app_bottom_nav_bar.dart';
 import 'package:reborn_app/shared/widgets/centered_line.dart';
@@ -48,10 +48,10 @@ class _FlakyEntries extends InMemoryEntriesRepository {
   final List<int> calls;
 
   @override
-  Future<List<Entry>> list({String? personId}) async {
+  Future<List<Entry>> list() async {
     calls.add(1);
     if (calls.length == 1) throw StateError('network');
-    return super.list(personId: personId);
+    return super.list();
   }
 }
 
@@ -63,19 +63,19 @@ class _CountingEntries extends InMemoryEntriesRepository {
   int calls = 0;
 
   @override
-  Future<List<Entry>> list({String? personId}) async {
+  Future<List<Entry>> list() async {
     calls++;
     if (failFrom != null && calls >= failFrom!) throw StateError('network');
-    return super.list(personId: personId);
+    return super.list();
   }
 }
 
 /// 불러오는 데 1초 걸리는 기록 저장소 (로딩 상태 확인).
 class _SlowEntries extends InMemoryEntriesRepository {
   @override
-  Future<List<Entry>> list({String? personId}) async {
+  Future<List<Entry>> list() async {
     await Future<void>.delayed(const Duration(seconds: 1));
-    return super.list(personId: personId);
+    return super.list();
   }
 }
 
@@ -110,6 +110,12 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  /// 샘플에서 가장 최근 일기(홈 제안의 출처)와 그 AI 제안.
+  Entry latestEntry() => (buildSampleData(
+    now,
+  ).entries.toList()..sort((a, b) => b.createdAt.compareTo(a.createdAt))).first;
+  List<String> latestSuggestions() => latestEntry().feedback!.suggestions;
+
   double top(WidgetTester tester, Finder finder) =>
       tester.getTopLeft(finder).dy;
 
@@ -123,24 +129,20 @@ void main() {
       '아직 오늘의 마음을 기록하지 않았어요',
       '1분만 천천히 돌아볼까요?',
       '감정 기록하기',
-      '최근 관계 신호',
-      '전체 보기',
-      '지민',
-      '친구',
-      '최근 부정적인 기록이 늘었어요',
-      '마지막 기록 1일 전',
       '이번 주 감정 흐름',
       '✦ 10월',
       '오늘 해볼까요?',
-      '오늘은 거리를 두고, 내일 가벼운 간식과 함께 말을 건네 보세요.',
+      latestSuggestions()[0],
+      latestSuggestions()[1],
     ]) {
       expect(find.text(text), findsWidgets, reason: text);
     }
+    expect(find.text('최근 관계 신호'), findsNothing, reason: '인물 기능은 없앴다');
     expect(find.byType(RecordCardAfter), findsNothing);
     expect(find.textContaining('긍정적인 감정이', findRichText: true), findsOneWidget);
   });
 
-  testWidgets('402×874에서 각 요소의 y가 Figma 좌표와 ±1px 안에서 같다', (tester) async {
+  testWidgets('402×874에서 위쪽은 Figma 좌표와 같고, 아래는 정한 간격으로 이어진다', (tester) async {
     useDesignScreen(tester);
     await pumpHome(tester);
 
@@ -157,14 +159,22 @@ void main() {
     );
     expectY('인사말', find.textContaining('규리님'), HomeLayout.greetingY);
     expectY('기록 카드', find.byType(RecordCardBefore), HomeLayout.recordCardY);
-    expectY('관계 신호 제목', find.text('최근 관계 신호'), HomeLayout.signalTitleY);
-    expectY('신호 카드', find.byType(RelationSignalCard), HomeLayout.signalCardY);
-    expectY('그래프 카드', find.byType(WeeklyEmotionCard), HomeLayout.graphCardY);
-    expectY('오늘 해볼까요 제목', find.text('오늘 해볼까요?'), HomeLayout.actionTitleY);
+    // 관계 신호 섹션을 빼서(2026-11-28) 그래프부터는 Figma보다 위로 당겨졌다.
+    const graphY =
+        HomeLayout.recordCardY +
+        HomeLayout.recordCardHeightBefore +
+        HomeLayout.recordCardToGraph;
+    expectY('그래프 카드', find.byType(WeeklyEmotionCard), graphY);
+    const shift = HomeLayout.graphCardY - graphY;
+    expectY(
+      '오늘 해볼까요 제목',
+      find.text('오늘 해볼까요?'),
+      HomeLayout.actionTitleY - shift,
+    );
     final actions = find.byType(ActionSuggestionCard);
     expect(actions, findsNWidgets(2));
-    expectY('액션 카드 1', actions.at(0), HomeLayout.actionCardY1);
-    expectY('액션 카드 2', actions.at(1), HomeLayout.actionCardY2);
+    expectY('액션 카드 1', actions.at(0), HomeLayout.actionCardY1 - shift);
+    expectY('액션 카드 2', actions.at(1), HomeLayout.actionCardY2 - shift);
   });
 
   testWidgets('카드 크기: 폭 354, 높이는 Figma와 같다', (tester) async {
@@ -181,7 +191,6 @@ void main() {
       find.byType(RecordCardBefore),
       HomeLayout.recordCardHeightBefore,
     );
-    expectSize(find.byType(RelationSignalCard), HomeLayout.signalCardHeight);
     expectSize(find.byType(WeeklyEmotionCard), HomeLayout.graphCardHeight);
     expectSize(
       find.byType(ActionSuggestionCard).first,
@@ -202,9 +211,9 @@ void main() {
           d.color == AppColors.light.barStrong &&
           d.borderRadius == AppRadii.graphBarBorderRadius;
     });
-    // 월(무표정 0과 슬픔 −2의 평균 −1 → 0.3333), 화(−2와 +1의 평균 → 0.4167), 수(−2 → 0.1667)
+    // (평균+5)/10: 월(무표정 강도1 → 0 → 0.5), 화(불안 강도4 → −4 → 0.1), 수(슬픔 강도3 → −3 → 0.2)
     expect(bars, findsNWidgets(3));
-    const expected = [0.33333, 0.41667, 0.16667];
+    const expected = [0.5, 0.1, 0.2];
     for (var i = 0; i < 3; i++) {
       expect(
         tester.getSize(bars.at(i)).height,
@@ -364,8 +373,13 @@ void main() {
     await pumpHome(tester);
 
     final scrollable = tester.state<ScrollableState>(find.byType(Scrollable));
-    // 내용 높이 1288(Figma 최신 프레임) − 화면 874
-    expect(scrollable.position.maxScrollExtent, closeTo(1288 - 874, 1));
+    // 내용 높이 1288(Figma 최신 프레임) − 화면 874에서, 없앤 관계 신호 묶음 170
+    // (제목 32 + 간격 12 + 카드 104 + 간격 22)만큼 짧아졌다.
+    const removedSignalSection = 32 + 12 + 104 + 22;
+    expect(
+      scrollable.position.maxScrollExtent,
+      closeTo(1288 - 874 - removedSignalSection, 1),
+    );
   });
 
   testWidgets('상단 바는 스크롤해도 화면 위에 고정되고 블러 배경을 가진다', (tester) async {
@@ -406,17 +420,17 @@ void main() {
     final scrollable = tester.state<ScrollableState>(find.byType(Scrollable));
     await tester.dragFrom(
       const Offset(300, 180),
-      const Offset(0, -300),
+      const Offset(0, -200),
       touchSlopY: 0,
     );
     await tester.pumpAndSettle();
-    expect(scrollable.position.pixels, closeTo(300, 1));
+    expect(scrollable.position.pixels, closeTo(200, 1));
 
     await tester.tap(find.bySemanticsLabel('맨 위로 이동'));
     await tester.pump(); // 애니메이션 시작 프레임
     // 애니메이션 도중에는 아직 위로 올라가는 중이다.
     await tester.pump(HomeLayout.scrollToTopDuration ~/ 2);
-    expect(scrollable.position.pixels, inExclusiveRange(0, 300));
+    expect(scrollable.position.pixels, inExclusiveRange(0, 200));
 
     await tester.pumpAndSettle();
     expect(scrollable.position.pixels, 0);
@@ -572,6 +586,8 @@ void main() {
       tester,
       overrides: [
         entriesRepositoryProvider.overrideWith((ref) => _FlakyEntries(calls)),
+        // 벨 뱃지도 일기를 읽으므로, 홈 데이터 호출만 세도록 알림은 비워 둔다.
+        notificationsProvider.overrideWith((ref) async => const []),
       ],
     );
 
@@ -622,7 +638,6 @@ void main() {
             body: '오늘은 기분이 좋았다',
             emotion: Emotion.joy,
             intensity: 2,
-            personId: 'p2',
             createdAt: now,
           );
       container.read(dataRevisionProvider.notifier).bump();
@@ -660,14 +675,9 @@ void main() {
     testWidgets('"오늘 기록 보기"를 누르면 오늘 쓴 기록 상세가 열린다', (tester) async {
       final container = await pumpApp(tester);
       await container
-          .read(analysisServiceProvider)
-          .saveEntry(
-            body: '오늘만의 특별한 기록',
-            emotion: Emotion.joy,
-            intensity: 1,
-            createdAt: now,
-          );
-      container.read(dataRevisionProvider.notifier).bump();
+          .read(recordActionsProvider)
+          .save(body: '오늘만의 특별한 기록', emotion: Emotion.joy, intensity: 1);
+      await tester.pump(const Duration(seconds: 1)); // AI 코멘트 도착
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('오늘 기록 보기'));
@@ -676,23 +686,49 @@ void main() {
       expect(find.text('오늘만의 특별한 기록'), findsOneWidget);
     });
 
-    testWidgets('관계 신호 카드를 누르면 인사이트 상세로 이동한다', (tester) async {
-      await pumpApp(tester);
-
-      await tester.tap(find.text('최근 부정적인 기록이 늘었어요').first);
+    testWidgets('오늘 기록의 AI 코멘트가 도착하면 기록 완료 카드에 보인다', (tester) async {
+      final container = await pumpApp(tester);
+      final saved = await container
+          .read(recordActionsProvider)
+          .save(body: '과제가 많아 지쳤다', emotion: Emotion.sadness, intensity: 3);
+      await tester.pumpAndSettle();
+      expect(find.textContaining('코멘트를 쓰고 있어요'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 1)); // AI 코멘트 도착
       await tester.pumpAndSettle();
 
-      expect(find.text('이렇게 해 보면 어떨까요?'), findsOneWidget);
+      final stored = await container
+          .read(entriesRepositoryProvider)
+          .get(saved.id);
+      expect(stored!.feedback, isNotNull);
+      final bubble = find.byKey(const Key('home-ai-comment'));
+      expect(bubble, findsOneWidget);
+      expect(
+        find.descendant(
+          of: bubble,
+          matching: find.text(stored.feedback!.comment),
+        ),
+        findsOneWidget,
+      );
+      // 오늘 일기의 제안이 "오늘 해볼까요?"에 나온다.
+      expect(find.text(stored.feedback!.suggestions.first), findsOneWidget);
+    });
+
+    testWidgets('제안 카드를 누르면 그 제안이 나온 일기 상세가 열린다', (tester) async {
+      await pumpApp(tester);
+      await tester.tap(find.text(latestSuggestions()[0]));
+      await tester.pumpAndSettle();
+      expect(find.text('AI 코멘트'), findsOneWidget);
+      expect(find.text(latestEntry().body), findsOneWidget);
     });
 
     testWidgets('제안 카드의 원을 누르면 담기고, 채워진 뒤 다음 제안이 그 자리로 온다 (T-26)', (
       tester,
     ) async {
       final container = await pumpApp(tester);
-      // 샘플에는 첫 제안이 이미 담겨 있어 [두 번째, 세 번째] 제안이 보인다.
-      final pool = SuggestionPool.forInsight(InsightType.negativeTrend, '지민');
+      final pool = latestSuggestions();
+      expect(find.text(pool[0]), findsOneWidget);
       expect(find.text(pool[1]), findsOneWidget);
-      expect(find.text(pool[2]), findsOneWidget);
+      expect(find.text(pool[2]), findsNothing);
 
       await tester.tap(
         find.descendant(
@@ -704,7 +740,9 @@ void main() {
       await tester.pump(ComponentLayout.toastFade);
 
       final todos = await container.read(todosRepositoryProvider).list();
-      expect(todos.where((t) => t.title == pool[1]).length, 1);
+      final added = todos.where((t) => t.title == pool[0]).toList();
+      expect(added, hasLength(1));
+      expect(added.single.entryId, latestEntry().id);
       expect(find.text('체크리스트에 담았어요'), findsWidgets);
       // 채워진 원이 잠깐 보인다.
       expect(find.bySemanticsLabel('체크리스트에 담았어요'), findsWidgets);
@@ -712,25 +750,21 @@ void main() {
       await tester.pump(HomeLayout.suggestionSwapDelay);
       await tester.pump(const Duration(seconds: 4)); // 토스트가 사라질 때까지
       await tester.pumpAndSettle();
-      expect(find.text(pool[1]), findsNothing, reason: '담은 제안은 빠진다');
-      expect(find.text(pool[2]), findsOneWidget);
-      expect(find.text(pool[3]), findsOneWidget, reason: '다음 제안이 채워진다');
+      expect(find.text(pool[0]), findsNothing, reason: '담은 제안은 빠진다');
+      expect(find.text(pool[1]), findsOneWidget);
+      expect(find.text(pool[2]), findsOneWidget, reason: '다음 제안이 채워진다');
     });
 
     testWidgets('제안을 모두 담으면 안내와 체크리스트 버튼이 나온다', (tester) async {
       final container = await pumpApp(tester);
-      final insight =
-          (await container.read(insightsRepositoryProvider).list()).first;
-      final pool = SuggestionPool.forInsight(insight.type, '지민');
-      for (final title in pool) {
-        if (title == pool.first) continue; // 샘플에 이미 있다
+      for (final title in latestSuggestions()) {
         await container
             .read(todosRepositoryProvider)
             .create(
               title: title,
               createdAt: now,
               source: TodoSource.suggestion,
-              insightId: insight.id,
+              entryId: latestEntry().id,
             );
       }
       container.read(dataRevisionProvider.notifier).bump();
@@ -738,38 +772,28 @@ void main() {
 
       expect(find.byType(ActionSuggestionCard), findsNothing);
       expect(find.text('오늘 제안을 모두 담았어요'), findsOneWidget);
+
+      await tester.tap(find.text('체크리스트 보기'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('todo-title')), findsOneWidget);
     });
 
-    testWidgets('"오늘 해볼까요? >"는 체크리스트가 있는 전체 탭으로, "이번 주 감정 흐름 >"는 기록 탭으로 간다', (
+    testWidgets('"오늘 해볼까요? >"는 기록 탭 체크리스트로, "이번 주 감정 흐름 >"는 기록 탭 달력으로 간다', (
       tester,
     ) async {
       await pumpApp(tester);
       await tester.tap(find.bySemanticsLabel('오늘 해볼까요?'));
       await tester.pumpAndSettle();
-      expect(find.text('체크리스트'), findsOneWidget);
-
-      await tester.tap(find.text('투데이'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.bySemanticsLabel('이번 주 감정 흐름, 기록 보기'));
-      await tester.pumpAndSettle();
-      expect(find.text('2026년 10월'), findsOneWidget);
-    });
-
-    testWidgets('최근 관계 신호 카드를 누르면 그 인사이트 상세가 열린다', (tester) async {
-      await pumpApp(tester);
-      await tester.tap(find.byType(RelationSignalCard).first);
-      await tester.pumpAndSettle();
-      expect(find.text('이렇게 해 보면 어떨까요?'), findsOneWidget);
+      expect(find.byKey(const Key('todo-title')), findsOneWidget);
+      expect(find.text('2026년 10월'), findsNothing);
     });
 
     testWidgets('기록을 모두 지우면 홈은 안내 문구를 보여 준다', (tester) async {
       final container = await pumpApp(tester);
       await container.read(entriesRepositoryProvider).deleteAll();
-      await container.read(insightsRepositoryProvider).deleteAll();
       container.read(dataRevisionProvider.notifier).bump();
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('아직 감지된 관계 변화가 없어요'), findsOneWidget);
       expect(find.textContaining('해 볼 만한 일을 제안해 드려요'), findsOneWidget);
       expect(find.textContaining('이번 주 기록이 쌓이면'), findsOneWidget);
       expect(tester.takeException(), isNull);

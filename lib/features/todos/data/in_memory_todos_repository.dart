@@ -20,17 +20,15 @@ class InMemoryTodosRepository implements TodosRepository {
   Future<Todo> create({
     required String title,
     required DateTime createdAt,
-    String? personId,
     TodoSource source = TodoSource.manual,
-    String? insightId,
+    String? entryId,
   }) async {
     final todo = Todo(
       id: 't${_nextId++}',
       title: title,
       createdAt: createdAt,
-      personId: personId,
       source: source,
-      insightId: insightId,
+      entryId: entryId,
     );
     _items.add(todo);
     return todo;

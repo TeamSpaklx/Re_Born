@@ -10,7 +10,7 @@ import '../../../core/errors/app_error_log.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/app_dialogs.dart';
 import '../../../shared/widgets/bottom_cta_bar.dart';
-import '../../../shared/widgets/consent_row.dart';
+import '../../../shared/widgets/check_row.dart';
 import '../../../shared/widgets/cta_button.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/page_scaffold.dart';
@@ -37,7 +37,7 @@ class _AccountDeleteScreenState extends ConsumerState<AccountDeleteScreen> {
   static const _items = [
     '남긴 모든 기록과 감정 분석 결과',
     '등록한 인물과 관계 지수 이력',
-    '인사이트와 체크리스트',
+    'AI 코멘트와 체크리스트',
     '이메일·닉네임 등 계정 정보',
   ];
 
@@ -48,8 +48,7 @@ class _AccountDeleteScreenState extends ConsumerState<AccountDeleteScreen> {
   }
 
   Future<void> _delete() async {
-    final social = ref.read(sessionProvider)?.isSocial ?? false;
-    if (!social && _password.text.isEmpty) {
+    if (_password.text.isEmpty) {
       setState(() => _error = '비밀번호를 입력해 주세요.');
       return;
     }
@@ -66,9 +65,7 @@ class _AccountDeleteScreenState extends ConsumerState<AccountDeleteScreen> {
       _error = null;
     });
     try {
-      await ref
-          .read(authActionsProvider)
-          .deleteAccount(social ? null : _password.text);
+      await ref.read(authActionsProvider).deleteAccount(_password.text);
     } on AuthFailure catch (failure) {
       if (!mounted) return;
       setState(() {
@@ -152,29 +149,23 @@ class _AccountDeleteScreenState extends ConsumerState<AccountDeleteScreen> {
               ),
             ),
             const SizedBox(height: AppSpacing.space16),
-            ConsentRow(
+            CheckRow(
               key: const Key('delete-confirm'),
-              label: '위 내용을 모두 확인했어요',
+              title: '위 내용을 모두 확인했어요',
               checked: _confirmed,
               onChanged: (v) => setState(() => _confirmed = v),
             ),
             const SizedBox(height: AppSpacing.space16),
-            if (ref.watch(sessionProvider)?.isSocial ?? false)
-              Text(
-                '${ref.watch(sessionProvider)!.provider!.label} 계정으로 로그인했어요. 비밀번호 대신 위 확인으로 본인 확인을 마쳐요.',
-                style: AppTextStyles.body.copyWith(color: colors.textSecondary),
-              )
-            else
-              PasswordField(
-                fieldKey: const Key('delete-password'),
-                controller: _password,
-                label: '비밀번호 확인',
-                hint: '본인 확인을 위해 비밀번호를 입력해 주세요',
-                errorText: _error,
-                onChanged: (_) {
-                  if (_error != null) setState(() => _error = null);
-                },
-              ),
+            PasswordField(
+              fieldKey: const Key('delete-password'),
+              controller: _password,
+              label: '비밀번호 확인',
+              hint: '본인 확인을 위해 비밀번호를 입력해 주세요',
+              errorText: _error,
+              onChanged: (_) {
+                if (_error != null) setState(() => _error = null);
+              },
+            ),
           ],
         ),
       ),

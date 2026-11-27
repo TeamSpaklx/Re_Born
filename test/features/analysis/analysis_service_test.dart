@@ -1,159 +1,147 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:reborn_app/features/ai_comment/data/ai_comment_service.dart';
+import 'package:reborn_app/features/ai_comment/data/fake_ai_comment_service.dart';
+import 'package:reborn_app/features/ai_comment/models/ai_feedback.dart';
 import 'package:reborn_app/features/analysis/analysis_service.dart';
 import 'package:reborn_app/features/analysis/data/sample_data.dart';
 import 'package:reborn_app/features/analysis/record_streak_calculator.dart';
 import 'package:reborn_app/features/entries/data/in_memory_entries_repository.dart';
 import 'package:reborn_app/features/entries/models/emotion.dart';
 import 'package:reborn_app/features/entries/models/entry.dart';
-import 'package:reborn_app/features/insights/data/in_memory_insights_repository.dart';
-import 'package:reborn_app/features/insights/models/insight.dart';
-import 'package:reborn_app/features/people/data/in_memory_people_repository.dart';
-import 'package:reborn_app/features/people/models/person.dart';
-import 'package:reborn_app/features/people/models/relation_type.dart';
 
-/// update에서 실패하는 기록 저장소 (T-20: 분석 실패 시 기록은 남고 failed).
-class _FailingOnDoneEntries extends InMemoryEntriesRepository {
+/// 항상 실패하는 AI (T-20: AI가 실패해도 기록은 남고 failed).
+class _FailingAi implements AiCommentService {
   @override
-  Future<void> update(Entry entry) async {
-    if (entry.analysisStatus == AnalysisStatus.pending &&
-        entry.analysis != null) {
-      throw StateError('저장 실패');
-    }
-    return super.update(entry);
-  }
+  Future<AiFeedback> analyze(Entry entry, {required CommentTone tone}) async =>
+      throw StateError('네트워크 오류');
 }
 
 void main() {
   final now = DateTime(2026, 10, 22, 12);
-  final person = Person(
-    id: 'p1',
-    name: '하은',
-    relationType: RelationType.friend,
-    createdAt: DateTime(2026, 9),
-  );
 
   AnalysisService build({
     InMemoryEntriesRepository? entries,
-    InMemoryInsightsRepository? insights,
-    InMemoryIndexHistoryRepository? history,
+    AiCommentService? ai,
   }) => AnalysisService(
     entries: entries ?? InMemoryEntriesRepository(),
-    people: InMemoryPeopleRepository(initial: [person]),
-    indexHistory: history ?? InMemoryIndexHistoryRepository(),
-    insights: insights ?? InMemoryInsightsRepository(),
+    aiComment:
+        ai ?? FakeAiCommentService(delay: Duration.zero, clock: () => now),
     clock: () => now,
   );
 
-  test('T-10: 기록 저장 → 분석 done, 점수 −2, 키워드가 붙는다', () async {
+  test('T-10: 저장하면 규칙 분석까지 끝나 점수 −2·키워드가 붙고, 코멘트는 pending', () async {
     final entries = InMemoryEntriesRepository();
     final service = build(entries: entries);
 
     final saved = await service.saveEntry(
-      body: '하은이가 고맙다는 말이 없어 서운했다',
+      body: '친구가 고맙다는 말이 없어 서운했다',
       emotion: Emotion.sadness,
       intensity: 2,
-      personId: person.id,
     );
 
-    expect(saved.analysisStatus, AnalysisStatus.done);
+    expect(saved.analysisStatus, AnalysisStatus.pending);
     expect(saved.score, -2);
     expect(saved.analysis!.keywords, contains('서운'));
-    expect((await entries.list()).single.id, saved.id);
+    expect(saved.feedback, isNull);
+    expect((await entries.get(saved.id))!.score, -2);
   });
 
-  test('T-23: 기록 3건 미만이면 지수를 저장하지 않는다(데이터 부족)', () async {
-    final history = InMemoryIndexHistoryRepository();
-    final service = build(history: history);
-    for (var i = 0; i < 2; i++) {
-      await service.saveEntry(
-        body: '본문',
-        emotion: Emotion.joy,
-        intensity: 2,
-        personId: person.id,
-        createdAt: DateTime(2026, 10, 22 - i, 9),
-      );
-    }
-    expect(await history.list(person.id), isEmpty);
-  });
-
-  test('T-14: 기록 3건 이상이면 오늘 지수가 저장되고, 삭제하면 다시 계산된다', () async {
-    final history = InMemoryIndexHistoryRepository();
-    final entries = InMemoryEntriesRepository();
-    final service = build(entries: entries, history: history);
-    final saved = <Entry>[];
-    for (var i = 0; i < 4; i++) {
-      saved.add(
-        await service.saveEntry(
-          body: '본문',
-          emotion: i == 3 ? Emotion.anger : Emotion.joy,
-          intensity: 3,
-          personId: person.id,
-          createdAt: DateTime(2026, 10, 22 - i, 9),
-        ),
-      );
-    }
-    final before = (await history.list(person.id)).single;
-
-    await service.deleteEntry(saved[3].id); // 분노(−3) 기록 삭제
-
-    final after = (await history.list(person.id)).single;
-    expect(after.index, greaterThan(before.index));
-    expect(after.entryCount, 3);
-  });
-
-  test('T-20: 분석 중 저장이 실패해도 기록은 남고 failed로 표시된다', () async {
-    final entries = _FailingOnDoneEntries();
-    final service = build(entries: entries);
-
-    final result = await service.saveEntry(
-      body: '본문',
+  test('강도 5단계: 점수는 극성 × 강도라 −5~+5', () async {
+    final service = build();
+    final sad = await service.saveEntry(
+      body: '너무 힘들었다',
+      emotion: Emotion.sadness,
+      intensity: 5,
+    );
+    final joy = await service.saveEntry(
+      body: '정말 기뻤다',
       emotion: Emotion.joy,
-      intensity: 1,
-      personId: person.id,
+      intensity: 5,
+    );
+    expect(sad.score, -5);
+    expect(joy.score, 5);
+  });
+
+  test('AI 코멘트를 받으면 done이 되고 코멘트·제안이 저장된다', () async {
+    final entries = InMemoryEntriesRepository();
+    final service = build(entries: entries);
+    final saved = await service.saveEntry(
+      body: '과제가 많아 지쳤다',
+      emotion: Emotion.sadness,
+      intensity: 3,
+    );
+
+    final done = await service.requestFeedback(
+      saved.id,
+      tone: CommentTone.warm,
+    );
+
+    expect(done.analysisStatus, AnalysisStatus.done);
+    expect(done.feedback!.comment, isNotEmpty);
+    expect(done.feedback!.suggestions, hasLength(3));
+    expect(done.analysis!.keywords, isNotNull, reason: '규칙 분석 결과는 그대로 남는다');
+    expect((await entries.get(saved.id))!.feedback, isNotNull);
+  });
+
+  test('T-20: AI가 실패해도 기록은 남고 failed로 표시된다', () async {
+    final entries = InMemoryEntriesRepository();
+    final service = build(entries: entries, ai: _FailingAi());
+    final saved = await service.saveEntry(
+      body: '오늘은 조금 힘들었다',
+      emotion: Emotion.sadness,
+      intensity: 2,
+    );
+
+    final result = await service.requestFeedback(
+      saved.id,
+      tone: CommentTone.warm,
     );
 
     expect(result.analysisStatus, AnalysisStatus.failed);
-    expect((await entries.list()).single.analysisStatus, AnalysisStatus.failed);
+    final stored = await entries.get(saved.id);
+    expect(stored, isNotNull);
+    expect(stored!.analysisStatus, AnalysisStatus.failed);
   });
 
-  test('수정: 인물을 옮기면 이전 인물의 지수도 다시 계산한다', () async {
+  test('다시 분석하면 실패한 기록도 코멘트를 받는다', () async {
     final entries = InMemoryEntriesRepository();
-    final history = InMemoryIndexHistoryRepository();
-    final service = AnalysisService(
-      entries: entries,
-      people: InMemoryPeopleRepository(
-        initial: [
-          person,
-          Person(
-            id: 'p2',
-            name: '지민',
-            relationType: RelationType.friend,
-            createdAt: DateTime(2026, 9),
-          ),
-        ],
-      ),
-      indexHistory: history,
-      insights: InMemoryInsightsRepository(),
-      clock: () => now,
+    final failing = build(entries: entries, ai: _FailingAi());
+    final saved = await failing.saveEntry(
+      body: '오늘은 조금 힘들었다',
+      emotion: Emotion.sadness,
+      intensity: 2,
     );
-    Entry? last;
-    for (var i = 0; i < 3; i++) {
-      last = await service.saveEntry(
-        body: '본문',
-        emotion: Emotion.joy,
-        intensity: 2,
-        personId: 'p1',
-        createdAt: DateTime(2026, 10, 22 - i, 9),
-      );
-    }
-    expect(await history.list('p1'), isNotEmpty);
+    await failing.requestFeedback(saved.id, tone: CommentTone.warm);
 
-    await service.updateEntry(last!.copyWith(personId: 'p2'));
-
-    expect(await history.list('p1'), isEmpty, reason: '2건만 남아 데이터 부족');
+    final retried = await build(
+      entries: entries,
+    ).retryAnalysis(saved.id, tone: CommentTone.warm);
+    expect(retried.analysisStatus, AnalysisStatus.done);
+    expect(retried.feedback, isNotNull);
   });
 
-  group('샘플 데이터 (Figma 홈 샘플과 같은 모양)', () {
+  test('수정하면 다시 규칙 분석하고 이전 코멘트는 지운다(새로 받는다)', () async {
+    final entries = InMemoryEntriesRepository();
+    final service = build(entries: entries);
+    final saved = await service.saveEntry(
+      body: '기뻤다',
+      emotion: Emotion.joy,
+      intensity: 2,
+    );
+    final done = await service.requestFeedback(
+      saved.id,
+      tone: CommentTone.warm,
+    );
+
+    final edited = await service.updateEntry(
+      done.copyWith(emotion: Emotion.anger, intensity: 4),
+    );
+    expect(edited.score, -4);
+    expect(edited.analysisStatus, AnalysisStatus.pending);
+    expect(edited.feedback, isNull);
+  });
+
+  group('샘플 데이터', () {
     final data = buildSampleData(now);
 
     test('오늘은 기록이 없고, 최근 5일 연속·최장 20일', () {
@@ -171,19 +159,12 @@ void main() {
       expect(streak.longest, 20);
     });
 
-    test('지민과의 부정 추세 인사이트가 하나 있고 홈 문구가 계산값 기반이다', () {
-      final insight = data.insights.single;
-      expect(insight.personId, 'p1');
-      expect(insight.type, InsightType.negativeTrend);
-      expect(insight.evidence.negCount, greaterThanOrEqualTo(3));
-    });
-
-    test('모든 기록은 분석이 끝난 상태, 지수 이력은 날짜 오름차순으로 계산 가능한 날만', () {
-      expect(
-        data.entries.every((e) => e.analysisStatus == AnalysisStatus.done),
-        isTrue,
-      );
-      expect(data.indexPoints, isNotEmpty);
+    test('모든 일기는 분석이 끝났고 AI 코멘트가 붙어 있으며 강도는 1~5', () {
+      for (final e in data.entries) {
+        expect(e.analysisStatus, AnalysisStatus.done);
+        expect(e.feedback, isNotNull);
+        expect(e.intensity, inInclusiveRange(1, 5));
+      }
     });
   });
 }
