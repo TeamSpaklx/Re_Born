@@ -4,19 +4,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/router.dart';
+import '../../../../app/theme/app_assets.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../../../../shared/widgets/app_bottom_sheet.dart';
 import '../../../../shared/widgets/app_dialogs.dart';
 import '../../../../shared/widgets/settings_group.dart';
 import '../../../auth/presentation/auth_providers.dart';
 import '../../../notifications/presentation/notifications_providers.dart';
 import '../../../security/presentation/app_lock_controller.dart';
-import '../../../settings/models/app_settings.dart';
 import '../../../settings/presentation/settings_providers.dart';
 
-/// 전체 탭의 설정 (F-10·F-11): 알림, 동의 on/off, 기록 전체 삭제(확인 팝업), 로그아웃, 계정 삭제(재인증 화면),
-/// 의료 서비스 아님 안내.
+/// 전체 탭의 설정 (F-10·F-11). 레퍼런스 설정 화면처럼 카드 밖 소제목 + 아이콘 목록 카드로 묶는다.
+/// - 개인정보 보호 및 보안: 안내 카드(누르면 설명 시트), 동의 관리(하위 화면), 앱 잠금
+/// - 앱 사용: 알림, 알림 설정, 다크 모드
+/// - 계정: 로그아웃, 기록 전체 삭제(확인 팝업), 계정 삭제(재인증 화면)
+/// 맨 아래에 의료 서비스 아님 안내.
 class SettingsSection extends ConsumerWidget {
   const SettingsSection({super.key});
 
@@ -45,107 +49,114 @@ class SettingsSection extends ConsumerWidget {
     if (context.mounted) context.go(AppRoutes.login);
   }
 
+  void _openPrivacyInfo(BuildContext context) {
+    final colors = context.colors;
+    showAppBottomSheet<void>(
+      context,
+      title: '내 기록은 이렇게 지켜요',
+      builder: (context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (final line in _privacyPoints)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.space12),
+              child: Text(
+                '• $line',
+                style: AppTextStyles.body.copyWith(
+                  color: colors.textSecondary,
+                  height: 1.6,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  static const _privacyPoints = [
+    '감정 분석은 앱 안의 규칙으로만 해요. 외부 AI에 기록을 보내지 않아요.',
+    '기록은 내 계정에서만 볼 수 있어요.',
+    '앱 잠금을 켜면 Face ID·지문·기기 암호로 앱을 지킬 수 있어요.',
+    '기록 전체 삭제와 계정 삭제는 아래 "계정"에서 언제든 할 수 있어요.',
+  ];
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.colors;
-    final settings =
-        ref.watch(settingsProvider).value ?? const AppSettings(nickname: '');
-    final consents = settings.consents;
-    final actions = ref.read(settingsActionsProvider);
     final unread = ref.watch(unreadNotificationCountProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          '설정',
-          style: AppTextStyles.sectionTitle.copyWith(color: colors.textBlack),
+        const SettingsGroupHeader(title: '개인정보 보호 및 보안'),
+        SettingsInfoCard(
+          key: const Key('privacy-info'),
+          iconAsset: AppAssets.ixShieldTick,
+          title: '기록은 이 기기 안에서만 분석해요',
+          description: '감정 분석은 앱 안 규칙으로만 해요.\n기록 내용은 밖으로 보내지 않아요.',
+          onTap: () => _openPrivacyInfo(context),
         ),
         const SizedBox(height: AppSpacing.space12),
+        const _SecurityGroup(),
+        const SizedBox(height: AppSpacing.space24),
         SettingsGroup(
+          title: '앱 사용',
           children: [
             SettingsRow.link(
               key: const Key('open-notifications'),
+              iconAsset: AppAssets.ixNotification,
               title: '알림',
               trailingText: unread > 0 ? '$unread개 안 읽음' : null,
+              trailingEmphasis: true,
               onTap: () => context.push(AppRoutes.notifications),
             ),
             SettingsRow.link(
               key: const Key('open-notification-settings'),
+              iconAsset: AppAssets.ixSetting,
               title: '알림 설정',
               onTap: () => context.push(AppRoutes.notificationSettings),
             ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.space12),
-        SettingsGroup(
-          title: '화면',
-          children: [
             SettingsRow.toggle(
               key: const Key('dark-mode-toggle'),
+              iconAsset: AppAssets.ixMoon,
               title: '다크 모드',
               value: ref.watch(themeModeProvider) == ThemeMode.dark,
               onChanged: (v) => ref.read(themeModeProvider.notifier).setDark(v),
             ),
           ],
         ),
-        const SizedBox(height: AppSpacing.space12),
-        const _SecurityGroup(),
-        const SizedBox(height: AppSpacing.space12),
+        const SizedBox(height: AppSpacing.space24),
         SettingsGroup(
-          title: '동의 관리',
+          title: '계정',
           children: [
-            SettingsRow.toggle(
-              key: const Key('consent-privacy'),
-              title: '개인정보 수집·이용 동의',
-              value: consents.privacy,
-              onChanged: (v) =>
-                  actions.saveConsents(consents.copyWith(privacy: v)),
-            ),
-            SettingsRow.toggle(
-              key: const Key('consent-ai'),
-              title: '감정 분석 사용 (앱 안 규칙 기반)',
-              value: consents.aiAnalysis,
-              onChanged: (v) =>
-                  actions.saveConsents(consents.copyWith(aiAnalysis: v)),
-            ),
-            SettingsRow.toggle(
-              key: const Key('consent-analytics'),
-              title: '사용 분석 동의',
-              value: consents.analytics,
-              onChanged: (v) =>
-                  actions.saveConsents(consents.copyWith(analytics: v)),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.space12),
-        SettingsGroup(
-          title: '데이터·계정',
-          children: [
-            SettingsRow.destructive(
-              key: const Key('delete-records'),
-              title: '기록 전체 삭제',
-              onTap: () => _deleteRecords(context, ref),
-            ),
             SettingsRow.link(
               key: const Key('logout'),
+              iconAsset: AppAssets.ixLogout,
               title: '로그아웃',
               onTap: () => _logout(context, ref),
             ),
             SettingsRow.destructive(
+              key: const Key('delete-records'),
+              iconAsset: AppAssets.trash,
+              title: '기록 전체 삭제',
+              onTap: () => _deleteRecords(context, ref),
+            ),
+            SettingsRow.destructive(
               key: const Key('delete-account'),
+              iconAsset: AppAssets.ixProfileDelete,
               title: '계정 삭제',
               onTap: () => context.push(AppRoutes.accountDelete),
             ),
           ],
         ),
         if (kDebugMode) ...[
-          const SizedBox(height: AppSpacing.space12),
+          const SizedBox(height: AppSpacing.space24),
           SettingsGroup(
+            title: '개발용',
             children: [
               SettingsRow.link(
                 key: const Key('open-design-gallery'),
-                title: '디자인 갤러리 (개발용)',
+                title: '디자인 갤러리',
                 onTap: () => context.push(AppRoutes.devGallery),
               ),
             ],
@@ -161,7 +172,8 @@ class SettingsSection extends ConsumerWidget {
   }
 }
 
-/// 보안: 앱 잠금(Face ID·Touch ID·지문·기기 암호). 켤 때는 한 번 인증에 성공해야 켜진다.
+/// 개인정보 보호 및 보안 카드: 동의 관리(하위 화면)와 앱 잠금(Face ID·Touch ID·지문·기기 암호).
+/// 앱 잠금은 켤 때 한 번 인증에 성공해야 켜진다.
 class _SecurityGroup extends ConsumerWidget {
   const _SecurityGroup();
 
@@ -189,10 +201,16 @@ class _SecurityGroup extends ConsumerWidget {
     );
     final label = ref.watch(deviceAuthKindProvider).value?.label ?? '';
     return SettingsGroup(
-      title: '보안',
       children: [
+        SettingsRow.link(
+          key: const Key('open-consents'),
+          iconAsset: AppAssets.ixDocumentText,
+          title: '동의 관리',
+          onTap: () => context.push(AppRoutes.consentSettings),
+        ),
         SettingsRow.toggle(
           key: const Key('app-lock'),
+          iconAsset: AppAssets.ixLock,
           title: label.isEmpty ? '앱 잠금' : '앱 잠금 ($label)',
           value: enabled,
           onChanged: (v) => _toggle(context, ref, v),
