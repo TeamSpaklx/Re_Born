@@ -34,4 +34,16 @@ abstract final class RelationIndex {
     final index = ((average + 3) / 6 * 100).round().clamp(0, 100);
     return (index: index, entryCount: count);
   }
+
+  /// 지난주(7일 전) 지수에서 지금 지수까지의 변화(점). 양수면 올랐고 음수면 내렸다.
+  /// 지금이나 7일 전 중 하나라도 "데이터 부족"이면 비교할 수 없어 null.
+  static int? weeklyChange(List<Entry> entries, DateTime asOf) {
+    final current = compute(entries, asOf);
+    final before = compute(
+      entries,
+      asOf.subtract(const Duration(days: recentDays)),
+    );
+    if (current == null || before == null) return null;
+    return current.index - before.index;
+  }
 }

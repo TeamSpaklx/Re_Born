@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:reborn_app/app/theme/app_colors.dart';
 import 'package:reborn_app/app/app.dart';
 import 'package:reborn_app/app/data_providers.dart';
 import 'package:reborn_app/app/main_shell.dart';
@@ -70,8 +71,19 @@ void main() {
     expect(find.text('지민'), findsOneWidget);
     expect(find.text('승현'), findsOneWidget);
     expect(find.text('친구'), findsWidgets);
-    expect(find.text('관계 지수'), findsWidgets);
+    // 지수 숫자 아래에 구간 설명이 붙는다(샘플: 지민 32 → 멀어짐, 승현 77 → 가까움).
+    expect(find.text('조금 멀어졌어요'), findsOneWidget);
+    expect(find.text('가까워요'), findsOneWidget);
     expect(find.text('데이터 부족'), findsNothing, reason: '샘플은 두 인물 모두 3건 이상');
+  });
+
+  testWidgets('지수 색: 가까운 관계만 분홍, 멀어진 관계는 검정 숫자 + 회색 막대', (tester) async {
+    await pumpApp(tester);
+    final colors = AppColors.light;
+    Color numberColor(String value) =>
+        tester.widget<Text>(find.text(value)).style!.color!;
+    expect(numberColor('77'), colors.brand);
+    expect(numberColor('32'), colors.textBlack);
   });
 
   testWidgets('T-09: 인물이 없으면 안내와 추가 버튼이 보인다', (tester) async {

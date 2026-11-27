@@ -273,6 +273,15 @@ abstract final class LoginLayout {
   static const legalBottom = 14.0;
 }
 
+/// 관계 탭 인물 카드 오른쪽 지수 칸 (추정값).
+abstract final class PersonCardLayout {
+  /// "조금 멀어졌어요"(캡션 8자)가 한 줄에 들어가는 폭.
+  static const indexColumnWidth = 96.0;
+
+  /// 지수 막대 폭(예전 칸 폭 64와 같은 길이).
+  static const barWidth = 64.0;
+}
+
 abstract final class ComponentLayout {
   // 토글 (Figma `834:1302`): 64×28 알약, 흰 손잡이 38×24, 안쪽 2.
   static const toggleWidth = 64.0;

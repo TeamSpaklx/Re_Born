@@ -95,6 +95,7 @@
 
 ### 1.7 사용 규칙
 - 핑크(`brand`)는 **행동·선택·강조**에만 씁니다(버튼, 선택된 칩, 체크, 활성 탭, 막대). 본문 글자를 핑크로 칠하지 않습니다(링크처럼 눌리는 글자와 선택 상태만 예외).
+- **분홍은 두 가지 역할에만 씁니다 (2026-11-28 디자인 피드백):** ① 누르는 것(버튼, 선택된 탭·칩, 링크) ② 내 감정 데이터(감정 차트·칩, "가까워요" 관계 지수). 개수·합계 같은 일반 수치나 정보 글자는 검정·회색으로 씁니다. 같은 분홍이 숫자·버튼·링크에 다 쓰이면 무엇을 눌러야 하는지 안 보이기 때문입니다. 그래서 `SummaryCard`는 흰 카드 + 검정 숫자이고, 관계 탭 인물 카드의 지수는 "가까워요" 구간만 분홍입니다.
 - 한 화면에 핑크 면적이 크면(핑크 카드 + 핑크 버튼) 위계가 사라집니다. 핑크 카드 안의 버튼은 `cta`, 흰 카드 안의 버튼은 `ctaSoft`를 씁니다.
 - 위험 색(`danger`)은 삭제·로그아웃처럼 되돌릴 수 없는 동작과 오류·읽지 않음 표시에만 씁니다.
 - **대비(확인 필요):** 흰 글자 on `brand`(`#FF6090`)와 `brand` on 흰색은 대비비가 약 3:1이라 작은 글자의 WCAG AA(4.5:1)에 못 미칩니다. 버튼 글자는 16 SemiBold 이상으로 쓰고, 핑크 글자는 큰 글자·아이콘에만 씁니다.
@@ -286,7 +287,8 @@ Figma "Dark Mode"(`8877:1778`) 시안에서 읽은 값과, 시안에 없는 화�
 | `SelectCard` | `select_card.dart` | 온보딩 관계 유형 |
 | `ConsentRow` | `consent_row.dart` | 확인 체크(계정 삭제), 전체 동의 강조형 포함 |
 | `PermissionRow` | `permission_row.dart` | 권한·기능 안내 행(지금은 디자인 갤러리에서만, 가입 단계 화면을 지워서) |
-| `SummaryCard` | `summary_card.dart` | 전체 탭·관계 탭·인사이트 상세의 수치 2~3칸 |
+| `SummaryCard` | `summary_card.dart` | 전체 탭·관계 탭·인사이트 상세의 수치 2~3칸. 흰 카드 + 검정 숫자(`greeting`) + 회색 이름, 칸 사이 `cardBorder` 세로선(분홍 역할 규칙) |
+| `PersonCard` | `features/relations/.../person_card.dart` | 관계 탭 인물 카드. 오른쪽 칸(폭 96, `PersonCardLayout`): 지난주 대비 변화(▲/▼ 캡션 회색) + 지수 숫자, 아래 구간 설명(가까워요·무난해요·조금 멀어졌어요), 지수 막대(64). 숫자·막대는 "가까워요"만 `brand`, 나머지는 `textBlack` 숫자 + `iconMuted` 막대 |
 | `NotificationRow` | `notification_row.dart` | 알림 목록(읽지 않음 강조) |
 | `SwipeToDelete` | `swipe_to_delete.dart` | 기록·체크리스트 밀어서 삭제(확인 팝업 선택) |
 | `AppFab` | `app_fab.dart` | 기록 탭 "기록하기"(`TabPageScaffold.floating`) |

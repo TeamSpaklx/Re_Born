@@ -5,6 +5,7 @@ import '../../../app/data_revision.dart';
 import '../../../core/providers/clock_provider.dart';
 import '../../../core/utils/dates.dart';
 import '../../analysis/relation_index.dart';
+import '../../analysis/relation_band.dart';
 import '../models/person.dart';
 import '../models/relation_type.dart';
 
@@ -30,12 +31,19 @@ class PersonSummary {
     required this.index,
     required this.daysSinceLastRecord,
     required this.entryCount,
+    this.indexChange,
   });
 
   final Person person;
   final int? index;
   final int? daysSinceLastRecord;
   final int entryCount;
+
+  /// 지난주(7일 전) 대비 지수 변화. 비교할 데이터가 없으면 null.
+  final int? indexChange;
+
+  /// 지수 구간(가까워요·무난해요·조금 멀어졌어요). 데이터 부족이면 null.
+  RelationBand? get band => index == null ? null : RelationBand.of(index!);
 }
 
 final personSummariesProvider = FutureProvider<List<PersonSummary>>((
@@ -56,6 +64,7 @@ final personSummariesProvider = FutureProvider<List<PersonSummary>>((
               ? null
               : daysBetween(own.first.createdAt, now),
           entryCount: own.length,
+          indexChange: RelationIndex.weeklyChange(own, now),
         );
       }(),
   ];
