@@ -29,7 +29,7 @@ test/features/<기능>/   lib과 같은 구조
 
 탭 위로 쌓이는 화면: 스플래시, 로그인, 알림 목록·설정, 계정 삭제(재인증), 인사이트 상세, 위기 안내(시트).
 
-**소셜 로그인:** 로그인 화면의 구글/카카오 버튼 → `AuthRepository.signInWithSocial`(메모리 구현은 즉시 성공). 신규·기존 회원 모두 투데이로 갑니다(설치 후 첫 로그인이면 앞에 끝 화면이 한 번 끼어듭니다). 처음 온 사용자는 닉네임이 "카카오 사용자" 같은 임시값(프로필에서 변경)이고, 로그인 화면 문구("로그인은 … 동의하는 것으로 간주")대로 필수 동의(개인정보·감정 분석)는 켜짐, 선택 동의(사용 분석)는 꺼짐으로 시작합니다. 알림은 설정에서 켭니다. 소셜 계정 삭제는 비밀번호 없이 확인 체크만 합니다. 실제 연결은 백엔드가 Supabase OAuth(Google·Kakao)를 켠 뒤 provider 한 줄 교체.
+**이메일 로그인·가입:** 로그인 화면(`/login`)에서 이메일·비밀번호로 로그인하고, "이메일로 회원가입"(`/signup`)에서 이메일·닉네임·비밀번호·비밀번호 확인을 한 화면에 받아 가입합니다(`AuthActions.signIn`/`signUp`, 메모리 구현). 가입하면 바로 로그인 상태로 투데이에 갑니다(설치 후 첫 로그인이면 앞에 끝 화면이 한 번 끼어듭니다). 가입 화면 문구("가입은 … 동의하는 것으로 간주")대로 필수 동의(개인정보·감정 분석)는 켜짐, 선택 동의(사용 분석)는 꺼짐으로 시작합니다. 계정 삭제는 확인 체크 + 비밀번호 재입력입니다. 실제 연결은 백엔드가 Supabase Auth Email provider를 켠 뒤 provider 한 줄 교체.
 
 **프로필 사진:** 전체 탭 프로필 행 → 프로필 편집 시트(사진 찍기·앨범에서 선택·기본 캐릭터로 되돌리기·닉네임). 사진 경로는 `AppSettings.profileImagePath`에 메모리로만 저장되어 앱을 다시 켜면 기본 캐릭터로 돌아갑니다(백엔드가 스토리지 연결 시 교체). 사진이 없으면 인물·사용자 모두 감정 캐릭터 7종 중 고정 배정된 하나가 임시 프로필입니다.
 
@@ -40,21 +40,23 @@ test/features/<기능>/   lib과 같은 구조
 **시작 화면:** 앱은 스플래시(`/splash`, Figma `805:953`: 흰 배경, 가운데 로고 160, 아래 "TeamSpaklx")로 시작합니다. 스플래시 뒤의 이동은 `splash_screen.dart`의 `_goNext()` 한 곳에서 정합니다. 로그인한 상태면 최소 1초(홈 데이터가 준비될 때까지, 최대 3초) 보여 준 뒤 투데이(`/today`)로, 아니면 1초 뒤 로그인(`/login`)으로 서서히 넘어갑니다. 설치 후 처음 켠 것이면(`IntroStore.seen == false`) 로그인 앞에 인트로 온보딩(`/intro`)이 한 번 끼어듭니다(아래 인트로 항목). 시간 값은 Figma에 없는 추정값입니다. 시작할 때 저장된 설정대로 기록 리마인드 예약도 맞춥니다(`syncReminder`).
 
 **인증 흐름(F-01):**
-- 로그인 화면(`/login`, Figma `8877:1929`)은 구글·카카오만 있습니다. 이메일 로그인·가입은 Figma에 없어 보류했고, 가입 단계 화면(이메일 가입·약관 동의·첫 인물·알림 안내)은 지웠습니다. SPEC F-01은 별도 PR에서 맞춥니다.
+- 로그인 화면(`/login`)은 RE:BORN 워드마크(Figma `8877:1929` 크기·좌우 여백) 아래에 이메일·비밀번호 입력, 로그인 버튼, "이메일로 회원가입" 링크, 약관 안내가 있습니다. 이메일 로그인 화면은 Figma에 없어 공통 컴포넌트(`AppTextField`·`PasswordField`·`CtaButton`)로 구성했습니다. 소셜 로그인(구글·카카오)은 2026-11-27에 뺐습니다.
+- 가입 화면(`/signup`)은 한 화면입니다(별도 동의·첫 인물·알림 안내 단계 없음).
 - **인트로 온보딩(`/intro`, Figma `8877:1945`):** 설치 후 최초 1회만 스플래시와 로그인 사이에 보입니다. "시작하기"를 누르면 `IntroStore.markSeen()`(`shared_preferences`의 `intro_seen`)으로 기록하고 로그인으로 갑니다. 로그아웃·계정 삭제 뒤에도 다시 보이지 않고, 이미 로그인된 상태로 켜면 건너뜁니다. Figma의 A/B 시안(진행 막대)은 실험안이라 만들지 않았습니다.
-- **인트로 끝 화면(`/start`, Figma `8877:1965`):** 설치 후 첫 로그인 직후, 투데이로 가기 전에 한 번만 보입니다(`handleSocialSignIn`이 `IntroStore.startSeen`을 보고 갈림). "시작하기"를 누르면 `markStartSeen()`(`intro_start_seen`)으로 기록하고 투데이로 갑니다. 검은 배경이고, Figma 메모대로 분홍 버튼 글자는 흰색 대신 어두운 색(`onStartCta`)입니다.
-- 로그인하면 신규·기존 회원 모두 바로 투데이. 로그아웃·계정 삭제 뒤에는 로그인 화면으로 갑니다.
-- 예외 처리 (`handleSocialSignIn`, `AuthActions`):
+- **인트로 끝 화면(`/start`, Figma `8877:1965`):** 설치 후 첫 로그인·가입 직후, 투데이로 가기 전에 한 번만 보입니다(`goHomeAfterAuth`가 `IntroStore.startSeen`을 보고 갈림). "시작하기"를 누르면 `markStartSeen()`(`intro_start_seen`)으로 기록하고 투데이로 갑니다. 검은 배경이고, Figma 메모대로 분홍 버튼 글자는 흰색 대신 어두운 색(`onStartCta`)입니다.
+- 로그아웃·계정 삭제 뒤에는 로그인 화면으로 갑니다.
+- 예외 처리 (`LoginScreen`, `SignupScreen`):
 
   | 상황 | 처리 |
   |---|---|
-  | 사용자가 로그인 창을 닫음(`AuthFailureType.cancelled`) | 안내 없이 그대로 |
-  | 네트워크 오류, 30초 넘게 응답 없음(`AuthActions.socialSignInTimeout`) | 토스트 안내, 다시 누를 수 있음 |
-  | 알 수 없는 오류 | 일반 토스트 + `AppErrorLog`(`social-login`) |
-  | 로그인 중 | 두 버튼 모두 막고 누른 버튼에 로딩 표시(연타 방지) |
-- **로그인 유지(임시):** 인증은 메모리 구현(`InMemoryAuthRepository`)이지만, `main.dart`가 `PrefsAuthSessionStore`(`shared_preferences`의 `auth_session_provider`·`auth_social_members`)를 넘겨서 앱을 다시 켜도 소셜 로그인 상태가 유지됩니다. 신규 회원은 첫 설정(닉네임·동의)을 저장한 뒤 바로 저장하고, 로그아웃·계정 삭제 때 지웁니다. 기록 데이터는 여전히 메모리에만 있어 다시 켜면 샘플로 돌아갑니다.
-- **디버그 패널:** 백엔드가 없어 로그인이 항상 성공하므로, 디버그 빌드에서 로그인 화면의 워드마크를 길게 누르면 다음 결과(평소대로·신규 회원·기존 회원·취소·네트워크 오류·알 수 없는 오류)와 2초 지연을 고를 수 있습니다(`SocialOutcome`). 출시 빌드에는 없습니다.
-- **Supabase Auth를 붙일 때:** `main.dart`의 `authRepositoryProvider` override 한 줄을 Supabase 구현으로 바꾸고, `auth_session_store.dart`는 지웁니다(세션은 SDK가 저장). "신규 회원"은 Supabase 계정 유무가 아니라 첫 설정(프로필 행)을 만들었는지로 판단합니다(`AuthRepository.completeSocialSignup`). 사용자가 OAuth 창을 닫으면 `AuthFailureType.cancelled`를 던집니다.
+  | 이메일 형식·비밀번호 길이·확인 불일치·닉네임 | 입력창 아래 안내, 요청 보내지 않음 |
+  | 이메일·비밀번호 불일치(`invalidCredentials`) | 비밀번호 아래 안내 |
+  | 이미 가입된 이메일(`emailTaken`) | 가입 화면 이메일 아래 안내 |
+  | 네트워크 오류 | 토스트 안내, 다시 누를 수 있음 |
+  | 알 수 없는 오류 | 일반 토스트 + `AppErrorLog`(`login`·`signup`) |
+  | 처리 중 | 버튼을 막고 "로그인 중…"/"가입 중…" 표시(연타 방지) |
+- **로그인 유지(임시):** 인증은 메모리 구현(`InMemoryAuthRepository`)이지만, `main.dart`가 `PrefsAuthSessionStore`(`shared_preferences`의 `auth_session_email`)를 넘겨서 앱을 다시 켜도 로그인 상태가 유지됩니다. 저장하는 것은 이메일뿐이고 비밀번호는 저장하지 않습니다. 가입한 계정 자체는 메모리에만 있어 다시 켜면 데모 계정만 남고, 기록 데이터도 샘플로 돌아갑니다.
+- **Supabase Auth를 붙일 때:** `main.dart`의 `authRepositoryProvider` override 한 줄을 Supabase 구현(`signInWithPassword`·`signUp`)으로 바꾸고, `auth_session_store.dart`는 지웁니다(세션은 SDK가 저장). Supabase에서 이메일 인증(Confirm email)을 켜면 가입 직후 세션이 없으므로 "메일을 확인해 주세요" 상태가 추가로 필요합니다.
 - 시연용 이메일 계정은 `demo@reborn.app` / `reborn1234`입니다(메모리에만 저장). 알림은 앱 안 목록(인사이트에서 생성)만 구현했고 기기 푸시(F-10 확장)는 없습니다.
 
 ## 3. 홈 화면 데이터 모양

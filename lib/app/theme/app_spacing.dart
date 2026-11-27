@@ -247,27 +247,19 @@ abstract final class StartLayout {
 
 /// 공통 컴포넌트 치수. 토글·세그먼트·토스트·바텀시트·CTA·알림 버튼·스켈레톤은
 /// Figma 컴포넌트 섹션(`749:337`) 값이고, 모달·설정 목록·애니메이션 시간은 Figma에 없어 추정이다.
-/// 로그인 화면 (Figma 8877:1929, 402×874 기준).
+/// 이메일 로그인 화면. 워드마크·좌우 여백·약관 아래 여백은 Figma 로그인(8877:1929, 402×874) 값이고,
+/// 입력 폼 자리는 Figma에 없어 추정이다.
 abstract final class LoginLayout {
   /// RE:BORN 워드마크 314×78.
   static const logoWidth = 314.0;
   static const logoHeight = 78.0;
 
-  /// 워드마크 세로 위치: Figma에서 위쪽이 화면 위에서 331px(874 높이, 상태 바 포함).
-  /// 기기 높이가 달라도 같은 비율에 오도록 정렬값으로 바꿨다: 331 = (874 − 78) × (y + 1) / 2 → y ≈ −0.168.
-  static const logoAlignment = Alignment(0, -0.168);
+  /// 워드마크 아래에서 이메일 입력까지(추정).
+  static const logoToForm = 48.0;
 
-  /// 소셜 버튼: 높이 55(Figma 메모대로 두 버튼을 같은 높이로), 사이 16, 좌우 44.
+  /// 로그인 버튼 높이 55(예전 소셜 버튼과 같은 높이), 좌우 44.
   static const buttonHeight = 55.0;
-  static const buttonGap = 16.0;
   static const horizontalMargin = 44.0;
-
-  /// 버튼 안 아이콘 24와 글자 사이 16.
-  static const iconSize = 24.0;
-  static const iconGap = 16.0;
-
-  /// 버튼 아래에서 약관 안내까지 57.
-  static const buttonsToLegal = 57.0;
 
   /// 약관 안내 아래 여백: Figma에서 글자 아래가 화면 아래에서 48px, 홈 인디케이터(34)를 빼면 안전 영역 위로 14px.
   static const legalBottom = 14.0;
