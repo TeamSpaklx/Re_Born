@@ -11,7 +11,6 @@ import '../../../shared/widgets/page_scaffold.dart';
 import '../models/auth_user.dart';
 import '../models/auth_validator.dart';
 import 'auth_providers.dart';
-import 'legal_notice.dart';
 import 'login_screen.dart';
 import 'password_field.dart';
 
@@ -163,8 +162,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     clear(_confirmError, () => _confirmError = null),
                 onSubmitted: (_) => _submit(),
               ),
-              const SizedBox(height: AppSpacing.space32),
-              const LegalNotice(key: Key('signup-legal'), action: '가입은'),
             ],
           ),
         ),

@@ -475,7 +475,7 @@ void main() {
         SizedBox(
           width: 354,
           child: SettingsInfoCard(
-            iconAsset: AppAssets.ixShieldTick,
+            iconAsset: AppAssets.ixMessageText,
             title: '기록은 이 기기 안에서만 분석해요',
             description: '기록 내용을 밖으로 보내지 않아요.',
             onTap: () => tapped++,

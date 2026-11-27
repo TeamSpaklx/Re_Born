@@ -7,7 +7,6 @@ import 'package:reborn_app/features/entries/models/emotion.dart';
 import 'package:reborn_app/features/entries/presentation/widgets/emotion_face.dart';
 import 'package:reborn_app/features/entries/presentation/widgets/emotion_picker.dart';
 import 'package:reborn_app/shared/widgets/app_fab.dart';
-import 'package:reborn_app/shared/widgets/consent_row.dart';
 import 'package:reborn_app/shared/widgets/donut_chart.dart';
 import 'package:reborn_app/shared/widgets/month_calendar.dart';
 import 'package:reborn_app/shared/widgets/notification_row.dart';
@@ -160,30 +159,6 @@ void main() {
       tester.getSemantics(find.byType(SelectCard)).label,
       '친구, 편하게 마음을 나누는 친구',
     );
-  });
-
-  testWidgets('동의 행: 체크 토글과 내용 보기가 따로 눌린다', (tester) async {
-    bool checked = false;
-    var viewed = 0;
-    await pump(
-      tester,
-      StatefulBuilder(
-        builder: (context, setState) => ConsentRow(
-          tag: '필수',
-          label: '개인정보 수집·이용',
-          checked: checked,
-          onChanged: (v) => setState(() => checked = v),
-          onView: () => viewed++,
-        ),
-      ),
-    );
-    await tester.tap(find.text('개인정보 수집·이용'));
-    await tester.pump();
-    expect(checked, isTrue);
-    expect(viewed, 0);
-
-    await tester.tap(find.bySemanticsLabel('개인정보 수집·이용 내용 보기'));
-    expect(viewed, 1);
   });
 
   testWidgets('요약 카드: 칸마다 수치와 이름', (tester) async {

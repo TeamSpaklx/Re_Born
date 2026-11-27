@@ -91,7 +91,7 @@ void main() {
   }
 
   group('로그인', () {
-    testWidgets('워드마크·입력·버튼·약관 안내가 좌우 44 여백 안에 그려진다', (tester) async {
+    testWidgets('워드마크·입력·버튼이 좌우 44 여백 안에 그려지고 약관 안내는 없다', (tester) async {
       await pumpLogin(tester);
 
       final logo = tester.getRect(wordmark());
@@ -106,11 +106,8 @@ void main() {
       expect(button.width, closeTo(314, 0.5));
       expect(find.text('이메일로 회원가입'), findsOneWidget);
 
-      // 약관 안내: 글자 아래가 안전 영역 위 14(화면 아래에서 48).
-      final legal = tester.getRect(find.byKey(const Key('login-legal')));
-      expect(legal.bottom, closeTo(874 - 48, 0.5));
-      expect(legal.center.dx, closeTo(201, 0.5));
-      expect(find.textContaining('로그인은 '), findsOneWidget);
+      // 출시 계획이 없어 약관 안내를 뺐다(2026-11-28 회의).
+      expect(find.textContaining('로그인은 '), findsNothing);
     });
 
     testWidgets('데모 계정으로 로그인하면 투데이로 가고, 로그인 상태가 기기에 남는다', (tester) async {
@@ -230,20 +227,6 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(TodayScreen), findsOneWidget);
     });
-
-    testWidgets('약관 안내의 두 링크가 각각 내용을 연다', (tester) async {
-      await pumpLogin(tester);
-
-      await tester.tap(find.byKey(const Key('login-legal-서비스 이용약관')));
-      await tester.pumpAndSettle();
-      expect(find.text('서비스 이용약관'), findsOneWidget);
-      await tester.tapAt(const Offset(201, 100)); // 바깥을 눌러 닫는다
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.byKey(const Key('login-legal-개인정보 수집·이용')));
-      await tester.pumpAndSettle();
-      expect(find.text('개인정보 수집·이용'), findsOneWidget);
-    });
   });
 
   group('회원가입', () {
@@ -277,7 +260,7 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('가입하면 바로 투데이로 가고, 닉네임·필수 동의가 저장된다', (tester) async {
+    testWidgets('가입하면 바로 투데이로 가고, 닉네임이 저장된다', (tester) async {
       final c = await pumpLogin(tester);
       await openSignup(tester);
 
@@ -288,9 +271,6 @@ void main() {
       expect(store.sessionEmail, 'new@reborn.app');
       final settings = await c.read(settingsProvider.future);
       expect(settings.nickname, '리본이');
-      expect(settings.consents.privacy, isTrue);
-      expect(settings.consents.aiAnalysis, isTrue);
-      expect(settings.consents.analytics, isFalse);
     });
 
     testWidgets('형식이 틀리면 각 입력창 아래에 안내하고 가입하지 않는다', (tester) async {

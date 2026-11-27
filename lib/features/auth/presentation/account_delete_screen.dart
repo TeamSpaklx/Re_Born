@@ -10,7 +10,7 @@ import '../../../core/errors/app_error_log.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/app_dialogs.dart';
 import '../../../shared/widgets/bottom_cta_bar.dart';
-import '../../../shared/widgets/consent_row.dart';
+import '../../../shared/widgets/check_row.dart';
 import '../../../shared/widgets/cta_button.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/page_scaffold.dart';
@@ -149,9 +149,9 @@ class _AccountDeleteScreenState extends ConsumerState<AccountDeleteScreen> {
               ),
             ),
             const SizedBox(height: AppSpacing.space16),
-            ConsentRow(
+            CheckRow(
               key: const Key('delete-confirm'),
-              label: '위 내용을 모두 확인했어요',
+              title: '위 내용을 모두 확인했어요',
               checked: _confirmed,
               onChanged: (v) => setState(() => _confirmed = v),
             ),

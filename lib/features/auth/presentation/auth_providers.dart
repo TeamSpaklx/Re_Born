@@ -43,16 +43,7 @@ class AuthActions {
         .signUp(email: email, password: password);
     final settings = _ref.read(settingsRepositoryProvider);
     final current = await settings.get();
-    await settings.save(
-      current.copyWith(
-        nickname: nickname.trim(),
-        consents: const Consents(
-          privacy: true,
-          aiAnalysis: true,
-          analytics: false,
-        ),
-      ),
-    );
+    await settings.save(current.copyWith(nickname: nickname.trim()));
     _ref.read(dataRevisionProvider.notifier).bump();
     _ref.read(sessionProvider.notifier).set(user);
   }

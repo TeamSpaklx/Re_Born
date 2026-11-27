@@ -14,12 +14,13 @@ Future<void> showCrisisNotice(BuildContext context) {
     context,
     title: '마음이 많이 힘드신 것 같아요',
     message: '혼자 견디지 않아도 괜찮아요. 가까운 사람이나 전문 상담 기관에 도움을 요청해 보세요.',
-    builder: (context) => const _CrisisContacts(),
+    builder: (context) => const CrisisContacts(),
   );
 }
 
-class _CrisisContacts extends StatelessWidget {
-  const _CrisisContacts();
+/// 위기 상담 연락처 카드. 위기 안내 시트와 마이 탭 "도움받을 곳"이 같이 쓴다.
+class CrisisContacts extends StatelessWidget {
+  const CrisisContacts({super.key});
 
   static const _contacts = [
     ('자살예방 상담전화', '109', '24시간'),

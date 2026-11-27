@@ -12,14 +12,17 @@ import '../../../../shared/widgets/app_bottom_sheet.dart';
 import '../../../../shared/widgets/app_dialogs.dart';
 import '../../../../shared/widgets/settings_group.dart';
 import '../../../auth/presentation/auth_providers.dart';
+import '../../../ai_comment/models/ai_feedback.dart';
 import '../../../notifications/presentation/notifications_providers.dart';
+import '../../../record/presentation/crisis_notice.dart';
 import '../../../security/presentation/app_lock_controller.dart';
 import '../../../settings/presentation/settings_providers.dart';
 
-/// 전체 탭의 설정 (F-10·F-11). 레퍼런스 설정 화면처럼 카드 밖 소제목 + 아이콘 목록 카드로 묶는다.
-/// - 개인정보 보호 및 보안: 안내 카드(누르면 설명 시트), 동의 관리(하위 화면), 앱 잠금
-/// - 앱 사용: 알림, 알림 설정, 화면 모드(기기 설정 / 라이트 / 다크)
+/// 마이 탭의 설정 (F-10·F-11). 레퍼런스 설정 화면처럼 카드 밖 소제목 + 아이콘 목록 카드로 묶는다.
+/// - 앱 사용: 알림, 알림 설정, 화면 모드(기기 설정 / 라이트 / 다크), 앱 잠금
+/// - AI 코멘트: 말투(다정하게 / 담백하게)
 /// - 계정: 로그아웃, 기록 전체 삭제(확인 팝업), 계정 삭제(재인증 화면)
+/// - 도움: 도움받을 곳(위기 상담 연락처)
 /// 맨 아래에 의료 서비스 아님 안내.
 class SettingsSection extends ConsumerWidget {
   const SettingsSection({super.key});
@@ -78,56 +81,52 @@ class SettingsSection extends ConsumerWidget {
     await ref.read(themeModeProvider.notifier).setMode(picked);
   }
 
-  void _openPrivacyInfo(BuildContext context) {
-    final colors = context.colors;
-    showAppBottomSheet<void>(
+  /// AI 코멘트 말투 고르기. 다음에 받는 코멘트부터 바뀐다.
+  Future<void> _pickTone(
+    BuildContext context,
+    WidgetRef ref,
+    CommentTone current,
+  ) async {
+    final picked = await showAppBottomSheet<CommentTone>(
       context,
-      title: '내 기록은 이렇게 지켜요',
+      title: 'AI 코멘트 말투',
+      message: '다음에 쓰는 일기부터 이 말투로 코멘트를 받아요.',
       builder: (context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          for (final line in _privacyPoints)
-            Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.space12),
-              child: Text(
-                '• $line',
-                style: AppTextStyles.body.copyWith(
-                  color: colors.textSecondary,
-                  height: 1.6,
-                ),
-              ),
+          for (final tone in CommentTone.values)
+            SheetOptionRow(
+              key: Key('comment-tone-${tone.name}'),
+              title: tone.label,
+              subtitle: tone.description,
+              selected: tone == current,
+              onTap: () => Navigator.of(context).pop(tone),
             ),
         ],
       ),
     );
+    if (picked == null || picked == current) return;
+    await ref.read(settingsActionsProvider).saveCommentTone(picked);
   }
 
-  static const _privacyPoints = [
-    '감정 분석은 앱 안의 규칙으로만 해요. 외부 AI에 기록을 보내지 않아요.',
-    '기록은 내 계정에서만 볼 수 있어요.',
-    '앱 잠금을 켜면 Face ID·지문·기기 암호로 앱을 지킬 수 있어요.',
-    '기록 전체 삭제와 계정 삭제는 아래 "계정"에서 언제든 할 수 있어요.',
-  ];
+  void _openHelp(BuildContext context) {
+    showAppBottomSheet<void>(
+      context,
+      title: '도움받을 곳',
+      message: '힘든 마음이 계속되면 혼자 견디지 말고 전문 기관에 이야기해 보세요.',
+      builder: (context) => const CrisisContacts(),
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.colors;
     final unread = ref.watch(unreadNotificationCountProvider);
+    final tone =
+        ref.watch(settingsProvider).value?.commentTone ?? CommentTone.warm;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SettingsGroupHeader(title: '개인정보 보호 및 보안'),
-        SettingsInfoCard(
-          key: const Key('privacy-info'),
-          iconAsset: AppAssets.ixShieldTick,
-          title: '기록은 이 기기 안에서만 분석해요',
-          description: '감정 분석은 앱 안 규칙으로만 해요.\n기록 내용은 밖으로 보내지 않아요.',
-          onTap: () => _openPrivacyInfo(context),
-        ),
-        const SizedBox(height: AppSpacing.space12),
-        const _SecurityGroup(),
-        const SizedBox(height: AppSpacing.space24),
         SettingsGroup(
           title: '앱 사용',
           children: [
@@ -151,6 +150,20 @@ class SettingsSection extends ConsumerWidget {
               title: '화면 모드',
               trailingText: ref.watch(themeModeProvider).label,
               onTap: () => _pickThemeMode(context, ref),
+            ),
+            const _AppLockRow(),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.space24),
+        SettingsGroup(
+          title: 'AI 코멘트',
+          children: [
+            SettingsRow.link(
+              key: const Key('comment-tone'),
+              iconAsset: AppAssets.ixMessageText,
+              title: '코멘트 말투',
+              trailingText: tone.label,
+              onTap: () => _pickTone(context, ref, tone),
             ),
           ],
         ),
@@ -178,6 +191,18 @@ class SettingsSection extends ConsumerWidget {
             ),
           ],
         ),
+        const SizedBox(height: AppSpacing.space24),
+        SettingsGroup(
+          title: '도움',
+          children: [
+            SettingsRow.link(
+              key: const Key('open-help'),
+              iconAsset: AppAssets.ixCall,
+              title: '도움받을 곳',
+              onTap: () => _openHelp(context),
+            ),
+          ],
+        ),
         if (kDebugMode) ...[
           const SizedBox(height: AppSpacing.space24),
           SettingsGroup(
@@ -201,10 +226,9 @@ class SettingsSection extends ConsumerWidget {
   }
 }
 
-/// 개인정보 보호 및 보안 카드: 동의 관리(하위 화면)와 앱 잠금(Face ID·Touch ID·지문·기기 암호).
-/// 앱 잠금은 켤 때 한 번 인증에 성공해야 켜진다.
-class _SecurityGroup extends ConsumerWidget {
-  const _SecurityGroup();
+/// 앱 잠금(Face ID·Touch ID·지문·기기 암호) 토글 행. 켤 때 한 번 인증에 성공해야 켜진다.
+class _AppLockRow extends ConsumerWidget {
+  const _AppLockRow();
 
   Future<void> _toggle(BuildContext context, WidgetRef ref, bool on) async {
     final result = await ref
@@ -229,22 +253,12 @@ class _SecurityGroup extends ConsumerWidget {
       appLockControllerProvider.select((s) => s.enabled),
     );
     final label = ref.watch(deviceAuthKindProvider).value?.label ?? '';
-    return SettingsGroup(
-      children: [
-        SettingsRow.link(
-          key: const Key('open-consents'),
-          iconAsset: AppAssets.ixDocumentText,
-          title: '동의 관리',
-          onTap: () => context.push(AppRoutes.consentSettings),
-        ),
-        SettingsRow.toggle(
-          key: const Key('app-lock'),
-          iconAsset: AppAssets.ixLock,
-          title: label.isEmpty ? '앱 잠금' : '앱 잠금 ($label)',
-          value: enabled,
-          onChanged: (v) => _toggle(context, ref, v),
-        ),
-      ],
+    return SettingsRow.toggle(
+      key: const Key('app-lock'),
+      iconAsset: AppAssets.ixLock,
+      title: label.isEmpty ? '앱 잠금' : '앱 잠금 ($label)',
+      value: enabled,
+      onChanged: (v) => _toggle(context, ref, v),
     );
   }
 }

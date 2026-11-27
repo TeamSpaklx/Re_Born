@@ -43,8 +43,8 @@ abstract final class AppAssets {
   static const ixEyeOff = '$_icons/ix_eye_off.svg';
 
   // 전체 탭 설정 행 아이콘 (Iconsax Linear).
-  static const ixShieldTick = '$_icons/ix_shield_tick.svg';
-  static const ixDocumentText = '$_icons/ix_document_text.svg';
+  static const ixMessageText = '$_icons/ix_message_text.svg';
+  static const ixCall = '$_icons/ix_call.svg';
   static const ixLock = '$_icons/ix_lock.svg';
   static const ixNotification = '$_icons/ix_notification.svg';
   static const ixMoon = '$_icons/ix_moon.svg';

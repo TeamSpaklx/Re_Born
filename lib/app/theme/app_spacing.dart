@@ -256,9 +256,6 @@ abstract final class LoginLayout {
   /// 로그인 버튼 높이 55(예전 소셜 버튼과 같은 높이), 좌우 44.
   static const buttonHeight = 55.0;
   static const horizontalMargin = 44.0;
-
-  /// 약관 안내 아래 여백: Figma에서 글자 아래가 화면 아래에서 48px, 홈 인디케이터(34)를 빼면 안전 영역 위로 14px.
-  static const legalBottom = 14.0;
 }
 
 abstract final class ComponentLayout {

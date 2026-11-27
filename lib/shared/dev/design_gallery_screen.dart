@@ -20,7 +20,6 @@ import '../widgets/app_text_button.dart';
 import '../widgets/app_text_field.dart';
 import '../widgets/bottom_cta_bar.dart';
 import '../widgets/check_row.dart';
-import '../widgets/consent_row.dart';
 import '../widgets/donut_chart.dart';
 import '../widgets/month_calendar.dart';
 import '../widgets/notification_row.dart';
@@ -436,29 +435,10 @@ class _DesignGalleryScreenState extends State<DesignGalleryScreen> {
               onTap: () => setState(() => _select = 1),
             ),
             gap(AppSpacing.space16),
-            ConsentRow(
-              label: '전체 동의',
-              emphasized: true,
-              checked: _checkA && _checkB,
-              onChanged: (v) => setState(() => _checkA = _checkB = v),
-            ),
-            ConsentRow(
-              tag: '필수',
-              label: '개인정보 수집·이용',
-              checked: _checkA,
-              onChanged: (v) => setState(() => _checkA = v),
-              onView: _noop,
-            ),
-            ConsentRow(
-              tag: '선택',
-              label: '사용 분석',
-              checked: _checkB,
-              onChanged: (v) => setState(() => _checkB = v),
-            ),
             const PermissionRow(
               iconAsset: AppAssets.bell,
               title: 'AI 코멘트 알림',
-              description: '관계의 변화가 감지되면 알려 드려요.',
+              description: '일기의 AI 코멘트가 도착하면 알려 드려요.',
             ),
           ]),
           section('요약 · 탭 · 알림 · 차트', [

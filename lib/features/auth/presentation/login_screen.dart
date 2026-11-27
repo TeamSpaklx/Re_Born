@@ -15,7 +15,6 @@ import '../../onboarding/data/intro_store.dart';
 import '../models/auth_user.dart';
 import '../models/auth_validator.dart';
 import 'auth_providers.dart';
-import 'legal_notice.dart';
 import 'password_field.dart';
 
 /// 로그인·가입이 끝난 뒤 갈 곳: 설치 후 처음이면 "시작할 준비가 끝났어요" 화면을 한 번 거치고, 아니면 투데이.
@@ -169,8 +168,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     const Spacer(),
                     const SizedBox(height: AppSpacing.space24),
-                    const LegalNotice(key: Key('login-legal'), action: '로그인은'),
-                    const SizedBox(height: LoginLayout.legalBottom),
                   ],
                 ),
               ),

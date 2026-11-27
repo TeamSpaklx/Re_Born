@@ -17,7 +17,6 @@ import '../features/record/presentation/record_detail_screen.dart';
 import '../features/record/presentation/record_form_screen.dart';
 import '../features/record/presentation/record_result_screen.dart';
 import '../features/record/presentation/record_screen.dart';
-import '../features/settings/presentation/consent_settings_screen.dart';
 import '../features/splash/presentation/splash_screen.dart';
 import '../shared/dev/design_gallery_screen.dart';
 import 'main_shell.dart';
@@ -38,7 +37,6 @@ abstract final class AppRoutes {
   static const intro = '/intro';
   static const start = '/start';
   static const accountDelete = '/account/delete';
-  static const consentSettings = '/settings/consents';
   static const notifications = '/notifications';
   static const notificationSettings = '/notifications/settings';
 
@@ -104,11 +102,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.notificationSettings,
         pageBuilder: (context, state) =>
             _swipe(state, const NotificationSettingsScreen()),
-      ),
-      GoRoute(
-        path: AppRoutes.consentSettings,
-        pageBuilder: (context, state) =>
-            _swipe(state, const ConsentSettingsScreen()),
       ),
       GoRoute(
         path: AppRoutes.accountDelete,

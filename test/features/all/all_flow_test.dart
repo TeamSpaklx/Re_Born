@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:reborn_app/features/settings/presentation/consent_settings_screen.dart';
 import 'package:reborn_app/features/auth/presentation/login_screen.dart';
 import 'package:reborn_app/app/app.dart';
 import 'package:reborn_app/app/data_providers.dart';
@@ -10,6 +9,7 @@ import 'package:reborn_app/app/theme/app_spacing.dart';
 import 'package:reborn_app/core/platform/image_picker_service.dart';
 import 'package:reborn_app/core/providers/clock_provider.dart';
 import 'package:reborn_app/features/auth/data/in_memory_auth_repository.dart';
+import 'package:reborn_app/features/ai_comment/models/ai_feedback.dart';
 import 'package:reborn_app/features/auth/presentation/auth_providers.dart';
 import 'package:reborn_app/shared/widgets/app_bottom_nav_bar.dart';
 import 'package:reborn_app/shared/widgets/app_toggle.dart';
@@ -74,53 +74,45 @@ void main() {
     expect(find.text('체크리스트'), findsNothing);
     expect(find.byKey(const Key('todo-title')), findsNothing);
     // 설정은 카드 밖 소제목으로 묶인다(레퍼런스 설정 화면 구조).
-    expect(find.text('개인정보 보호 및 보안'), findsOneWidget);
-    expect(find.text('앱 사용'), findsOneWidget);
-    expect(find.text('계정'), findsOneWidget);
+    for (final title in ['앱 사용', 'AI 코멘트', '계정', '도움']) {
+      expect(find.text(title), findsOneWidget, reason: title);
+    }
+    // 동의 관련 항목은 없앴다(2026-11-28 회의).
+    expect(find.text('개인정보 보호 및 보안'), findsNothing);
+    expect(find.text('동의 관리'), findsNothing);
+    expect(find.byKey(const Key('app-lock')), findsOneWidget);
   });
 
-  testWidgets('개인정보 안내 카드를 누르면 보호 방식 설명이 열린다', (tester) async {
-    await pumpAll(tester);
-    await tester.scrollUntilVisible(
-      find.byKey(const Key('privacy-info')),
-      200,
-      scrollable: find.byType(Scrollable).first,
-    );
-
-    await tester.tap(find.byKey(const Key('privacy-info')));
-    await tester.pumpAndSettle();
-
-    expect(find.text('내 기록은 이렇게 지켜요'), findsOneWidget);
-    expect(find.textContaining('외부 AI에 기록을 보내지 않아요'), findsOneWidget);
-  });
-
-  testWidgets('T-30: 동의 관리 화면에서 동의를 끄면 설정에 저장된다', (tester) async {
+  testWidgets('AI 코멘트 말투를 고르면 설정에 저장되고 행에 보인다', (tester) async {
     final container = await pumpAll(tester);
     await tester.scrollUntilVisible(
-      find.byKey(const Key('open-consents')),
+      find.byKey(const Key('comment-tone')),
       200,
       scrollable: find.byType(Scrollable).first,
     );
-    await tester.tap(find.byKey(const Key('open-consents')));
-    await tester.pumpAndSettle();
-    expect(find.byType(ConsentSettingsScreen), findsOneWidget);
+    expect(find.text('다정하게'), findsOneWidget);
 
-    await tester.tap(
-      find.descendant(
-        of: find.byKey(const Key('consent-ai')),
-        matching: find.byType(AppToggle),
-      ),
-    );
+    await tester.tap(find.byKey(const Key('comment-tone')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('comment-tone-plain')));
     await tester.pumpAndSettle();
 
     final settings = await container.read(settingsRepositoryProvider).get();
-    expect(settings.consents.aiAnalysis, isFalse);
-    expect(settings.consents.privacy, isTrue);
+    expect(settings.commentTone, CommentTone.plain);
+    expect(find.text('담백하게'), findsOneWidget);
+  });
 
-    // 자세히 보기는 내용 시트를 연다.
-    await tester.tap(find.byKey(const Key('consent-detail-ai')));
+  testWidgets('도움받을 곳을 누르면 위기 상담 연락처가 열린다', (tester) async {
+    await pumpAll(tester);
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('open-help')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.byKey(const Key('open-help')));
     await tester.pumpAndSettle();
-    expect(find.textContaining('외부 AI 서비스로 보내지 않아요'), findsOneWidget);
+    expect(find.text('자살예방 상담전화'), findsOneWidget);
+    expect(find.text('109'), findsOneWidget);
   });
 
   testWidgets('F-11: 기록 전체 삭제는 확인 후 일기를 지우고 체크리스트는 남긴다', (tester) async {

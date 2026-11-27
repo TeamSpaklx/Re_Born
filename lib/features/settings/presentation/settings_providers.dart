@@ -5,6 +5,7 @@ import '../../../app/data_providers.dart';
 import '../../../app/data_revision.dart';
 import '../../security/presentation/app_lock_controller.dart';
 import '../data/theme_mode_store.dart';
+import '../../ai_comment/models/ai_feedback.dart';
 import '../models/app_settings.dart';
 
 /// 화면 모드: 기기 설정 따르기([ThemeMode.system]) / 라이트 / 다크.
@@ -36,22 +37,22 @@ final themeModeProvider = NotifierProvider<ThemeModeController, ThemeMode>(
   ThemeModeController.new,
 );
 
-/// 닉네임·동의 설정.
+/// 닉네임·알림·AI 코멘트 말투 설정.
 final settingsProvider = FutureProvider<AppSettings>((ref) {
   ref.watch(dataRevisionProvider);
   return ref.watch(settingsRepositoryProvider).get();
 });
 
-/// 동의 변경과 데이터 삭제 (SPEC F-11).
+/// 설정 변경과 데이터 삭제 (SPEC F-11).
 class SettingsActions {
   SettingsActions(this._ref);
 
   final Ref _ref;
 
-  Future<void> saveConsents(Consents consents) async {
+  Future<void> saveCommentTone(CommentTone tone) async {
     final repo = _ref.read(settingsRepositoryProvider);
     final current = await repo.get();
-    await repo.save(current.copyWith(consents: consents));
+    await repo.save(current.copyWith(commentTone: tone));
     _ref.read(dataRevisionProvider.notifier).bump();
   }
 
