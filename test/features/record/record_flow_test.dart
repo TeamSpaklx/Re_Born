@@ -58,6 +58,7 @@ void main() {
   Future<void> pickEmotionAndIntensity(WidgetTester tester) async {
     await tester.tap(find.byKey(const Key('emotion-sadness')));
     await tester.pump();
+    await tester.ensureVisible(find.byKey(const Key('intensity-2')));
     await tester.tap(find.byKey(const Key('intensity-2')));
     await tester.pump();
   }

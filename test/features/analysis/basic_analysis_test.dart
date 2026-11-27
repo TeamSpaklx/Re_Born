@@ -100,7 +100,9 @@ void main() {
 
     test('강도 선택 필수, 미래 날짜 불가', () {
       expect(EntryValidator.validateIntensity(null), isNotNull);
-      expect(EntryValidator.validateIntensity(4), isNotNull);
+      expect(EntryValidator.validateIntensity(0), isNotNull);
+      expect(EntryValidator.validateIntensity(6), isNotNull);
+      expect(EntryValidator.validateIntensity(5), isNull);
       expect(EntryValidator.validateIntensity(2), isNull);
       final now = DateTime(2026, 10, 22);
       expect(

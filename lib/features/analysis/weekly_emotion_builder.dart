@@ -3,7 +3,7 @@ import '../entries/models/entry.dart';
 import '../home/models/weekly_emotion_flow.dart';
 
 /// 홈의 "이번 주 감정 흐름"을 만든다. 순수 함수.
-/// 이번 주(월~일)의 요일별 기록 점수 평균을 `(평균 + 3) / 6`(0~1)으로 바꿔 막대 값으로 쓴다.
+/// 이번 주(월~일)의 요일별 기록 점수 평균을 `(평균 + 5) / 10`(0~1)으로 바꿔 막대 값으로 쓴다.
 /// 이 값의 정의는 **임시(팀 확인 필요)**이다(docs/DESIGN_SPEC_CHECK.md 질문 1·3).
 WeeklyEmotionFlow buildWeeklyEmotion(List<Entry> entries, DateTime today) {
   final base = dateOnly(today);
@@ -19,7 +19,7 @@ WeeklyEmotionFlow buildWeeklyEmotion(List<Entry> entries, DateTime today) {
     days.add(
       scores.isEmpty
           ? null
-          : (scores.reduce((a, b) => a + b) / scores.length + 3) / 6,
+          : (scores.reduce((a, b) => a + b) / scores.length + 5) / 10,
     );
   }
 

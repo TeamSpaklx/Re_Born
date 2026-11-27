@@ -1,3 +1,5 @@
+import 'intensity_level.dart';
+
 /// 기록 입력 검사 (SPEC F-03, T-11·T-12). 문제가 없으면 null, 있으면 안내 문구.
 abstract final class EntryValidator {
   static const maxBodyLength = 2000;
@@ -10,8 +12,9 @@ abstract final class EntryValidator {
     return null;
   }
 
+  /// 강도는 1~5단계 기준표([IntensityLevel]) 중 하나여야 한다.
   static String? validateIntensity(int? intensity) {
-    if (intensity == null || intensity < 1 || intensity > 3) {
+    if (IntensityLevel.of(intensity) == null) {
       return '강도를 선택해 주세요.';
     }
     return null;

@@ -202,9 +202,9 @@ void main() {
           d.color == AppColors.light.barStrong &&
           d.borderRadius == AppRadii.graphBarBorderRadius;
     });
-    // 월(무표정 0과 슬픔 −2의 평균 −1 → 0.3333), 화(−2와 +1의 평균 → 0.4167), 수(−2 → 0.1667)
+    // (평균+5)/10: 월(무표정 0과 슬픔 −2의 평균 −1 → 0.4), 화(−2와 +1의 평균 → 0.45), 수(−2 → 0.3)
     expect(bars, findsNWidgets(3));
-    const expected = [0.33333, 0.41667, 0.16667];
+    const expected = [0.4, 0.45, 0.3];
     for (var i = 0; i < 3; i++) {
       expect(
         tester.getSize(bars.at(i)).height,

@@ -13,18 +13,18 @@ void main() {
     id: '$at$score',
     body: '본문',
     emotion: score < 0 ? Emotion.sadness : Emotion.joy,
-    intensity: score.abs().clamp(1, 3),
+    intensity: score.abs().clamp(1, 5),
     score: score,
     createdAt: at,
     personId: personId,
   );
 
   group('이번 주 감정 흐름', () {
-    test('월~일 7칸, 요일별 평균 점수를 (평균+3)/6으로 바꾼다', () {
+    test('월~일 7칸, 요일별 평균 점수를 (평균+5)/10으로 바꾼다', () {
       final flow = buildWeeklyEmotion([
-        entry(DateTime(2026, 10, 19, 9), 3), // 월 → 1.0
-        entry(DateTime(2026, 10, 20, 9), -3), // 화 → 0.0
-        entry(DateTime(2026, 10, 20, 20), 3), // 화 평균 0 → 0.5
+        entry(DateTime(2026, 10, 19, 9), 5), // 월 → 1.0
+        entry(DateTime(2026, 10, 20, 9), -5), // 화 → 0.0
+        entry(DateTime(2026, 10, 20, 20), 5), // 화 평균 0 → 0.5
       ], now);
 
       expect(flow.days, hasLength(7));

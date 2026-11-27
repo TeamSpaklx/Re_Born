@@ -7,6 +7,7 @@ import '../../../../app/theme/app_text_styles.dart';
 import '../../../../core/utils/korean_date.dart';
 import '../../../../shared/widgets/pressable.dart';
 import '../../models/entry.dart';
+import '../../models/intensity_level.dart';
 import 'emotion_chip.dart';
 import 'emotion_face.dart';
 
@@ -32,7 +33,7 @@ class EntryCard extends StatelessWidget {
     return Semantics(
       button: true,
       label:
-          '${entry.emotion.label} 강도 ${entry.intensity}, $time, '
+          '${entry.emotion.label} ${IntensityLevel.of(entry.intensity)?.label ?? ''}, $time, '
           '${personName == null ? '' : '$personName, '}${entry.body}',
       excludeSemantics: true,
       onTap: onTap,
@@ -125,20 +126,22 @@ class EntryCard extends StatelessWidget {
   }
 }
 
-/// 강도 1~3을 점 세 개 중 채워진 개수로 보여 준다.
+/// 강도 1~5단계를 점 다섯 개 중 채워진 개수와 단계 이름(예: "영향 있음")으로 보여 준다.
 class IntensityDots extends StatelessWidget {
-  const IntensityDots({super.key, required this.level});
+  const IntensityDots({super.key, required this.level, this.showLabel = true});
 
   final int level;
+  final bool showLabel;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final label = IntensityLevel.of(level)?.label;
     return ExcludeSemantics(
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          for (var i = 1; i <= 3; i++)
+          for (var i = IntensityLevel.min; i <= IntensityLevel.max; i++)
             Container(
               width: 6,
               height: 6,
@@ -150,6 +153,15 @@ class IntensityDots extends StatelessWidget {
                     : colors.textSecondary.withValues(alpha: 0.3),
               ),
             ),
+          if (showLabel && label != null) ...[
+            const SizedBox(width: 3),
+            Text(
+              label,
+              style: AppTextStyles.caption.copyWith(
+                color: colors.textSecondary,
+              ),
+            ),
+          ],
         ],
       ),
     );

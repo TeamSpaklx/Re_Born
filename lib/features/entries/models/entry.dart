@@ -34,10 +34,10 @@ class Entry {
   final String? personId;
   final Emotion emotion;
 
-  /// 강도 1~3.
+  /// 강도 1~5 ([IntensityLevel] 기준표).
   final int intensity;
 
-  /// −3~+3 (극성 × 강도).
+  /// −5~+5 (극성 × 강도).
   final int score;
   final DateTime createdAt;
   final AnalysisStatus analysisStatus;
