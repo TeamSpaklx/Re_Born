@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../app/theme/app_assets.dart';
 import '../../../../app/theme/app_colors.dart';
@@ -7,6 +6,7 @@ import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../core/utils/app_haptics.dart';
 import '../../../../shared/widgets/pressable.dart';
+import '../../../../shared/widgets/tinted_svg.dart';
 
 /// 섹션 제목 줄. 오른쪽에 "전체 보기 >"가 있거나("최근 관계 신호"),
 /// 제목 옆에 화살표가 붙는다("오늘 해볼까요? >", Before 디자인).
@@ -63,7 +63,10 @@ class SectionTitleRow extends StatelessWidget {
                       titleText,
                       if (trailingChevron) ...[
                         const SizedBox(width: _chevronGap),
-                        SvgPicture.asset(AppAssets.chevronSection),
+                        TintedSvg(
+                          AppAssets.chevronSection,
+                          color: context.colors.iconStrong,
+                        ),
                       ],
                     ],
                   ),
@@ -73,7 +76,10 @@ class SectionTitleRow extends StatelessWidget {
               titleText,
               if (trailingChevron) ...[
                 const SizedBox(width: _chevronGap),
-                SvgPicture.asset(AppAssets.chevronSection),
+                TintedSvg(
+                  AppAssets.chevronSection,
+                  color: context.colors.iconStrong,
+                ),
               ],
             ],
             const Spacer(),
@@ -97,7 +103,10 @@ class SectionTitleRow extends StatelessWidget {
                           color: colors.textSecondary,
                         ),
                       ),
-                      SvgPicture.asset(AppAssets.chevronSeeAll),
+                      TintedSvg(
+                        AppAssets.chevronSeeAll,
+                        color: context.colors.iconMuted,
+                      ),
                     ],
                   ),
                 ),

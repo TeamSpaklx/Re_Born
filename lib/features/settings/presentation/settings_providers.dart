@@ -1,9 +1,31 @@
+import 'package:flutter/material.dart' show ThemeMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/data_providers.dart';
 import '../../../app/data_revision.dart';
 import '../../security/presentation/app_lock_controller.dart';
+import '../data/theme_mode_store.dart';
 import '../models/app_settings.dart';
+
+/// 화면 모드(라이트/다크). 켬/끔 토글 하나라 [ThemeMode.light]와 [ThemeMode.dark]만 쓴다.
+/// 초기값은 저장소에서 동기로 읽어, 첫 프레임부터 저장된 모드로 그린다.
+class ThemeModeController extends Notifier<ThemeMode> {
+  @override
+  ThemeMode build() =>
+      ref.read(themeModeStoreProvider).dark ? ThemeMode.dark : ThemeMode.light;
+
+  /// 바로 화면에 반영하고, 저장은 뒤따른다(저장이 실패해도 이번 실행에서는 그대로 보인다).
+  Future<void> setDark(bool value) async {
+    state = value ? ThemeMode.dark : ThemeMode.light;
+    try {
+      await ref.read(themeModeStoreProvider).setDark(value);
+    } catch (_) {}
+  }
+}
+
+final themeModeProvider = NotifierProvider<ThemeModeController, ThemeMode>(
+  ThemeModeController.new,
+);
 
 /// 닉네임·동의 설정.
 final settingsProvider = FutureProvider<AppSettings>((ref) {

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 /// 앱에서 쓰는 모든 색. 화면에서 `Color(0x...)`를 직접 쓰지 않고 이 값만 쓴다.
 ///
-/// 라이트 팔레트 한 벌만 있다([AppColors.light]). 다크 모드를 추가할 때는
-/// 같은 필드로 `AppColors.dark`를 만들고 `ThemeData.extensions`에 넣으면 된다.
+/// 팔레트는 [AppColors.light]와 [AppColors.dark] 두 벌이고, 같은 필드를 가진다.
+/// 설정의 다크 모드 토글이 둘 중 어느 쪽을 `ThemeData.extensions`에 넣을지 정한다.
 /// 값의 출처는 docs/DESIGN_SYSTEM.md.
 @immutable
 class AppColors extends ThemeExtension<AppColors> {
@@ -15,6 +15,8 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.cardPink,
     required this.cardWhite,
     required this.cardBorder,
+    required this.iconStrong,
+    required this.iconMuted,
     required this.textBlack,
     required this.textStrong,
     required this.textSecondary,
@@ -48,6 +50,8 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.sheetHandle,
     required this.sheetTitle,
     required this.sheetRowText,
+    required this.sheetSurface,
+    required this.toastSurface,
     required this.toastBorder,
     required this.toastText,
     required this.toastAccent,
@@ -61,8 +65,14 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.lockHelpPressed,
     required this.kakaoYellow,
     required this.onKakao,
+    required this.socialSurface,
+    required this.onSocial,
     required this.socialBorder,
     required this.loginLegalText,
+    required this.startBackground,
+    required this.startTitle,
+    required this.startBody,
+    required this.onStartCta,
     required this.emotionJoy,
     required this.emotionLove,
     required this.emotionExcited,
@@ -86,6 +96,12 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color cardPink;
   final Color cardWhite;
   final Color cardBorder;
+
+  /// 진한 화살표(그래프·섹션 제목 옆). SVG에 박힌 #1C1B1F 대신 칠한다.
+  final Color iconStrong;
+
+  /// 옅은 화살표·원(행 화살표, 전체 보기, 선택 원). SVG에 박힌 #4C535F 대신 칠한다.
+  final Color iconMuted;
 
   final Color textBlack;
   final Color textStrong;
@@ -148,6 +164,12 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color sheetRowText;
 
   /// 토스트 테두리·문구·강조(체크·확인)·체크 원 배경 (Figma `834:2088`).
+  /// 바텀시트·다이얼로그 면. 라이트는 흰색, 다크는 카드보다 한 단계 밝은 회청색(Figma 8877:1918).
+  final Color sheetSurface;
+
+  /// 토스트 면. 다크는 Figma 다크 토스트(8877:1922).
+  final Color toastSurface;
+
   final Color toastBorder;
   final Color toastText;
   final Color toastAccent;
@@ -179,10 +201,26 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color onKakao;
 
   /// 로그인 화면 구글 버튼 테두리 `#E5E5E5` (Figma 8877:1932).
+  /// 구글 버튼 면과 소셜 버튼 글자. 브랜드 가이드상 다크 모드에서도 흰 버튼·어두운 글자를 쓴다(Figma 다크 로그인).
+  final Color socialSurface;
+  final Color onSocial;
+
   final Color socialBorder;
 
   /// 로그인 화면 약관 안내 글자 `rgba(76,83,95,0.8)` (Figma 8877:1940). 값은 [lockHelpText]와 같지만 쓰임이 달라 따로 둔다.
   final Color loginLegalText;
+
+  /// 인트로 끝 화면(Figma 8877:1965) 배경 검정.
+  final Color startBackground;
+
+  /// 인트로 끝 화면 제목 글자 흰색.
+  final Color startTitle;
+
+  /// 인트로 끝 화면 설명 글자 #C2C2C7.
+  final Color startBody;
+
+  /// 인트로 끝 화면 CTA 글자 #260913(분홍 위 흰 글자는 대비 2.36:1이라 Figma 메모대로 어둡게).
+  final Color onStartCta;
 
   /// 감정 7색(RebornMood 캐릭터의 이름표 색에서 뽑음): 기쁨
   final Color emotionJoy;
@@ -214,6 +252,8 @@ class AppColors extends ThemeExtension<AppColors> {
     cardPink: Color(0xFFFEDAE5),
     cardWhite: Color(0xFFFFFFFF),
     cardBorder: Color(0xFFEEE6E9),
+    iconStrong: Color(0xFF1C1B1F),
+    iconMuted: Color(0xFF4C535F),
     textBlack: Color(0xFF000000),
     textStrong: Color(0xFF1A1A1A),
     textSecondary: Color(0xCC4C535F), // rgba(76,83,95,0.8)
@@ -247,6 +287,8 @@ class AppColors extends ThemeExtension<AppColors> {
     sheetHandle: Color(0xFFE4E4E4),
     sheetTitle: Color(0xFF22252C),
     sheetRowText: Color(0xFF4B5260),
+    sheetSurface: Color(0xFFFFFFFF),
+    toastSurface: Color(0xFFFFFFFF),
     toastBorder: Color(0xFFE9E9EE),
     toastText: Color(0xFF22232A),
     toastAccent: Color(0xFFD94F79),
@@ -260,8 +302,92 @@ class AppColors extends ThemeExtension<AppColors> {
     lockHelpPressed: Color(0x33A0A7B4),
     kakaoYellow: Color(0xFFFEE500),
     onKakao: Color(0xFF191919),
+    socialSurface: Color(0xFFFFFFFF),
+    onSocial: Color(0xFF000000),
     socialBorder: Color(0xFFE5E5E5),
     loginLegalText: Color(0xCC4C535F),
+    startBackground: Color(0xFF000000),
+    startTitle: Color(0xFFFFFFFF),
+    startBody: Color(0xFFC2C2C7),
+    onStartCta: Color(0xFF260913),
+    emotionJoy: Color(0xFFF4B1CB),
+    emotionLove: Color(0xFFFF9EC4),
+    emotionExcited: Color(0xFFFAD599),
+    emotionNeutral: Color(0xFFD1BDF3),
+    emotionAnxiety: Color(0xFFB9E5C6),
+    emotionAnger: Color(0xFFFDA4AC),
+    emotionSadness: Color(0xFFBBD5ED),
+  );
+
+  /// 다크 팔레트. 페이지 배경 #0F1013, 카드 #1C1D23, 테두리 #3B3D47, 칩 #2D2F39, 글자 #E4E4E4·#B7BAC6,
+  /// 시트 #33353E, 토스트 #202229는 Figma "Dark Mode"(8877:1778) 시안에서 읽은 값이고,
+  /// 시안에 없는 화면의 색은 같은 규칙(밝기만 반전, 브랜드·감정·카카오는 유지)으로 정한 값이다.
+  static const dark = AppColors(
+    brand: Color(0xFFFF6090),
+    cta: Color(0xFFFF6090),
+    onCta: Color(0xFFFFFFFF),
+    background: Color(0xFF0F1013),
+    cardPink: Color(0xFF3A2530),
+    cardWhite: Color(0xFF1C1D23),
+    cardBorder: Color(0xFF3B3D47),
+    iconStrong: Color(0xFFE4E4E4),
+    iconMuted: Color(0xFFB7BAC6),
+    textBlack: Color(0xFFE4E4E4),
+    textStrong: Color(0xFFE4E4E4),
+    textSecondary: Color(0xFFB7BAC6),
+    textDate: Color(0xCCB7BAC6),
+    textGraphCaption: Color(0xFF9A9FAD),
+    emoji: Color(0xFF7D8492),
+    chip: Color(0xFF2D2F39),
+    avatar: Color(0xFF3B3D47),
+    iconTile: Color(0xFF2D2F39),
+    gridLine: Color(0x4DA0A7B4),
+    attendancePanel: Color(0xFF4A2735),
+    onAttendancePanel: Color(0xCCFFFFFF),
+    bellButton: Color(0x1AFFFFFF),
+    navFill: Color(0xCC22242B),
+    navBorder: Color(0xFF3B3D47),
+    navShadow: Color(0x66000000),
+    navSelection: Color(0xFF2D2F39),
+    recordCardSubtitle: Color(0xFFB7BAC6),
+    ctaSoft: Color(0xFFFFAFC7),
+    onCtaSoft: Color(0xFF000000),
+    barStrong: Color(0xFFD94F79),
+    barMid: Color(0xFFFF80A6),
+    barLight: Color(0xFFFFB3CA),
+    toggleOff: Color(0x52787880),
+    danger: Color(0xFFFF6B70),
+    dangerTile: Color(0xFF3A1D20),
+    ctaPrimary: Color(0xFFFF80A6),
+    toggleOn: Color(0xFFFFAFC7),
+    segmentTrack: Color(0xFF1C1D23),
+    segmentSelected: Color(0xFF3B3D47),
+    sheetHandle: Color(0xFF5A5C66),
+    sheetTitle: Color(0xFFE4E4E4),
+    sheetRowText: Color(0xFFC9CCD6),
+    sheetSurface: Color(0xFF33353E),
+    toastSurface: Color(0xFF202229),
+    toastBorder: Color(0xFF3B3D47),
+    toastText: Color(0xFFE4E4E4),
+    toastAccent: Color(0xFFFF80A6),
+    toastCheckFill: Color(0xFF3A2530),
+    skeleton: Color(0xFF2D2F39),
+    emptyText: Color(0xFF6B7080),
+    scrim: Color(0x99000000),
+    topBarTint: Color(0x1A0F1013),
+    splashBackground: Color(0xFF0F1013),
+    lockHelpText: Color(0xCCB7BAC6),
+    lockHelpPressed: Color(0x33A0A7B4),
+    kakaoYellow: Color(0xFFFEE500),
+    onKakao: Color(0xFF191919),
+    socialSurface: Color(0xFFFFFFFF),
+    onSocial: Color(0xFF000000),
+    socialBorder: Color(0xFFE5E5E5),
+    loginLegalText: Color(0xCCB7BAC6),
+    startBackground: Color(0xFF000000),
+    startTitle: Color(0xFFFFFFFF),
+    startBody: Color(0xFFC2C2C7),
+    onStartCta: Color(0xFF260913),
     emotionJoy: Color(0xFFF4B1CB),
     emotionLove: Color(0xFFFF9EC4),
     emotionExcited: Color(0xFFFAD599),
@@ -280,6 +406,8 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? cardPink,
     Color? cardWhite,
     Color? cardBorder,
+    Color? iconStrong,
+    Color? iconMuted,
     Color? textBlack,
     Color? textStrong,
     Color? textSecondary,
@@ -313,6 +441,8 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? sheetHandle,
     Color? sheetTitle,
     Color? sheetRowText,
+    Color? sheetSurface,
+    Color? toastSurface,
     Color? toastBorder,
     Color? toastText,
     Color? toastAccent,
@@ -326,8 +456,14 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? lockHelpPressed,
     Color? kakaoYellow,
     Color? onKakao,
+    Color? socialSurface,
+    Color? onSocial,
     Color? socialBorder,
     Color? loginLegalText,
+    Color? startBackground,
+    Color? startTitle,
+    Color? startBody,
+    Color? onStartCta,
     Color? emotionJoy,
     Color? emotionLove,
     Color? emotionExcited,
@@ -344,6 +480,8 @@ class AppColors extends ThemeExtension<AppColors> {
       cardPink: cardPink ?? this.cardPink,
       cardWhite: cardWhite ?? this.cardWhite,
       cardBorder: cardBorder ?? this.cardBorder,
+      iconStrong: iconStrong ?? this.iconStrong,
+      iconMuted: iconMuted ?? this.iconMuted,
       textBlack: textBlack ?? this.textBlack,
       textStrong: textStrong ?? this.textStrong,
       textSecondary: textSecondary ?? this.textSecondary,
@@ -377,6 +515,8 @@ class AppColors extends ThemeExtension<AppColors> {
       sheetHandle: sheetHandle ?? this.sheetHandle,
       sheetTitle: sheetTitle ?? this.sheetTitle,
       sheetRowText: sheetRowText ?? this.sheetRowText,
+      sheetSurface: sheetSurface ?? this.sheetSurface,
+      toastSurface: toastSurface ?? this.toastSurface,
       toastBorder: toastBorder ?? this.toastBorder,
       toastText: toastText ?? this.toastText,
       toastAccent: toastAccent ?? this.toastAccent,
@@ -390,8 +530,14 @@ class AppColors extends ThemeExtension<AppColors> {
       lockHelpPressed: lockHelpPressed ?? this.lockHelpPressed,
       kakaoYellow: kakaoYellow ?? this.kakaoYellow,
       onKakao: onKakao ?? this.onKakao,
+      socialSurface: socialSurface ?? this.socialSurface,
+      onSocial: onSocial ?? this.onSocial,
       socialBorder: socialBorder ?? this.socialBorder,
       loginLegalText: loginLegalText ?? this.loginLegalText,
+      startBackground: startBackground ?? this.startBackground,
+      startTitle: startTitle ?? this.startTitle,
+      startBody: startBody ?? this.startBody,
+      onStartCta: onStartCta ?? this.onStartCta,
       emotionJoy: emotionJoy ?? this.emotionJoy,
       emotionLove: emotionLove ?? this.emotionLove,
       emotionExcited: emotionExcited ?? this.emotionExcited,
@@ -414,6 +560,8 @@ class AppColors extends ThemeExtension<AppColors> {
       cardPink: mix(cardPink, other.cardPink),
       cardWhite: mix(cardWhite, other.cardWhite),
       cardBorder: mix(cardBorder, other.cardBorder),
+      iconStrong: mix(iconStrong, other.iconStrong),
+      iconMuted: mix(iconMuted, other.iconMuted),
       textBlack: mix(textBlack, other.textBlack),
       textStrong: mix(textStrong, other.textStrong),
       textSecondary: mix(textSecondary, other.textSecondary),
@@ -447,6 +595,8 @@ class AppColors extends ThemeExtension<AppColors> {
       sheetHandle: mix(sheetHandle, other.sheetHandle),
       sheetTitle: mix(sheetTitle, other.sheetTitle),
       sheetRowText: mix(sheetRowText, other.sheetRowText),
+      sheetSurface: mix(sheetSurface, other.sheetSurface),
+      toastSurface: mix(toastSurface, other.toastSurface),
       toastBorder: mix(toastBorder, other.toastBorder),
       toastText: mix(toastText, other.toastText),
       toastAccent: mix(toastAccent, other.toastAccent),
@@ -460,8 +610,14 @@ class AppColors extends ThemeExtension<AppColors> {
       lockHelpPressed: mix(lockHelpPressed, other.lockHelpPressed),
       kakaoYellow: mix(kakaoYellow, other.kakaoYellow),
       onKakao: mix(onKakao, other.onKakao),
+      socialSurface: mix(socialSurface, other.socialSurface),
+      onSocial: mix(onSocial, other.onSocial),
       socialBorder: mix(socialBorder, other.socialBorder),
       loginLegalText: mix(loginLegalText, other.loginLegalText),
+      startBackground: mix(startBackground, other.startBackground),
+      startTitle: mix(startTitle, other.startTitle),
+      startBody: mix(startBody, other.startBody),
+      onStartCta: mix(onStartCta, other.onStartCta),
       emotionJoy: mix(emotionJoy, other.emotionJoy),
       emotionLove: mix(emotionLove, other.emotionLove),
       emotionExcited: mix(emotionExcited, other.emotionExcited),

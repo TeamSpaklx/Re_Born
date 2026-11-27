@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import '../features/all/presentation/all_screen.dart';
 import '../features/auth/presentation/account_delete_screen.dart';
 import '../features/auth/presentation/login_screen.dart';
+import '../features/onboarding/presentation/intro_screen.dart';
+import '../features/onboarding/presentation/start_screen.dart';
 import '../features/home/presentation/today_screen.dart';
 import '../features/insights/presentation/insight_detail_screen.dart';
 import '../features/notifications/presentation/notification_settings_screen.dart';
@@ -32,6 +34,8 @@ abstract final class AppRoutes {
 
   // 인증
   static const login = '/login';
+  static const intro = '/intro';
+  static const start = '/start';
   static const accountDelete = '/account/delete';
   static const notifications = '/notifications';
   static const notificationSettings = '/notifications/settings';
@@ -71,6 +75,14 @@ final routerProvider = Provider<GoRouter>((ref) {
               _swipe(state, const DesignGalleryScreen()),
         ),
       // 로그인은 뒤로 갈 곳이 없는 첫 화면이라 스와이프 백 없이, 스플래시 위로 서서히 나타난다.
+      GoRoute(
+        path: AppRoutes.intro,
+        pageBuilder: (context, state) => _fade(state, const IntroScreen()),
+      ),
+      GoRoute(
+        path: AppRoutes.start,
+        pageBuilder: (context, state) => _fade(state, const StartScreen()),
+      ),
       GoRoute(
         path: AppRoutes.login,
         pageBuilder: (context, state) => _fade(state, const LoginScreen()),

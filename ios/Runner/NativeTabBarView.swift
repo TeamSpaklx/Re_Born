@@ -53,6 +53,10 @@ final class NativeTabBarView: NSObject, FlutterPlatformView, UITabBarDelegate {
     super.init()
 
     container.backgroundColor = .clear
+    // 앱 안 다크 모드 설정을 따른다(시스템 설정과 달라도 유리 재질이 앱 색과 맞게).
+    let style: UIUserInterfaceStyle = (params["dark"] as? Bool ?? false) ? .dark : .light
+    container.overrideUserInterfaceStyle = style
+    tabBar.overrideUserInterfaceStyle = style
     configureItems(params)
 
     tabBar.delegate = self

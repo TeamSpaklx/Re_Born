@@ -14,7 +14,7 @@ void main() {
   late List<MethodCall> tabBarCalls;
 
   /// 가짜 아이콘: 실제 렌더링 없이 바이트만 넘긴다.
-  Future<NativeTabIcons> fakeIcons(double pixelRatio) async {
+  Future<NativeTabIcons> fakeIcons(double pixelRatio, Color tint) async {
     final bytes = Uint8List.fromList([1, 2, 3]);
     return NativeTabIcons(
       icons: List.filled(4, bytes),

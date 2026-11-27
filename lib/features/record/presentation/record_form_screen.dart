@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/theme/app_assets.dart';
@@ -27,6 +26,7 @@ import '../../entries/presentation/widgets/emotion_picker.dart';
 import '../../people/presentation/people_providers.dart';
 import 'crisis_notice.dart';
 import 'intensity_selector.dart';
+import '../../../shared/widgets/tinted_svg.dart';
 
 /// 기록 작성·수정 (F-03). **임시 디자인**.
 /// 본문(1~2000자) · 인물(선택) · 감정 · 강도를 고르고 저장하면 분석까지 이어진다.
@@ -285,7 +285,10 @@ class _RecordFormScreenState extends ConsumerState<RecordFormScreen> {
                         ),
                       ),
                     ),
-                    SvgPicture.asset(AppAssets.chevronSignal),
+                    TintedSvg(
+                      AppAssets.chevronSignal,
+                      color: context.colors.iconMuted,
+                    ),
                   ],
                 ),
               ),

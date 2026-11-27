@@ -3,28 +3,31 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'app_text_styles.dart';
 
-/// 앱 테마. 지금은 라이트 전용이다. 다크 모드는 나중에 [AppColors.dark]를 만들고
-/// `darkTheme`을 추가하는 방식으로 넣는다.
+/// 앱 테마. 라이트와 다크 두 벌이고 [AppColors]만 다르다.
+/// 다크 모드는 설정의 토글(`themeModeProvider`)이 고른다.
 abstract final class AppTheme {
-  static const _colors = AppColors.light;
+  static final ThemeData light = _build(AppColors.light, Brightness.light);
+  static final ThemeData dark = _build(AppColors.dark, Brightness.dark);
 
-  static final ThemeData light = ThemeData(
-    useMaterial3: true,
-    brightness: Brightness.light,
-    fontFamily: AppTextStyles.fontFamily,
-    scaffoldBackgroundColor: _colors.background,
-    colorScheme:
-        ColorScheme.fromSeed(
-          seedColor: _colors.cta,
-          brightness: Brightness.light,
-        ).copyWith(
-          primary: _colors.cta,
-          onPrimary: _colors.onCta,
-          surface: _colors.background,
-          onSurface: _colors.textBlack,
-        ),
-    // 화면 배경과 카드 색을 그대로 사용하고 머티리얼이 색을 덧입히지 않게 한다.
-    splashFactory: NoSplash.splashFactory,
-    extensions: const [AppColors.light],
-  );
+  static ThemeData _build(AppColors colors, Brightness brightness) {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: brightness,
+      fontFamily: AppTextStyles.fontFamily,
+      scaffoldBackgroundColor: colors.background,
+      colorScheme:
+          ColorScheme.fromSeed(
+            seedColor: colors.cta,
+            brightness: brightness,
+          ).copyWith(
+            primary: colors.cta,
+            onPrimary: colors.onCta,
+            surface: colors.background,
+            onSurface: colors.textBlack,
+          ),
+      // 화면 배경과 카드 색을 그대로 사용하고 머티리얼이 색을 덧입히지 않게 한다.
+      splashFactory: NoSplash.splashFactory,
+      extensions: [colors],
+    );
+  }
 }

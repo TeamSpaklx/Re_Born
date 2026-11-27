@@ -13,6 +13,7 @@ import 'package:reborn_app/features/auth/presentation/login_screen.dart';
 import 'package:reborn_app/features/entries/data/in_memory_entries_repository.dart';
 import 'package:reborn_app/features/entries/models/entry.dart';
 import 'package:reborn_app/features/home/presentation/today_screen.dart';
+import 'package:reborn_app/features/onboarding/data/intro_store.dart';
 import 'package:reborn_app/features/splash/presentation/splash_screen.dart';
 
 import '../../helpers/fakes.dart';
@@ -58,6 +59,8 @@ void main() {
         overrides: [
           initialLocationProvider.overrideWithValue(AppRoutes.splash),
           notificationServiceProvider.overrideWithValue(notifications),
+          // 인트로는 이미 본 상태로 두어, 로그아웃 상태 스플래시가 바로 로그인으로 가는지 본다.
+          introStoreProvider.overrideWithValue(InMemoryIntroStore(true)),
           authRepositoryProvider.overrideWithValue(
             InMemoryAuthRepository(
               signedInEmail: signedIn ? InMemoryAuthRepository.demoEmail : null,

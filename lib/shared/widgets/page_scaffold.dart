@@ -9,6 +9,7 @@ import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_text_styles.dart';
 import 'app_text_button.dart';
 import 'pressable.dart';
+import 'tinted_svg.dart';
 
 /// 탭 위로 쌓이는 전체 화면(작성·상세 등)의 공통 틀: 뒤로 가기 + 제목 + 오른쪽 동작.
 /// - [largeTitle]: 제목을 위 바 가운데 대신 바 아래에 크고 굵게(26) 놓는다(토스식 큰 제목 화면).
@@ -271,7 +272,10 @@ class PageBackButton extends StatelessWidget {
           child: Center(
             child: Transform.rotate(
               angle: math.pi,
-              child: SvgPicture.asset(AppAssets.chevronSignal),
+              child: TintedSvg(
+                AppAssets.chevronSignal,
+                color: context.colors.iconMuted,
+              ),
             ),
           ),
         ),

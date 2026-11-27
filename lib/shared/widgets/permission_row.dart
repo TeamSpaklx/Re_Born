@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_radii.dart';
 import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_text_styles.dart';
+import 'tinted_svg.dart';
 
 /// 권한·기능 안내 행: 아이콘 타일 + 이름 + 설명(온보딩 권한 안내, 알림 목록).
 class PermissionRow extends StatelessWidget {
@@ -35,7 +35,12 @@ class PermissionRow extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppRadii.iconTile),
             ),
             child: Center(
-              child: SvgPicture.asset(iconAsset, width: 28, height: 28),
+              child: TintedSvg(
+                iconAsset,
+                color: colors.textBlack,
+                width: 28,
+                height: 28,
+              ),
             ),
           ),
           const SizedBox(width: AppSpacing.space16),

@@ -65,6 +65,12 @@ abstract final class AppAssets {
   /// 기록 카드(Before)의 여우원숭이 일러스트 (604×604, 배경 투명, 원본 1254×1254를 줄임).
   static const mascotLemur = 'assets/images/mascot_lemur.png';
 
+  /// 인트로 온보딩의 앱 화면 목업 (942×1942, 원본 1066×2198을 줄임. Figma 8877:1946 안의 이미지).
+  static const introPreview = 'assets/images/onboarding/intro_preview.png';
+
+  /// 인트로 끝 화면의 기울어진 앱 화면 목업 (1295×1257, Figma 8877:1967 안의 이미지).
+  static const startPreview = 'assets/images/onboarding/start_preview.png';
+
   /// 감정 캐릭터 7종 (RebornMood 시안에서 캐릭터별로 잘라 번짐을 정리한 PNG, 320×320 투명 배경).
   static const _emotions = 'assets/images/emotions';
   static const emotionJoy = '$_emotions/joy.png';
@@ -124,6 +130,8 @@ abstract final class AppAssets {
     logo,
     logoMark,
     mascotLemur,
+    introPreview,
+    startPreview,
     ...emotionImages,
     pretendardBold,
   ];

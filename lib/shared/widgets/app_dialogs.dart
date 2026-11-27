@@ -124,7 +124,7 @@ class _AppDialog<T> extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(ComponentLayout.dialogPadding),
           decoration: BoxDecoration(
-            color: colors.cardWhite,
+            color: colors.sheetSurface,
             borderRadius: AppRadii.dialogBorderRadius,
           ),
           child: Column(
@@ -347,7 +347,7 @@ class _AppToastState extends State<_AppToast>
                 horizontal: ComponentLayout.toastPaddingH,
               ),
               decoration: BoxDecoration(
-                color: colors.cardWhite,
+                color: colors.toastSurface,
                 borderRadius: AppRadii.pillBorderRadius,
                 border: Border.all(
                   color: colors.toastBorder,

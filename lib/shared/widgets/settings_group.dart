@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../app/theme/app_assets.dart';
 import '../../app/theme/app_colors.dart';
@@ -8,6 +7,7 @@ import '../../app/theme/app_text_styles.dart';
 import 'app_card.dart';
 import 'app_toggle.dart';
 import 'pressable.dart';
+import 'tinted_svg.dart';
 
 /// 설정 목록 묶음: 흰 둥근 카드 하나에 행들을 모은다. 선택적으로 굵은 제목이 맨 위에 온다.
 /// Figma에 없어서 토스 설정 화면의 구조(둥근 카드로 묶은 목록)를 참고해 만든 추정 디자인.
@@ -106,7 +106,7 @@ class SettingsRow extends StatelessWidget {
               ),
               const SizedBox(width: 6),
             ],
-            SvgPicture.asset(AppAssets.chevronSignal),
+            TintedSvg(AppAssets.chevronSignal, color: context.colors.iconMuted),
           ],
         ],
       ),

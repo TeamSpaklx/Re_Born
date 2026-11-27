@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/router.dart';
@@ -30,6 +29,7 @@ import '../../insights/presentation/insights_providers.dart';
 import '../../people/presentation/people_providers.dart';
 import 'widgets/index_line_chart.dart';
 import 'widgets/person_avatar.dart';
+import '../../../shared/widgets/tinted_svg.dart';
 
 /// 인물 상세 = 관계 히스토리 (F-09).
 /// 오늘 지수, 기간(1주·1개월·3개월·전체) 선택, 지수 곡선 그래프와 시작 대비 변화량, 감정 분포(도넛),
@@ -447,7 +447,10 @@ class _InsightTile extends StatelessWidget {
                   ],
                 ),
               ),
-              SvgPicture.asset(AppAssets.chevronSignal),
+              TintedSvg(
+                AppAssets.chevronSignal,
+                color: context.colors.iconMuted,
+              ),
             ],
           ),
         ),
