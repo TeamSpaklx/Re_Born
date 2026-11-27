@@ -207,7 +207,7 @@ Figma "Dark Mode"(`8877:1778`) 시안에서 읽은 값과, 시안에 없는 화�
 
 ## 6. 아이콘·일러스트
 
-- **아이콘:** 하단 탭 투데이·관계·기록은 Phosphor, 전체는 Iconsax(`menu`). **앱에 새 아이콘이 필요하면 Iconsax(Linear)를 씁니다**: Iconsax 공개 저장소(`lusaxweb/iconsax`)의 SVG를 받아 `assets/icons/ui/ix_*.svg`로 넣고 `AppAssets`에 상수를 추가합니다(아이콘 패키지는 쓰지 않음). 지금 쓰는 것: add, edit, camera, gallery, eye, eye-off, trash, setting, 그리고 전체 탭 설정 행의 shield-tick, document-text, lock, notification, moon, logout, profile-delete. 소셜 로그인 마크(`google_g` 24, `kakao_bubble` 24×23)는 Figma 로그인 화면(`8877:1934`·`8877:1938`)에서 받은 그대로이고, 출시 전 각 회사 브랜드 가이드 확인이 필요합니다. 크기 20(행 화살표·체크), 24(체크 원), 28(탭·벨).
+- **아이콘:** 하단 탭 투데이·관계·기록은 Phosphor, 전체는 Iconsax(`menu`). **앱에 새 아이콘이 필요하면 Iconsax(Linear)를 씁니다**: Iconsax 공개 저장소(`lusaxweb/iconsax`)의 SVG를 받아 `assets/icons/ui/ix_*.svg`로 넣고 `AppAssets`에 상수를 추가합니다(아이콘 패키지는 쓰지 않음). 지금 쓰는 것: add, edit, camera, gallery, eye, eye-off, trash, setting, 그리고 전체 탭 설정 행의 shield-tick, document-text, lock, notification, moon, logout, profile-delete, 설정 행 꺾쇠 arrow-right-1. 소셜 로그인 마크(`google_g` 24, `kakao_bubble` 24×23)는 Figma 로그인 화면(`8877:1934`·`8877:1938`)에서 받은 그대로이고, 출시 전 각 회사 브랜드 가이드 확인이 필요합니다. 크기 20(행 화살표·체크), 24(체크 원), 28(탭·벨).
 - **마스코트(여우원숭이, `AppAssets.mascotLemur`):** 홈 기록 카드(버튼 뒤에서 얼굴만), 빈·오류 상태(120×120, `EmptyState(showMascot: true)`).
 - **감정 캐릭터 7종:** `assets/images/emotions/`의 PNG(`AppAssets.emotionImages`)를 `EmotionFace`로 그립니다(달력 20, 카드 44, 상세 64, 선택 격자 칸). 정식 에셋이 오면 같은 파일 이름으로 교체합니다.
 - 이모지는 쓰지 않습니다(8장 글자 규칙).
@@ -235,7 +235,7 @@ Figma "Dark Mode"(`8877:1778`) 시안에서 읽은 값과, 시안에 없는 화�
 | 카드 `AppCard` | `app_card.dart` | `white`(테두리 없음, 투명 2px 자리) · `outlined`(1px `cardBorder`, 기록 카드 Before) · `pink`(기록 완료). 모서리 24 | ✅ |
 | 목록 구획 머리글 `ListSectionHeader` | `list_section_header.dart` | 14 SemiBold `textSecondary`, 위 24 아래 8, 오른쪽 trailing | ✅ |
 | 프로필 행 `ProfileRow` | `profile_row.dart` | 아바타 56 + 이름(18) + 보조 문구(14) + 화살표(누를 수 있을 때) | ✅ |
-| 설정 목록 `SettingsGroup` · `SettingsRow` · `SettingsGroupHeader` · `SettingsInfoCard` | `settings_group.dart` | 레퍼런스 설정 화면 구조(추정): 카드 **밖** 위에 회색 소제목(`sectionLabel` 14 SemiBold, `textSecondary`, 아래 8), 흰 카드에 행 묶음, 행 사이 1px `cardBorder` 구분선(아이콘이 있으면 글자 시작점부터). 행 60: 왼쪽 아이콘 24(선택, 글자색) + 간격 16 + 제목, 오른쪽 토글 / 회색 값 + 화살표(`trailingEmphasis`면 브랜드색) / 위험(빨강). 안내 카드: 브랜드색 아이콘 + 굵은 제목 + 회색 설명 + 화살표, 안쪽 20 | 추정 |
+| 설정 목록 `SettingsGroup` · `SettingsRow` · `SettingsGroupHeader` · `SettingsInfoCard` | `settings_group.dart` | 레퍼런스 설정 화면 구조(추정): 카드 **밖** 위에 회색 소제목(`sectionLabel` 14 SemiBold, `textSecondary`, 아래 8), 흰 카드에 행 묶음, 행 사이 1px `cardBorder` 구분선(아이콘이 있으면 글자 시작점부터). 행 60: 왼쪽 아이콘 24(선택, 글자색) + 간격 16 + 제목, 오른쪽 토글 / 회색 값 + 꺾쇠(`trailingEmphasis`면 값이 브랜드색) / 위험(빨강). 묶음 안 아이콘은 꺾쇠까지 모두 Iconsax Linear(꺾쇠는 `arrow-right-1` 20, `iconMuted`). 안내 카드: 브랜드색 아이콘 + 굵은 제목 + 회색 설명 + 화살표, 안쪽 20 | 추정 |
 | 뱃지 `AppBadge` · `Badged` | `app_badge.dart` | 점 8 / 숫자(99+) 높이 18, `danger` | ✅ |
 | 인물·기록 목록 카드 | `person_card.dart`, `entry_card.dart` | 화면별 임시 카드 | 🟡 레퍼런스 반영 필요 |
 | 날짜 그룹 기록 카드(감정색 카드 + 태그 칩 + 시각) | — | 레퍼런스: Mentry·감정 기록 앱 | ⬜ |

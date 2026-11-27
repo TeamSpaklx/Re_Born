@@ -89,7 +89,8 @@ class SettingsGroupHeader extends StatelessWidget {
   }
 }
 
-/// 설정 행 하나(높이 60). 왼쪽에 선택적 아이콘([iconAsset], 24)을 두고,
+/// 설정 행 하나(높이 60). 왼쪽에 선택적 아이콘([iconAsset], 24)을 두고, 꺾쇠까지 모두 Iconsax(Linear)로 맞춘다.
+///
 /// 오른쪽 끝에 토글([SettingsRow.toggle]), 값과 화살표([SettingsRow.link]),
 /// 또는 아무것도 없는 위험 동작 행([SettingsRow.destructive], 빨강)을 둔다.
 class SettingsRow extends StatelessWidget {
@@ -171,7 +172,12 @@ class SettingsRow extends StatelessWidget {
               ),
               const SizedBox(width: 6),
             ],
-            TintedSvg(AppAssets.chevronSignal, color: colors.iconMuted),
+            TintedSvg(
+              AppAssets.ixArrowRight,
+              color: colors.iconMuted,
+              width: ComponentLayout.settingsChevronSize,
+              height: ComponentLayout.settingsChevronSize,
+            ),
           ],
         ],
       ),
@@ -251,8 +257,10 @@ class SettingsInfoCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: AppSpacing.space12),
                 child: TintedSvg(
-                  AppAssets.chevronSignal,
+                  AppAssets.ixArrowRight,
                   color: colors.iconMuted,
+                  width: ComponentLayout.settingsChevronSize,
+                  height: ComponentLayout.settingsChevronSize,
                 ),
               ),
             ],

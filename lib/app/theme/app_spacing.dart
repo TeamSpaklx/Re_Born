@@ -400,6 +400,9 @@ abstract final class ComponentLayout {
   static const settingsIconSize = 24.0;
   static const settingsIconGap = 16.0;
 
+  /// 행 오른쪽 꺾쇠(Iconsax `arrow-right-1`) 크기. 예전 Figma 꺾쇠와 같은 20.
+  static const settingsChevronSize = 20.0;
+
   /// 행 사이 구분선 두께.
   static const settingsDividerWidth = 1.0;
 

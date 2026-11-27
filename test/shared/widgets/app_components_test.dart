@@ -440,6 +440,13 @@ void main() {
 
       // 행 왼쪽에 아이콘 24, 값 글자는 기본 회색·강조는 브랜드색.
       expect(find.byType(TintedSvg), findsNWidgets(4)); // 아이콘 2 + 화살표 2
+      // 꺾쇠도 Iconsax(arrow-right-1)로 통일한다.
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is TintedSvg && w.asset == AppAssets.ixArrowRight,
+        ),
+        findsNWidgets(2),
+      );
       expect(
         tester.widget<Text>(find.text('한국어')).style!.color,
         colors.textSecondary,
